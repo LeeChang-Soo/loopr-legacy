@@ -84,6 +84,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="utils/balance-text-field.html">
 <link rel="import" href="utils/relayname-text-field.html">
 <link rel="import" href="utils/loopr-ajax.html">
+<link rel="import" href="utils/loopr-relay-ajax.html">
 <link rel="import" href="loopr-page/looper-toolbar.html">
 <link rel="import" href="loopr-page/looper-footer.html">
 <link rel="import" href="loopr-page/simple-toolbar.html">
@@ -242,6 +243,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/config.json" last-response="{{appConfigRaw}}"></loopr-ajax>
         <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
         <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}"></loopr-ajax>
+        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/localization.json" last-response="{{localizationRaw}}"></loopr-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>

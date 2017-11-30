@@ -1,0 +1,40 @@
+<dom-module id="localize">
+    <global-variable key="settings-lang" value="{{settingsLang}}"></global-variable>
+    <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+    <loopr-ajax relay="{{settingsRelay}}" suffix="Loopring/mock-relay-data/master/localization.json" last-response="{{localizationRaw}}"></loopr-ajax>
+    <script>
+        class Localize extends Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior], Polymer.Element) {
+            static get is() { return 'localize'}
+
+            static get properties() {
+                return {
+                    // set the current language—shared across all elements in the app
+                    // that use AppLocalizeBehavior
+                    language: {
+                        type: String,
+                        computed: '_computeLanguage(resources, settingsLang)'
+                    },
+
+                    // Initialize locale data
+                    resources: {
+                        type: Object,
+                        computed: '_computeResource(localizationRaw)'
+                    }
+                };
+            }
+
+            _computeResource(localizationRaw) {
+                if(localizationRaw){
+                    return localizationRaw.result;
+                }
+            }
+
+            _computeLanguage(resources, settingsLang) {
+                if(resources && settingsLang){
+                    return resources[settingsLang];
+                }
+            }
+        }
+        customElements.define(Localize.is, Localize);
+    </script>
+</dom-module>
