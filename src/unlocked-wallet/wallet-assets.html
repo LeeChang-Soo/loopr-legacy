@@ -136,7 +136,8 @@
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
                         <template>
-                            <div class="horiziontal layout">[[item.token]]</div></template>
+                            <div class="horiziontal layout"><vaadin-checkbox name="batchOperation" value="[[item.token]]">[[item.token]]</vaadin-checkbox></div>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="50px">
                         <template class="header">Name</template>
@@ -174,6 +175,9 @@
                         </template>
                     </vaadin-grid-column>
                 </vaadin-grid>
+                <div>
+                    <a href="javascript:void(0)" on-click="_batchAuthorize">Batch Authorize</a> &nbsp;&nbsp;&nbsp;<a href="">Batch De-authorize</a>
+                </div>
             </paper-card>
         </div>
     </template>
@@ -200,7 +204,8 @@
                     value: 'Hide 0 Balances'
                 },
                 result: {
-                    type: Object
+                    type: Object,
+                    observer: '_resultChange'
                 }
             };
         }
@@ -213,6 +218,7 @@
                 this.hideBalance = true;
                 this.result = this._computeZeroBalance(this.erc20Tokens, true);
             }
+            this._clearChecked();
         }
 
         _computeTips(hideBalance, searched) {
@@ -278,6 +284,26 @@
         }
 
         _isWETH(token) { return token === 'WETH'; }
+
+        _batchAuthorize() {
+            Array.prototype.forEach.call(this.root.querySelectorAll('vaadin-checkbox'), (item) => {
+                if(item.name === "batchOperation"){
+                    console.log(item.value)
+                }
+            });
+        }
+
+        _resultChange(){
+            this._clearChecked();
+        }
+
+        _clearChecked() {
+            Array.prototype.forEach.call(this.root.querySelectorAll('vaadin-checkbox'), (item) => {
+                if(item.name === "batchOperation"){
+                    item.checked = false;
+                }
+            });
+        }
 
         go() {
             //this.$.ajax.generateRequest();
