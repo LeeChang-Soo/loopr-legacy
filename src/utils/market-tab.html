@@ -39,7 +39,10 @@
         static get properties() {
             return {
                 appConfig: Object,
-                selectedTab: String,
+                selectedTab: {
+                    type: String,
+                    notify: true
+                },
                 sources: {
                     type: Object
                 },

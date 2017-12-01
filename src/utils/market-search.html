@@ -31,6 +31,7 @@
             return {
                 appConfig: Object,
                 keyword: String,
+                selectedTab: String,
                 sources: {
                     type: Object
                 },
@@ -65,7 +66,7 @@
                     return sources.filter(function(item){
                         return item.market.indexOf(keyword.toUpperCase()) > -1;
                     });
-                } else {
+                } else if(!this.selectedTab){
                     return sources;
                 }
             }
