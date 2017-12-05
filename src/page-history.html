@@ -39,7 +39,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             .sections {
                 padding-top: 32px;
             }
-            .sections[unresolved]{
+            .sections[unresolved] {
                 padding-top: 96px;
             }
         }
@@ -100,12 +100,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computedPage(page) {
-            if(page && "history" === page) return page;
+            if (page && "history" === page) return page;
         }
 
         _computedSubpage(page, subpage) {
-            if(page && "history" === page){
-                if(subpage){
+            if (page && "history" === page) {
+                if (subpage) {
                     return subpage;
                 } else {
                     return "trades";
@@ -114,11 +114,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computedThird(page, subpage, third) {
-            if(page && "history" === page && subpage && third) return third;
+            if (page && "history" === page && subpage && third) return third;
         }
 
         _computeSelected(page, subpage) {
-            if("history" != page) return;
+            if ("history" != page) return;
             if (subpage === 'trades' || subpage === 'rings' || subpage === 'orders' || subpage === 'stats') {
                 return subpage;
             } else {
@@ -128,7 +128,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         go(selectedPage) {
-            if(this.page && this.page === "history" && selectedPage && selectedPage.go){
+            if (this.page && this.page === "history" && selectedPage && selectedPage.go) {
                 selectedPage.go();
             }
         }

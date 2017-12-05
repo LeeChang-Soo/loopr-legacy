@@ -50,12 +50,10 @@
             opacity: 1;
         }
 
-         vaadin-password-field.fixedwidth {
+        vaadin-password-field.fixedwidth {
 
-             width: 282px;
-         }
-
-
+            width: 282px;
+        }
         </style>
         <loopr-page>
             <simple-toolbar slot="secondary-toolbar" title="Wallet" id="Generate New Wallet" back-link="#/wallet"></simple-toolbar>
@@ -67,10 +65,10 @@
                             <div secondary-text> Provide a very strong password:</div>
                             <div class="input-wrapper horizontal layout center-justified">
                                 <!--<iron-input bind-value="{{password}}" auto-validate>-->
-                                    <!--<input type$="{{inputType}}">-->
+                                <!--<input type$="{{inputType}}">-->
                                 <!--</iron-input>-->
                                 <!--<paper-icon-button id="visibleBtn" on-click="toggleVisible" icon="{{visibility}}"></paper-icon-button>-->
-                                <vaadin-password-field  class = "fixedwidth"  id="password" value="{{password}}"></vaadin-password-field>
+                                <vaadin-password-field class="fixedwidth" id="password" value="{{password}}"></vaadin-password-field>
                             </div>
                             <div class="error" show$="[[showError]]">
                                 Your password is too weak, it should have at least 9 characters.
@@ -122,8 +120,6 @@
         </loopr-page>
     </template>
     <script>
-
-
     class PageGenerateWallet extends Polymer.Element {
         static get is() {
             return 'page-generatewallet';

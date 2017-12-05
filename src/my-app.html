@@ -231,7 +231,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}">
         </app-route>
         <app-route route="{{subroute}}" pattern="/:pageId" data="{{subrouteData}}" tail="{{thirdroute}}">
-        <app-route route="{{thirdroute}}" pattern="/:third" data="{{thirdrouteData}}"></app-route>
+            <app-route route="{{thirdroute}}" pattern="/:third" data="{{thirdrouteData}}"></app-route>
         </app-route>
         <!-- hidden components -->
         <signtosend-dialog id="signtosend"></signtosend-dialog>
@@ -277,7 +277,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <!-- <paper-icon-button icon="menu" drawer-toggle></paper-icon-button> -->
                         <!-- <div spacer></div> -->
                         <a styleless href="/#/">
-                            <div main-title><iron-image src="images/logo_white.png" sizing="contain"></iron-image></div>
+                            <div main-title>
+                                <iron-image src="images/logo_white.png" sizing="contain"></iron-image>
+                            </div>
                         </a>
                         <div condensed-title></div>
                         <div class="address">[[wallet.address]]</div>
@@ -325,13 +327,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
-				inited:{
-		            type:Boolean,
-		            value:false
-	            },
-				initedPage:{
-					type:String
-				},
+                inited: {
+                    type: Boolean,
+                    value: false
+                },
+                initedPage: {
+                    type: String
+                },
                 cookieValues: Object,
                 settingsLang: String,
                 settingsCurrency: String,
@@ -552,7 +554,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _routeChanged(routeData, subrouteData, thirdrouteData) {
-            if(!this.route || !this.route.path || this.route.path != "/"){
+            if (!this.route || !this.route.path || this.route.path != "/") {
                 this.page = routeData.page;
             } else {
                 this.routeData = null;
@@ -562,24 +564,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.pageId = '';
                 this.thirdParam = '';
             }
-            if(!this.subroute || !this.subroute.path){
+            if (!this.subroute || !this.subroute.path) {
                 this.subrouteData = null;
                 this.thirdrouteData = null;
                 this.pageId = '';
                 this.thirdParam = '';
-            } else if(subrouteData){
+            } else if (subrouteData) {
                 this.pageId = subrouteData.pageId;
             }
-            if(!this.thirdroute || !this.thirdroute.path){
+            if (!this.thirdroute || !this.thirdroute.path) {
                 this.thirdrouteData = null;
                 this.thirdParam = '';
-            } else if(thirdrouteData){
+            } else if (thirdrouteData) {
                 this.thirdParam = thirdrouteData.third;
             }
         }
 
         _routePageChanged(page) {
-            if(page && this.route.path){
+            if (page && this.route.path) {
                 this.page = page;
             } else {
                 this.page = 'markets';
@@ -587,7 +589,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _routeIdChanged(pageId) {
-            if(pageId && this.subroute.path){
+            if (pageId && this.subroute.path) {
                 this.pageId = pageId
             } else {
                 this.pageId = '';
@@ -595,7 +597,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computedThirdParam(thirdrouteData) {
-            if(thirdrouteData && thirdrouteData.third && this.thirdroute.path){
+            if (thirdrouteData && thirdrouteData.third && this.thirdroute.path) {
                 return thirdrouteData.third;
             } else {
                 return '';
@@ -603,14 +605,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _pageChanged(page) {
-            if(this.inited ==false){
-                if(!this.initedPage){
+            if (this.inited == false) {
+                if (!this.initedPage) {
                     this.initedPage = this.page;
                 }
-               
-                if(this.selectedPage){
+
+                if (this.selectedPage) {
                     this.inited = true;
-                    
+
                 }
             }
             const resolvedPageUrl = this.resolveUrl('page-' + page + '.html');
@@ -619,7 +621,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 null,
                 this._showPage404.bind(this),
                 true);
-		}
+        }
         _selectedPageChanged(page) {
             if (page && page.go) {
                 page.go();

@@ -12,70 +12,74 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
+         :host {
+            display: block;
+        }
 
-            .container {
-                @apply(--layout-horizontal);
-                @apply(--layout-center-justified);
-            }
+        .container {
+            @apply(--layout-horizontal);
+            @apply(--layout-center-justified);
+        }
 
-            .left {
-                @apply(--layout-vertical);
-            }
+        .left {
+            @apply(--layout-vertical);
+        }
 
-            .split {
-                width: 10%;
-            }
+        .split {
+            width: 10%;
+        }
 
-            .right {
-                @apply(--layout-vertical);
-            }
+        .right {
+            @apply(--layout-vertical);
+        }
 
-            iron-list {
-                flex: 1 1 auto;
-            }
+        iron-list {
+            flex: 1 1 auto;
+        }
 
-            .hidden {
-                display: none;
-            }
+        .hidden {
+            display: none;
+        }
 
-            .line {
-                height: 80px;
-                width: 350px;
-                @apply(--layout-horizontal);
-                @apply(--layout-start-justified);
-            }
+        .line {
+            height: 80px;
+            width: 350px;
+            @apply(--layout-horizontal);
+            @apply(--layout-start-justified);
+        }
 
-            .advance {
-                height: 30px;
-                margin-top: 20px;
-                font-weight: 500;
-                color: rgba(0, 0, 0, .54);
-                font-size: 14px;
-            }
+        .advance {
+            height: 30px;
+            margin-top: 20px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, .54);
+            font-size: 14px;
+        }
 
-            .title {
-                margin-top: 20px;
-                font-weight: 500;
-                color: rgba(0, 0, 0, .54);
-                font-size: 14px;
-            }
+        .title {
+            margin-top: 20px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, .54);
+            font-size: 14px;
+        }
 
-            .button {
-                margin-top: 30px;
-            }
+        .button {
+            margin-top: 30px;
+        }
 
-            .line vaadin-combo-box, vaadin-text-field, paper-button, address-text-field, balance-text-field {
-                width: 100%;
-                height: 34px;
-            }
+        .line vaadin-combo-box,
+        vaadin-text-field,
+        paper-button,
+        address-text-field,
+        balance-text-field {
+            width: 100%;
+            height: 34px;
+        }
 
-            paper-button {
-                margin-left: 0px;
-                margin-right: 0px;
-            }
+        paper-button {
+            margin-left: 0px;
+            margin-right: 0px;
+        }
         </style>
         <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -83,36 +87,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
-
-            <simple-toolbar slot="secondary-toolbar" title="Transfer" back-link="#/wallet"
-                            tabindex="-1"></simple-toolbar>
+            <simple-toolbar slot="secondary-toolbar" title="Transfer" back-link="#/wallet" tabindex="-1"></simple-toolbar>
             <div class="sections">
                 <paper-card>
                     <div class="container">
                         <div class="left">
                             <div class="line">
-                                <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token"
-                                                  label="Token" item-value-path="token" tabindex="1"></vaadin-combo-box>
+                                <vaadin-combo-box id="tokensSelector" items="[[tokens]]" item-label-path="token" label="Token" item-value-path="token" tabindex="1"></vaadin-combo-box>
                             </div>
                             <div class="line">
-                                <address-text-field id="sendTo" value="{{address}}"
-                                                    label="Send To"
-                                                    error-message="Invalid ETH address"
-                                                    tabindex="2"></address-text-field>
+                                <address-text-field id="sendTo" value="{{address}}" label="Send To" error-message="Invalid ETH address" tabindex="2"></address-text-field>
                             </div>
                             <div class="line">
-                                <balance-text-field id="amount" value="{{amount}}" label="Amount to Send"
-                                                    placeholder="[[amountShow]]"
-                                                    pattern="[[_numPatten(selectedTokenBalance.precision)]]"
-                                                    error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
-                                                    tabindex="3"
-                                                    max="[[amountShow]]">
+                                <balance-text-field id="amount" value="{{amount}}" label="Amount to Send" placeholder="[[amountShow]]" pattern="[[_numPatten(selectedTokenBalance.precision)]]" error-message="[[_numError(amount, selectedTokenBalance.precision)]]" tabindex="3" max="[[amountShow]]">
                                     <div slot="suffix">[[selectedTokenBalance.unit]]</div>
                                 </balance-text-field>
                             </div>
                             <div class="line">
-                                <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]"
-                                                   label="Gas Limit" error-message="[[_integerError()]]" tabindex="4">
+                                <vaadin-text-field id="gasLimit" value="{{gasLimit}}" pattern="[[_integerPatten()]]" label="Gas Limit" error-message="[[_integerError()]]" tabindex="4">
                                 </vaadin-text-field>
                             </div>
                             <div class="line advance">
@@ -120,10 +112,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="hidden" id="hiddenExtData">
                                 <div class="line">
-                                    <vaadin-text-field id="additionalData" value="{{additionalData}}" label="Data"
-                                                       pattern="^0x([0-9a-fA-F]{8})*([0-9a-fA-F]{64})*$"
-                                                       error-message="Invalid extra data"
-                                                       tabindex="6">
+                                    <vaadin-text-field id="additionalData" value="{{additionalData}}" label="Data" pattern="^0x([0-9a-fA-F]{8})*([0-9a-fA-F]{64})*$" error-message="Invalid extra data" tabindex="6">
                                     </vaadin-text-field>
                                 </div>
                             </div>
@@ -159,306 +148,306 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </loopr-page>
     </template>
     <script>
+    class PageTransfer extends AppConfigMixin(Polymer.Element) {
+        static get is() {
+            return 'page-transfer';
+        }
 
-        class PageTransfer extends AppConfigMixin(Polymer.Element) {
-            static get is() {
-                return 'page-transfer';
-            }
-
-            static get properties() {
-                return {
-                    page: String,
-                    subpage: String,
-                    token: {
-                        type: String,
-                        computed: '_computedToken(page, subpage, appConfig)'
-                    },
-                    amount: {
-                        type: Number
-                    },
-                    amountShow: {
-                        type: Number,
-                        value: 0,
-                        computed: '_computeAmountShow(selectedTokenBalance)'
-                    },
-                    tokens: {
-                        type: Object,
-                        computed: '_computeTokens(balancesRaw)'
-                    },
-                    balances: {
-                        type: Object,
-                        computed: '_computeBalances(balancesRaw)',
-                    },
-                    selectedTokenBalance: {
-                        type: Object,
-                        computed: '_selectedToken(appConfig, balances, token)'
-                    },
-                    gasLimit: {
-                        type: Number
-                    },
-                    valid: {
-                        type: Boolean,
-                        computed: '_showOrHidden(address, amount, gasLimit, additionalData, amountShow, selectedTokenBalance)'
-                    }
+        static get properties() {
+            return {
+                page: String,
+                subpage: String,
+                token: {
+                    type: String,
+                    computed: '_computedToken(page, subpage, appConfig)'
+                },
+                amount: {
+                    type: Number
+                },
+                amountShow: {
+                    type: Number,
+                    value: 0,
+                    computed: '_computeAmountShow(selectedTokenBalance)'
+                },
+                tokens: {
+                    type: Object,
+                    computed: '_computeTokens(balancesRaw)'
+                },
+                balances: {
+                    type: Object,
+                    computed: '_computeBalances(balancesRaw)',
+                },
+                selectedTokenBalance: {
+                    type: Object,
+                    computed: '_selectedToken(appConfig, balances, token)'
+                },
+                gasLimit: {
+                    type: Number
+                },
+                valid: {
+                    type: Boolean,
+                    computed: '_showOrHidden(address, amount, gasLimit, additionalData, amountShow, selectedTokenBalance)'
                 }
             }
+        }
 
-            static get observers() {
-                return [
-                    '_computeGasLimit(appConfig)'
-                ]
-            }
+        static get observers() {
+            return [
+                '_computeGasLimit(appConfig)'
+            ]
+        }
 
-            _computedToken(page, subpage, appConfig) {
-                if (page && "transfer" === page && subpage && appConfig) {
-                    if(appConfig.tokenMap[subpage]){
-                        return subpage;
-                    } else {
-                        var detail = {text: "Not supported token :"+subpage, category: "error", duration: 8000}
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-                        window.location.href = "#/wallet/assets";
-                    }
-                }
-            }
-
-            _computeGasLimit(appConfig) {
-                if (appConfig) {
-                    this.gasLimit = appConfig.defaultGasLimit;
-                }
-            }
-
-            _computeTokens(rawBalances) {
-                if (rawBalances) {
-                    return _.map(rawBalances.result.tokens);
-                }
-            }
-
-            _computeBalances(rawBalances) {
-                if (rawBalances) {
-                    return _.keyBy(rawBalances.result.tokens, o => o.token);
-                }
-            }
-
-            _computeAmountShow(selectedTokenBalance) {
-                if (selectedTokenBalance) {
-                    return this._numberFormat(selectedTokenBalance.balance, selectedTokenBalance.digits, selectedTokenBalance.precision);
-                }
-            }
-
-            _selectedToken(appConfig, balances, token) {
-                if (appConfig && balances && token) {
-                    var combobox = this.$.tokensSelector;
-                    combobox.value = token.toUpperCase();
-                    return this._getTokenBalance(appConfig, balances, token);
-                }
-            }
-
-            _getTokenBalance(appConfig, balances, selectedToken) {
-                let selected = balances[selectedToken.toUpperCase()];
-                let balance = 0, allowance = 0
-                if (selected) {
-                    balance = selected.balance;
-                    allowance = selected.allowance;
-                }
-                let tokenConfig = appConfig.tokenMap[selectedToken.toUpperCase()];
-                if (!tokenConfig) {
-                    return;
-                }
-                return {
-                    token: selectedToken,
-                    unit: tokenConfig.unit,
-                    balance: balance,
-                    availableAllowance: allowance,
-                    defaultAllowance: tokenConfig.allowanceWarn,
-                    precision: tokenConfig.precision,
-                    digits: tokenConfig.digits,
-                    address: tokenConfig.address
-                }
-            }
-
-            ready() {
-//            if(!this.wallet){
-//                window.location.href = "#/wallet"
-//                return
-//            }
-                super.ready();
-                var combobox = this.$.tokensSelector;
-                var _this = this;
-                combobox.addEventListener('value-changed', function () {
-                    if (combobox.value && _this.appConfig.tokenMap && _this.appConfig.tokenMap[combobox.value]) {
-                        window.location.href = "#/transfer/" + combobox.value;
-                    }
-                });
-                this.$.gasLimit.addEventListener('value-changed', function () {
-                    _this.gasLimit = _this.$.gasLimit.value;
-                });
-                this.$.sendTo.focus();
-                document.addEventListener('keyup', function (event) {
-                    if (event.keyCode == "13") {
-                        this.$.send.click();
-                    }
-                }.bind(this));
-            }
-
-            handleClick() {
-                var extData = this.$.hiddenExtData;
-                if (extData.style.display == 'block') {
-                    extData.style.display = 'none';
+        _computedToken(page, subpage, appConfig) {
+            if (page && "transfer" === page && subpage && appConfig) {
+                if (appConfig.tokenMap[subpage]) {
+                    return subpage;
                 } else {
-                    extData.style.display = 'block';
-                    this.$.additionalData.value = "";
-                }
-            }
-
-            _showOrHidden(address, amount, gasLimit, additionalData, amountShow, selectedTokenBalance) {
-                let validator = new Validator();
-                if (!address || !amount || !gasLimit || !amountShow || amountShow < Number(amount) || !selectedTokenBalance) {
-                    this._buttonDisable();
-                    return false;
-                }
-                if (!validator.isValidETHAddress(address)) {
-                    this._buttonDisable();
-                    return false;
-                }
-                if (this._isNum(amount, selectedTokenBalance.precision) && this._isInteger(gasLimit)) {
-                    if (additionalData) {
-                        const dataRegex = /^0x([0-9a-fA-F]{8})*([0-9a-fA-F]{64})*$/i;
-                        if (additionalData.match(dataRegex)) {
-                            this._buttonAvailable();
-                            return true;
-                        } else {
-                            this._buttonDisable();
-                        }
-                    } else {
-                        this._buttonAvailable();
-                        return true;
-                    }
-                } else {
-                    this._buttonDisable();
-                }
-                return false;
-            }
-
-            _buttonAvailable() {
-                this.$.send.disabled = false;
-                this.$.send.style.backgroundColor = 'var(--app-primary-color)';
-            }
-
-            _buttonDisable() {
-                this.$.send.disabled = true;
-                this.$.send.style.backgroundColor = 'var(--paper-grey-300)';
-            }
-
-            _numPatten(precision) {
-                return "^[1-9]\\d*(\\.\\d{1," + precision + "})?|0\\.(\\d{1,"+(precision-1)+"})?[1-9]$";
-            }
-
-            _isNum(num, precision) {
-                return num.toString().match(this._numPatten(precision));
-            }
-
-            _numError(num, precision) {
-                return "Input number value with max " + precision + " precision"
-            }
-
-            _integerPatten() {
-                return "^[0-9]*$";
-            }
-
-            _isInteger(intVal) {
-                return intVal.toString().match(this._integerPatten())
-            }
-
-            _integerError(int) {
-                return "Input valid integer value"
-            }
-
-            _addressPatten() {
-                return new Validator().isValidETHAddress(address);
-            }
-
-            _addressError(address) {
-                return "Please input valid address"
-            }
-
-
-            async signToSend() {
-
-                try {
-                    if (!this.valid) {
-                        return;
-                    }
-
-                    const tx = {};
-
-                    console.log(this.gasPrice);
-                    tx.gasPrice = '0x' + (Number(this.settingsGasPrice)*1e9).toString(16);
-                    tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
-                    if (this.selectedTokenBalance.token === 'ETH') {
-
-                        tx.to = this.address;
-                        tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
-                        tx.data = this.additionalData || '0x';
-                        if (this.selectedTokenBalance.balance < (Number(tx.value) + Number(tx.gasLimit) * Number(tx.gasPrice))) {
-
-                            const detail = {
-                                tx: tx,
-                                token: {
-                                    balance: this.selectedTokenBalance.balance,
-                                    digits: this.selectedTokenBalance.digits,
-                                    precision: this.selectedTokenBalance.precision
-                                },
-                                title: "transfer ETH"
-                            };
-
-                            this.dispatchEvent(new CustomEvent('txamountconfirm', {
-                                bubbles: true,
-                                composed: true,
-                                detail: detail
-                            }));
-                            return;
-                        }
-
-                    } else {
-                        tx.to = this.selectedTokenBalance.address;
-                        tx.value = '0x0';
-                        tx.data = signer.generateTransferData(this.address, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16))
-                        const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
-
-                        if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
-                            var detail = {
-                                text: 'You has insufficient ETH balance for gasLimit * gasPrice',
-                                category: "warning",
-                                duration: 8000
-                            }
-                            this.dispatchEvent(new CustomEvent('notification', {
-                                bubbles: true,
-                                composed: true,
-                                detail: detail
-                            }));
-                            return;
-                        }
-                    }
-
-
-                    console.log(JSON.stringify(tx));
-                    var detail = {raws: [{"raw": JSON.stringify(tx), "subTitle": "transfer ETH"}]};
-                    this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
-                } catch (e) {
-                    var detail = {text: e.message, category: "error", duration: 8000}
+                    var detail = { text: "Not supported token :" + subpage, category: "error", duration: 8000 }
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
                         composed: true,
                         detail: detail
                     }));
+                    window.location.href = "#/wallet/assets";
                 }
             }
         }
 
-        window.customElements.define(PageTransfer.is, PageTransfer);
+        _computeGasLimit(appConfig) {
+            if (appConfig) {
+                this.gasLimit = appConfig.defaultGasLimit;
+            }
+        }
+
+        _computeTokens(rawBalances) {
+            if (rawBalances) {
+                return _.map(rawBalances.result.tokens);
+            }
+        }
+
+        _computeBalances(rawBalances) {
+            if (rawBalances) {
+                return _.keyBy(rawBalances.result.tokens, o => o.token);
+            }
+        }
+
+        _computeAmountShow(selectedTokenBalance) {
+            if (selectedTokenBalance) {
+                return this._numberFormat(selectedTokenBalance.balance, selectedTokenBalance.digits, selectedTokenBalance.precision);
+            }
+        }
+
+        _selectedToken(appConfig, balances, token) {
+            if (appConfig && balances && token) {
+                var combobox = this.$.tokensSelector;
+                combobox.value = token.toUpperCase();
+                return this._getTokenBalance(appConfig, balances, token);
+            }
+        }
+
+        _getTokenBalance(appConfig, balances, selectedToken) {
+            let selected = balances[selectedToken.toUpperCase()];
+            let balance = 0,
+                allowance = 0
+            if (selected) {
+                balance = selected.balance;
+                allowance = selected.allowance;
+            }
+            let tokenConfig = appConfig.tokenMap[selectedToken.toUpperCase()];
+            if (!tokenConfig) {
+                return;
+            }
+            return {
+                token: selectedToken,
+                unit: tokenConfig.unit,
+                balance: balance,
+                availableAllowance: allowance,
+                defaultAllowance: tokenConfig.allowanceWarn,
+                precision: tokenConfig.precision,
+                digits: tokenConfig.digits,
+                address: tokenConfig.address
+            }
+        }
+
+        ready() {
+            //            if(!this.wallet){
+            //                window.location.href = "#/wallet"
+            //                return
+            //            }
+            super.ready();
+            var combobox = this.$.tokensSelector;
+            var _this = this;
+            combobox.addEventListener('value-changed', function() {
+                if (combobox.value && _this.appConfig.tokenMap && _this.appConfig.tokenMap[combobox.value]) {
+                    window.location.href = "#/transfer/" + combobox.value;
+                }
+            });
+            this.$.gasLimit.addEventListener('value-changed', function() {
+                _this.gasLimit = _this.$.gasLimit.value;
+            });
+            this.$.sendTo.focus();
+            document.addEventListener('keyup', function(event) {
+                if (event.keyCode == "13") {
+                    this.$.send.click();
+                }
+            }.bind(this));
+        }
+
+        handleClick() {
+            var extData = this.$.hiddenExtData;
+            if (extData.style.display == 'block') {
+                extData.style.display = 'none';
+            } else {
+                extData.style.display = 'block';
+                this.$.additionalData.value = "";
+            }
+        }
+
+        _showOrHidden(address, amount, gasLimit, additionalData, amountShow, selectedTokenBalance) {
+            let validator = new Validator();
+            if (!address || !amount || !gasLimit || !amountShow || amountShow < Number(amount) || !selectedTokenBalance) {
+                this._buttonDisable();
+                return false;
+            }
+            if (!validator.isValidETHAddress(address)) {
+                this._buttonDisable();
+                return false;
+            }
+            if (this._isNum(amount, selectedTokenBalance.precision) && this._isInteger(gasLimit)) {
+                if (additionalData) {
+                    const dataRegex = /^0x([0-9a-fA-F]{8})*([0-9a-fA-F]{64})*$/i;
+                    if (additionalData.match(dataRegex)) {
+                        this._buttonAvailable();
+                        return true;
+                    } else {
+                        this._buttonDisable();
+                    }
+                } else {
+                    this._buttonAvailable();
+                    return true;
+                }
+            } else {
+                this._buttonDisable();
+            }
+            return false;
+        }
+
+        _buttonAvailable() {
+            this.$.send.disabled = false;
+            this.$.send.style.backgroundColor = 'var(--app-primary-color)';
+        }
+
+        _buttonDisable() {
+            this.$.send.disabled = true;
+            this.$.send.style.backgroundColor = 'var(--paper-grey-300)';
+        }
+
+        _numPatten(precision) {
+            return "^[1-9]\\d*(\\.\\d{1," + precision + "})?|0\\.(\\d{1," + (precision - 1) + "})?[1-9]$";
+        }
+
+        _isNum(num, precision) {
+            return num.toString().match(this._numPatten(precision));
+        }
+
+        _numError(num, precision) {
+            return "Input number value with max " + precision + " precision"
+        }
+
+        _integerPatten() {
+            return "^[0-9]*$";
+        }
+
+        _isInteger(intVal) {
+            return intVal.toString().match(this._integerPatten())
+        }
+
+        _integerError(int) {
+            return "Input valid integer value"
+        }
+
+        _addressPatten() {
+            return new Validator().isValidETHAddress(address);
+        }
+
+        _addressError(address) {
+            return "Please input valid address"
+        }
+
+
+        async signToSend() {
+
+            try {
+                if (!this.valid) {
+                    return;
+                }
+
+                const tx = {};
+
+                console.log(this.gasPrice);
+                tx.gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
+                tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
+                if (this.selectedTokenBalance.token === 'ETH') {
+
+                    tx.to = this.address;
+                    tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
+                    tx.data = this.additionalData || '0x';
+                    if (this.selectedTokenBalance.balance < (Number(tx.value) + Number(tx.gasLimit) * Number(tx.gasPrice))) {
+
+                        const detail = {
+                            tx: tx,
+                            token: {
+                                balance: this.selectedTokenBalance.balance,
+                                digits: this.selectedTokenBalance.digits,
+                                precision: this.selectedTokenBalance.precision
+                            },
+                            title: "transfer ETH"
+                        };
+
+                        this.dispatchEvent(new CustomEvent('txamountconfirm', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+
+                } else {
+                    tx.to = this.selectedTokenBalance.address;
+                    tx.value = '0x0';
+                    tx.data = signer.generateTransferData(this.address, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16))
+                    const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
+
+                    if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                        var detail = {
+                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                            category: "warning",
+                            duration: 8000
+                        }
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
+                }
+
+
+                console.log(JSON.stringify(tx));
+                var detail = { raws: [{ "raw": JSON.stringify(tx), "subTitle": "transfer ETH" }] };
+                this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
+            } catch (e) {
+                var detail = { text: e.message, category: "error", duration: 8000 }
+                this.dispatchEvent(new CustomEvent('notification', {
+                    bubbles: true,
+                    composed: true,
+                    detail: detail
+                }));
+            }
+        }
+    }
+
+    window.customElements.define(PageTransfer.is, PageTransfer);
     </script>
 </dom-module>

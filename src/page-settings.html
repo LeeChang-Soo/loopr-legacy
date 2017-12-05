@@ -90,7 +90,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
             <scary-cookie id="settingsMarginSplit" name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
             <scary-cookie id="settingsLang" name="settings-lang" value="{{settingsLang}}"></scary-cookie>
-
             <loopr-toolbar slot="secondary-toolbar" active-tab="settings"></loopr-toolbar>
             <div class="sections" unresolved>
                 <paper-card>
@@ -107,7 +106,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="item horizontal center layout">
                                 <div class="label">Relay</div>
                                 <vaadin-combo-box id="relay" placeholder="Default Loopring Relay" items="{{relays}}"></vaadin-combo-box>
-                                <a href="javascript:void(0)" on-click="setCustomRelay"><iron-icon icon="icons:add"></iron-icon></a>
+                                <a href="javascript:void(0)" on-click="setCustomRelay">
+                                    <iron-icon icon="icons:add"></iron-icon>
+                                </a>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Contract Version</div>
@@ -118,31 +119,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">LRC Fee</div>
-                                <vaadin-text-field id="lrcFee" value="{{appConfig.defaultLrcFeePermillage}}"
-                                                   pattern="[[_lrcFeePatten()]]"
-                                                   error-message="[[_lrcFeeError()]]">
+                                <vaadin-text-field id="lrcFee" value="{{appConfig.defaultLrcFeePermillage}}" pattern="[[_lrcFeePatten()]]" error-message="[[_lrcFeeError()]]">
                                     <div slot="suffix">‰</div>
                                 </vaadin-text-field>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Margin Split</div>
-                                <vaadin-text-field id="marginSplit" value="{{appConfig.defaultMarginSplitPercentage}}"
-                                                   pattern="[[_marginSplitPatten()]]"
-                                                   error-message="[[_marginSplitError()]]">
+                                <vaadin-text-field id="marginSplit" value="{{appConfig.defaultMarginSplitPercentage}}" pattern="[[_marginSplitPatten()]]" error-message="[[_marginSplitError()]]">
                                     <div slot="suffix">%</div>
                                 </vaadin-text-field>
                             </div>
                             <div class="item horizontal center layout">
                                 <div class="label">Gas Price</div>
                                 <div class="lrcContainer horizontal start-justified layout">
-                                    <div class="slider"><paper-slider id="gasPrice" pin min="1" max="60" max-markers="15" step="1" value="{{appConfig.defaultGasPrice}}"></paper-slider></paper-slider></div>
+                                    <div class="slider">
+                                        <paper-slider id="gasPrice" pin min="1" max="60" max-markers="15" step="1" value="{{appConfig.defaultGasPrice}}"></paper-slider>
+                                        </paper-slider>
+                                    </div>
                                     <div class="value-label"><span id="gasPriceLabel" class="caption">{{appConfig.defaultGasPrice}}GWEI</span></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </paper-card>
-
                 <div class="footer-spacer"></div>
                 <loopr-footer></loopr-footer>
             </div>
@@ -205,40 +204,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             var _this = this;
             this.$.lang.addEventListener('value-changed', function() {
                 _this.settingsLang = _this.$.lang.value || "en";
-                console.log("lang change to:"+_this.settingsLang);
+                console.log("lang change to:" + _this.settingsLang);
             });
 
             this.$.currency.addEventListener('value-changed', function() {
                 _this.settingsCurrency = _this.$.currency.value || "usd";
-                console.log("currency change to:"+_this.settingsCurrency);
+                console.log("currency change to:" + _this.settingsCurrency);
             });
 
             this.$.relay.addEventListener('value-changed', function(e) {
-                if(_this.$.relay.value){
+                if (_this.$.relay.value) {
                     _this.settingsRelay = _this.$.relay.value || "//relay1.loopring.io";
                 }
-                console.log("relay change to:"+_this.settingsRelay);
+                console.log("relay change to:" + _this.settingsRelay);
             });
 
             this.$.lrcFee.addEventListener('value-changed', function(e) {
-                if(this._isLrcFee(this.$.lrcFee.value)){
+                if (this._isLrcFee(this.$.lrcFee.value)) {
                     this.settingsLrcFee = this.$.lrcFee.value;
                     this.$.settingsLrcFee.value = this.$.lrcFee.value;
-                    console.log("lrcFee change to:"+this.$.lrcFee.value)
+                    console.log("lrcFee change to:" + this.$.lrcFee.value)
                 }
             }.bind(this));
 
             this.$.gasPrice.addEventListener('value-changed', function() {
                 _this.settingsGasPrice = _this.$.gasPrice.value;
                 _this.$.gasPriceLabel.textContent = _this.$.gasPrice.value + "GWEI";
-                console.log("gasPrice change to:"+_this.$.gasPrice.value)
+                console.log("gasPrice change to:" + _this.$.gasPrice.value)
             });
 
             this.$.marginSplit.addEventListener('value-changed', function() {
-                if(_this._isMarginSplitFee(_this.$.marginSplit.value)){
+                if (_this._isMarginSplitFee(_this.$.marginSplit.value)) {
                     _this.$.settingsMarginSplit.value = _this.$.marginSplit.value;
                     _this.settingsMarginSplit = _this.$.settingsMarginSplit.value;
-                    console.log("marginSplit change to: "+ _this.settingsMarginSplit);
+                    console.log("marginSplit change to: " + _this.settingsMarginSplit);
                 }
             });
         }
@@ -247,11 +246,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return ['_computeCookie(appConfig, cookieValues)'];
         }
 
-        setCustomRelay(){
+        setCustomRelay() {
             this.dispatchEvent(new CustomEvent('customrelay', { bubbles: true, composed: true }));
         }
 
-        _computeCookie(appConfig, cookieValues){
+        _computeCookie(appConfig, cookieValues) {
             if (appConfig && cookieValues) {
                 if (cookieValues["settingsLrcFee"]) {
                     this.settingsLrcFee = cookieValues["settingsLrcFee"];
@@ -270,7 +269,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _initContract(appConfig, settingsVersion) {
-            if(appConfig && settingsVersion){
+            if (appConfig && settingsVersion) {
                 var _this = this;
                 this.contractAddress = appConfig.contractVersionMap[settingsVersion].address;
                 this.$.version.addEventListener('value-changed', function() {
@@ -281,16 +280,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         /**
-        *
-        * @param appConfig
-        * @param cookieValues
-        * @returns {*}
-        * @private
-        */
-        _computedSettingsRelay(appConfig, cookieValues){
+         *
+         * @param appConfig
+         * @param cookieValues
+         * @returns {*}
+         * @private
+         */
+        _computedSettingsRelay(appConfig, cookieValues) {
             if (appConfig && cookieValues) {
                 let configs = appConfig.relays;
-                if(cookieValues["settingsRelayConfig"]){
+                if (cookieValues["settingsRelayConfig"]) {
                     let cookieRelay = JSON.parse(cookieValues["settingsRelayConfig"]);
                     configs = configs.concat(cookieRelay);
                 }
@@ -298,14 +297,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        _newCustomRelay(newRelay){
+        _newCustomRelay(newRelay) {
             this.relays.push(newRelay);
             this.settingsRelay = newRelay.value;
             // to reload relay, above could not make dropbox reload latest relay
             location.reload();
         }
 
-        _initBind(appConfig, cookieValues){
+        _initBind(appConfig, cookieValues) {
             if (appConfig && cookieValues) {
                 this.$.lang.value = cookieValues["settingsLang"] || appConfig.langs[0].value;
                 this.$.currency.value = cookieValues["settingsCurrency"] || appConfig.fiat[0].value;
