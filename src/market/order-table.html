@@ -72,6 +72,7 @@
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column width="50px">
                 <template class="header">
@@ -160,7 +161,10 @@
         <div class$="[[showPage]] horizontal end-justified layout">
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
-        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orders.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
+        <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orders.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
+
+        <loopr-relay-ajax id="ajax" relay="http://10.137.111.250:8083/rpc" method="loopring_getOrders" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
+
     </template>
     <script>
     class OrderTable extends AppConfigMixin(Polymer.Element) {
@@ -178,6 +182,11 @@
                     computed: '_computedMarket(page, subpage, third)'
                 },
                 filterMine: Boolean,
+
+                params:{
+                    type:String,
+                    computed:'_computeParams(market, filterMine, settingsVersion,currentPage)'
+                },
                 displayMode: {
                     type: String
                 },
@@ -216,7 +225,19 @@
                 }
             }
         }
+        _computeParams(market, filterMine, settingsVersion,currentPage){
+            const params = {};
+            if(market && settingsVersion){
+                params.market = market;
+                params.contractVersion = settingsVersion;
+                if(filterMine && this.wallet){
+                    params.address = this.wallet.address;
+                }
+                params.pageIndex = currentPage || 1;
 
+                return JSON.stringify(params);
+            }
+        }
         _computedBalance(data) {
             if (data) {
                 return _.keyBy(data.result.tokens, o => o.token);
@@ -340,45 +361,23 @@
             }
         }
 
-
-        _computeRest(rawBalances, tokenb, tokens, order) {
-            if (rawBalances) {
-
-                const balances = _.keyBy(rawBalances.result.tokens, 'token');
-
-                const balance = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(balances[tokenb.token].balance, tokenb) : this.numberFormat(balances[tokens.token].balance, tokens);
-                const allowance = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(balances[tokenb.token].allowance, tokenb) : this.numberFormat(balances[tokens.token].allowance, tokens);
-
-                const balanceRest = balance >= allowance ? allowance : balance;
-                const orderRest = order.total - order.totalDealedAndCanceled;
-
-                let rest = balanceRest >= orderRest ? orderRest : balanceRest;
-
-                if (rest < 0) {
-                    rest = 0;
-                }
-
-                return rest;
-
-            }
-        }
-
         _computeOrders(appConfig, resp, rawBalances) {
             if (appConfig && resp && resp.result.data) {
-                return _.map(resp.result.data, o => this._computeItem(appConfig, o, rawBalances));
+                return _.map(resp.result.data, o => this._computeItem(appConfig, o));
             }
         }
 
-        _computeItem(appConfig, order, rawBalances) {
+        _computeItem(appConfig, order) {
             let tokenb = this._getToken(order.orginalOrder.tokenB, appConfig);
             let tokens = this._getToken(order.orginalOrder.tokenS, appConfig);
-
-            order.totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.totalDealedAmountB, tokenb) : this.numberFormat(order.totalDealedAmountS, tokens);
-            order.totalCanceled = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) / this.numberFormat(order.orginalOrder.amountS, tokens) * this.numberFormat(order.totalCancelledAmountS, tokens) : this.numberFormat(order.totalCancelledAmountS, tokens);
-            order.dealedAndCanceled = order.totalDealed + order.totalCanceled
             order.total = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) : this.numberFormat(order.orginalOrder.amountS, tokens);
-
-
+            order.totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? order.total - this.numberFormat(order.remainedAmountB, tokenb) : order.total - this.numberFormat(order.remainedAmountS, tokens);
+            if(order.status === 'ORDER_CANCEL' || order.status === 'ORDER_CUTOFF') {
+                order.totalCanceled = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) / this.numberFormat(order.orginalOrder.amountS, tokens) * this.numberFormat(order.totalCancelledAmountS, tokens) : this.numberFormat(order.totalCancelledAmountS, tokens);
+            }else{
+                order.totalCanceled = 0;
+            }
+            order.dealedAndCanceled = order.totalDealed + order.totalCanceled;
 
             if (this.market) {
                 let marketConfig = this.getMarket(this.market);
