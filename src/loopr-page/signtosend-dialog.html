@@ -151,7 +151,7 @@
                     composed: true,
                     detail: detail
                 }));
-            }, function(err) {
+            }.bind(this), function(err) {
                 var detail = { text: err.message, category: "error", duration: 8000 };
                 this.dispatchEvent(new CustomEvent('notification', {
                     bubbles: true,
