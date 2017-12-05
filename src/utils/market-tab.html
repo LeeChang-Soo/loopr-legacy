@@ -39,7 +39,10 @@
         static get properties() {
             return {
                 appConfig: Object,
-                selectedTab: String,
+                selectedTab: {
+                    type: String,
+                    notify: true
+                },
                 sources: {
                     type: Object
                 },
@@ -54,7 +57,7 @@
                 results: {
                     type: Object,
                     notify: true,
-                    computed: '_computeResult(sources, selectedTab)'
+                    computed: '_computeResult(sources, searched, selectedTab)'
                 }
             };
         }
@@ -82,8 +85,8 @@
             }
         }
 
-        _computeResult(sources, selectedTab) {
-            if (sources) {
+        _computeResult(sources, searched, selectedTab) {
+            if (sources && !searched) {
                 if (selectedTab) {
                     return sources.filter(function(item) {
                         return item.market.indexOf("-" + selectedTab.toUpperCase()) > -1;

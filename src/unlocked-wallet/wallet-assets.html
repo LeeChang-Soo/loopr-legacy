@@ -298,6 +298,7 @@
 
         go() {
             if ("wallet" === this.page) {
+                this.hideBalance = false;
                 this.$.ajax.generateRequest();
             }
         }

@@ -41,10 +41,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </loopr-toolbar>
             <div class="sections" unresolved>
                 <paper-card transparent>
-                    <div class="horizontal end layout">
-                        <market-tab sources="{{tickers}}" results="{{searchResult}}" searched="{{searched}}"></market-tab>
+                    <div class="horizontal start layout">
+                        <market-tab sources="{{tickers}}" results="{{searchResult}}" searched="{{searched}}" selected-tab="{{marketSelector}}"></market-tab>
                         <div class="flex"></div>
-                        <market-search sources="{{tickers}}" results="{{searchResult}}" searched="{{searched}}" placeholder="Market"></market-search>
+                        <market-search sources="{{tickers}}" results="{{searchResult}}" searched="{{searched}}" selected-tab="{{marketSelector}}" placeholder="Market"></market-search>
                     </div>
                 </paper-card>
                 <paper-card>
@@ -108,7 +108,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     computed: '_process(resp.result)'
                 },
-                selectedTab: {
+                marketSelector: {
                     type: String
                 }
             };
@@ -148,6 +148,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         go() {
+            this.marketSelector = '';
             this.$.ajax.generateRequest();
         }
     }
