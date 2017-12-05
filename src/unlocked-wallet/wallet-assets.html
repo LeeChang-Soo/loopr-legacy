@@ -31,6 +31,10 @@
             padding-top: 0;
         }
 
+        .sections[unresolved] {
+            padding-top: 0;
+        }
+
         .summary {
             font-size: 1em;
             font-weight: 500;
@@ -67,9 +71,9 @@
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
+        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}" loading={{loading}}></loopr-ajax>
         <div class="sections">
             <paper-card transparent>Ether</paper-card>
             <paper-card tablewrapper>
@@ -77,12 +81,14 @@
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
                         <template>
-                            <div class="horiziontal layout">[[item.token]]</div></template>
+                            <div class="horiziontal layout">[[item.token]]</div>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="50px">
                         <template class="header">Name</template>
                         <template>
-                            <div class="horiziontal layout">[[item.name]]</div></template>
+                            <div class="horiziontal layout">[[item.name]]</div>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
@@ -123,7 +129,9 @@
             </paper-card>
             <paper-card transparent>
                 <div class="horizontal start layout">
-                    <div class="search"><asset-search sources="{{erc20Tokens}}" results="{{result}}" searched="{{searched}}"></asset-search></div>
+                    <div class="search">
+                        <asset-search sources="{{erc20Tokens}}" results="{{result}}" searched="{{searched}}"></asset-search>
+                    </div>
                     <div class="split"></div>
                     <div class="hidebalance horizontal center layout">
                         <a href="javascript:void(0)" on-click="_hideOrShowTips">{{hideOrShowTips}}</a>
@@ -136,12 +144,14 @@
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
                         <template>
-                            <div class="horiziontal layout">[[item.token]]</div></template>
+                            <div class="horiziontal layout">[[item.token]]</div>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="50px">
                         <template class="header">Name</template>
                         <template>
-                            <div class="horiziontal layout">[[item.name]]</div></template>
+                            <div class="horiziontal layout">[[item.name]]</div>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
@@ -174,6 +184,7 @@
                         </template>
                     </vaadin-grid-column>
                 </vaadin-grid>
+                <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
             </paper-card>
         </div>
     </template>
@@ -183,6 +194,8 @@
 
         static get properties() {
             return {
+                page: String,
+                subpage: String,
                 priceQuote: Object,
                 totalValue: Number,
                 etherTokens: Array,
@@ -201,12 +214,16 @@
                 },
                 result: {
                     type: Object
+                },
+                wallet: {
+                    type: Object,
+                    observer: '_walletChanged'
                 }
             };
         }
 
-        _hideOrShowTips(){
-            if(this.hideBalance) {
+        _hideOrShowTips() {
+            if (this.hideBalance) {
                 this.hideBalance = false;
                 this.result = this._computeZeroBalance(this.erc20Tokens, false);
             } else {
@@ -216,11 +233,11 @@
         }
 
         _computeTips(hideBalance, searched) {
-            if(searched) {
+            if (searched) {
                 this.hideBalance = false;
                 return 'Hide 0 Balances';
             } else {
-                if(hideBalance) {
+                if (hideBalance) {
                     return 'Show 0 Balances';
                 } else {
                     return 'Hide 0 Balances';
@@ -229,9 +246,9 @@
         }
 
         _computeZeroBalance(erc20Tokens, hideBalance) {
-            if(erc20Tokens){
-                if(hideBalance){
-                    return erc20Tokens.filter(function(item){
+            if (erc20Tokens) {
+                if (hideBalance) {
+                    return erc20Tokens.filter(function(item) {
                         return Number(item.balanceValue) > 0;
                     });
                 } else {
@@ -247,7 +264,7 @@
                     var item = i;
                     const tokenConfig = this.appConfig.tokenMap[i.token];
                     if (!tokenConfig) {
-                        console.error('Data error, no token:'+i.token+" config");
+                        console.error('Data error, no token:' + i.token + " config");
                         return null;
                     }
 
@@ -280,7 +297,16 @@
         _isWETH(token) { return token === 'WETH'; }
 
         go() {
-            //this.$.ajax.generateRequest();
+            if ("wallet" === this.page) {
+                this.hideBalance = false;
+                this.$.ajax.generateRequest();
+            }
+        }
+
+        _walletChanged(wallet) {
+            if (wallet) {
+                this.$.ajax.generateRequest();
+            }
         }
     }
 

@@ -115,18 +115,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         computeJsonUrl(page, pageId) {
-            if(page && "doc" === page){
+            if (page && "doc" === page) {
                 let url = "";
-                if (pageId) url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/"+pageId+".json";
+                if (pageId) url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/" + pageId + ".json";
                 else url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/home.json";
                 return url;
             }
         }
 
         computeMdUrl(page, pageId) {
-            if(page && "doc" === page){
+            if (page && "doc" === page) {
                 let url = "";
-                if (pageId) url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/"+pageId+".md";
+                if (pageId) url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/" + pageId + ".md";
                 else url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/home.md";
                 return url;
             }

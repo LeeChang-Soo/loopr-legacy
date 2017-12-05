@@ -3,66 +3,67 @@
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
+         :host {
+            display: block;
+        }
 
-            vaadin-grid {
-                --vaadin-grid-cell: {
-                    background-color: transparent;
-                };
+        vaadin-grid {
+            --vaadin-grid-cell: {
+                background-color: transparent;
             }
+            ;
+        }
 
-            paper-progress {
-                width: 100%;
-                --paper-progress-active-color: var(--app-primary-color);
-                --paper-progress-secondary-color: var(--paper-amber-500);
-            }
+        paper-progress {
+            width: 100%;
+            --paper-progress-active-color: var(--app-primary-color);
+            --paper-progress-secondary-color: var(--paper-amber-500);
+        }
 
-            .red {
-                color: var(--app-red-color);
-            }
+        .red {
+            color: var(--app-red-color);
+        }
 
-            .green {
-                color: var(--app-green-color);
-            }
+        .green {
+            color: var(--app-green-color);
+        }
 
-            div.long-hash {
-                width: 120px;
-            }
+        div.long-hash {
+            width: 120px;
+        }
 
-            .operations {
-                @apply --layout-horizontal;
-            }
+        .operations {
+            @apply --layout-horizontal;
+        }
 
-            .operations a {
-                text-align: center;
-                padding-left: 4px;
-                padding-right: 4px;
-            }
+        .operations a {
+            text-align: center;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
 
-            .hidden {
-                visibility: hidden;
-            }
+        .hidden {
+            visibility: hidden;
+        }
 
-            .show {
-                visibility: visible;
-            }
+        .show {
+            visibility: visible;
+        }
 
-            .hiddenMore {
-                visibility: hidden;
-                @apply(--layout-horizontal);
-                @apply(--layout-end-justified);
-            }
+        .hiddenMore {
+            visibility: hidden;
+            @apply(--layout-horizontal);
+            @apply(--layout-end-justified);
+        }
 
-            .showMore {
-                @apply(--layout-horizontal);
-                @apply(--layout-end-justified);
-            }
+        .showMore {
+            @apply(--layout-horizontal);
+            @apply(--layout-end-justified);
+        }
 
-            .seeMoreLink {
-                margin-right: 20px;
-            }
+        .seeMoreLink {
+            margin-right: 20px;
+        }
         </style>
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -95,8 +96,7 @@
             <vaadin-grid-column width="50px">
                 <template class="header">Amount</template>
                 <template>
-                    <pretty-number v="[[item.amountS]]" d=[[item.volumnPrecisionS]]
-                                   postfix="[[item.tokenS]]"></pretty-number>
+                    <pretty-number v="[[item.amountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.tokenS]]"></pretty-number>
                 </template>
                 <template class="footer"></template>
             </vaadin-grid-column>
@@ -110,8 +110,7 @@
             <vaadin-grid-column width="50px">
                 <template class="header">Size</template>
                 <template>
-                    <pretty-number v="[[item.amountB]]" d=[[item.volumnPrecisionB]]
-                                   postfix="[[item.tokenB]]"></pretty-number>
+                    <pretty-number v="[[item.amountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.tokenB]]"></pretty-number>
                 </template>
                 <template class="footer"></template>
             </vaadin-grid-column>
@@ -119,8 +118,7 @@
                 <template class="header">Status</template>
                 <template>
                     <div id="progress[[index]]" class="horizontal end-justified layout">
-                        <paper-progress value="[[item.totalDealed]]" secondary-progress="[[item.dealedAndCanceled]]"
-                                        max="[[item.total]]"></paper-progress>
+                        <paper-progress value="[[item.totalDealed]]" secondary-progress="[[item.dealedAndCanceled]]" max="[[item.total]]"></paper-progress>
                         <paper-tooltip for="progress[[index]]" position="left">
                             <div>
                                 <div>Original: [[item.total]]</div>
@@ -162,310 +160,309 @@
         <div class$="[[showPage]] horizontal end-justified layout">
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
-        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orders.json?page={{currentPage}}" last-response="{{resp}}"
-                    loading="{{loading}}"></loopr-ajax>
+        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orders.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
     </template>
     <script>
-        class OrderTable extends AppConfigMixin(Polymer.Element) {
-            static get is() {
-                return 'order-table';
-            }
+    class OrderTable extends AppConfigMixin(Polymer.Element) {
+        static get is() {
+            return 'order-table';
+        }
 
-            static get properties() {
-                return {
-                    page: String,
-                    subpage: String,
-                    third: String,
-                    market: {
-                        type: String,
-                        computed: '_computedMarket(page, subpage, third)'
-                    },
-                    filterMine: Boolean,
-                    displayMode: {
-                        type: String
-                    },
-                    orders: {
-                        type: Object,
-                        computed: '_computeOrders(appConfig, resp, balancesRaw)'
-                    },
-                    currentPage: {
-                        type: Number
-                    },
-                    totalPage: {
-                        type: Number
-                    },
-                    resp: {
-                        type: Object,
-                        observer: '_computePage'
-                    },
-                    showPage: {
-                        type: String,
-                        value: "hidden"
-                    },
-                    balances: {
-                        type: Object,
-                        computed: '_computedBalance(balancesRaw)'
-                    },
-                };
-            }
+        static get properties() {
+            return {
+                page: String,
+                subpage: String,
+                third: String,
+                market: {
+                    type: String,
+                    computed: '_computedMarket(page, subpage, third)'
+                },
+                filterMine: Boolean,
+                displayMode: {
+                    type: String
+                },
+                orders: {
+                    type: Object,
+                    computed: '_computeOrders(appConfig, resp, balancesRaw)'
+                },
+                currentPage: {
+                    type: Number
+                },
+                totalPage: {
+                    type: Number
+                },
+                resp: {
+                    type: Object,
+                    observer: '_computePage'
+                },
+                showPage: {
+                    type: String,
+                    value: "hidden"
+                },
+                balances: {
+                    type: Object,
+                    computed: '_computedBalance(balancesRaw)'
+                },
+            };
+        }
 
-            ready() {
-                super.ready();
-                this.hiddenCancel = true;
-                if (this.displayMode) {
-                    let displayMode = this.displayMode.toLowerCase();
-                    if ("wallet-orders" === displayMode) {
-                        this.hiddenCancel = false;
-                    }
+        ready() {
+            super.ready();
+            this.hiddenCancel = true;
+            if (this.displayMode) {
+                let displayMode = this.displayMode.toLowerCase();
+                if ("wallet-orders" === displayMode) {
+                    this.hiddenCancel = false;
                 }
             }
+        }
 
-            _computedBalance(data) {
-                if (data) {
-                    return _.keyBy(data.result.tokens, o => o.token);
+        _computedBalance(data) {
+            if (data) {
+                return _.keyBy(data.result.tokens, o => o.token);
+            }
+        }
+        _computedMarket(page, subpage, third) {
+            if (page && subpage) {
+                if (page === "market") {
+                    return subpage;
+                } else if (page === "history" && subpage === "orders") {
+                    if (third) return third;
+                } else if (page === "wallet" && subpage == "orders") {
+                    if (third) return third;
                 }
             }
-            _computedMarket(page, subpage, third){
-                if(page && subpage){
-                    if(page === "market") {
-                        return subpage;
-                    } else if(page === "history" && subpage === "orders") {
-                        if(third) return third;
-                    } else if(page === "wallet" && subpage == "orders") {
-                        if(third) return third;
-                    }
-                }
+        }
+
+        _showMore() {
+            if (this.filterMine) {
+                window.location.href = "#/wallet/orders/" + this.market;
+            } else {
+                window.location.href = "#/history/orders/" + this.market;
             }
+        }
 
-            _showMore(){
-                if(this.filterMine){
-                    window.location.href = "#/wallet/orders/"+this.market;
-                } else {
-                    window.location.href = "#/history/orders/"+this.market;
-                }
+        _computePage(resp) {
+            if (resp) {
+                let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
+                this.totalPage = Math.max(2, pageSize);
+                this.currentPage = resp.result.pageIndex;
+                this.pageRange = Math.min(3, pageSize);
+                this._pager();
+                this._showPage();
             }
+        }
 
-            _computePage(resp){
-                if(resp){
-                    let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
-                    this.totalPage = Math.max(2, pageSize);
-                    this.currentPage = resp.result.pageIndex;
-                    this.pageRange = Math.min(3, pageSize);
-                    this._pager();
-                    this._showPage();
-                }
+        _showPage() {
+            if (this.displayMode && (this.displayMode === "history-orders" || "wallet-orders" === this.displayMode)) {
+                this.showPage = "show";
+            } else {
+                this.showPage = "hidden";
             }
-
-            _showPage() {
-                if (this.displayMode && (this.displayMode === "history-orders" || "wallet-orders" === this.displayMode)) {
-                    this.showPage = "show";
-                } else {
-                    this.showPage = "hidden";
-                }
-                if(this.displayMode && this.displayMode === "market"){
-                    this.showSeeMore = "showMore";
-                } else {
-                    this.showSeeMore = "hiddenMore";
-                }
+            if (this.displayMode && this.displayMode === "market") {
+                this.showSeeMore = "showMore";
+            } else {
+                this.showSeeMore = "hiddenMore";
             }
+        }
 
-             _cancel(e) {
-                try {
-                    let currentVersion = this.settingsVersion;
-                    const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
+        _cancel(e) {
+            try {
+                let currentVersion = this.settingsVersion;
+                const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
 
-                    const target = e.target.order;
-                    let data = {};
-                    data.protocol = contractAddress;
-                    data.owner = this.wallet.address;
-                    data.tokenS = this.appConfig.tokenMap[target.tokenS.toUpperCase()].address;
-                    data.tokenB = this.appConfig.tokenMap[target.tokenB.toUpperCase()].address;
-                    data.amountS = target.amountS;
-                    data.amountB = target.amountB;
-                    data.timestamp = target.timestamp;
-                    data.ttl = target.ttl;
-                    data.salt = target.salt;
-                    data.lrcFee = target.lrcFee;
-                    data.buyNoMoreThanAmountB = target.buyNoMoreThanAmountB;
-                    data.marginSplitPercentage = target.marginSplitPercentage;
-                    data.v = Number(target.v);
-                    data.r = target.r;
-                    data.s = target.s;
+                const target = e.target.order;
+                let data = {};
+                data.protocol = contractAddress;
+                data.owner = this.wallet.address;
+                data.tokenS = this.appConfig.tokenMap[target.tokenS.toUpperCase()].address;
+                data.tokenB = this.appConfig.tokenMap[target.tokenB.toUpperCase()].address;
+                data.amountS = target.amountS;
+                data.amountB = target.amountB;
+                data.timestamp = target.timestamp;
+                data.ttl = target.ttl;
+                data.salt = target.salt;
+                data.lrcFee = target.lrcFee;
+                data.buyNoMoreThanAmountB = target.buyNoMoreThanAmountB;
+                data.marginSplitPercentage = target.marginSplitPercentage;
+                data.v = Number(target.v);
+                data.r = target.r;
+                data.s = target.s;
 
-                    if(!data.tokenS || !data.tokenB){
-                        const detail = {text: 'Token contract address is missing, please contact to the administrators to make up for '+ target.tokenS.toUpperCase()+' and '+target.tokenB.toUpperCase()+' contract Address', category: "error", duration: 8000}
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-
-                        return;
-                    }
-
-                    const order = new Order(data);
-                    const amount = target.buyNoMoreThanAmountB ? target.amountB : target.amountS;
-                    const cancelData = order.cancel(amount, this.wallet.privateKey);
-
-                    const rawTx = {
-                        to: contractAddress,
-                        gasPrice: '0x' + (Number(this.settingsGasPrice)*1e9).toString(16),
-                        gasLimit: '0x14820',
-                        value: '0x0',
-                        data: cancelData
-                    };
-
-                    const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
-                    if (ETHBalance < (Number(rawTx.gasLimit) * Number(rawTx.gasPrice))) {
-                        const detail = {
-                            text: 'You has insufficient ETH balance for gasLimit * gasPrice',
-                            category: "warning",
-                            duration: 8000
-                        };
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-                        return;
-                    }
-
-                    var detail = {raws: [{"raw": JSON.stringify(rawTx), "subTitle": "Cancel Order"}]};
-                    this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
-
-                } catch (e) {
-                    var detail = {text: e.message, category: "error", duration: 8000}
+                if (!data.tokenS || !data.tokenB) {
+                    const detail = { text: 'Token contract address is missing, please contact to the administrators to make up for ' + target.tokenS.toUpperCase() + ' and ' + target.tokenB.toUpperCase() + ' contract Address', category: "error", duration: 8000 }
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
                         composed: true,
                         detail: detail
                     }));
-                }
-            }
 
-
-            _computeRest(rawBalances, tokenb, tokens, order) {
-                if (rawBalances) {
-
-                    const balances = _.keyBy(rawBalances.result.tokens, 'token');
-
-                    const balance = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(balances[tokenb.token].balance, tokenb) : this.numberFormat(balances[tokens.token].balance, tokens);
-                    const allowance = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(balances[tokenb.token].allowance, tokenb) : this.numberFormat(balances[tokens.token].allowance, tokens);
-
-                    const balanceRest = balance >= allowance ? allowance : balance;
-                    const orderRest = order.total - order.totalDealedAndCanceled;
-
-                    let rest = balanceRest >= orderRest ? orderRest : balanceRest;
-
-                    if (rest < 0) {
-                        rest = 0;
-                    }
-
-                    return rest;
-
-                }
-            }
-
-            _computeOrders(appConfig, resp, rawBalances) {
-                if (appConfig && resp && resp.result.data) {
-                    return _.map(resp.result.data, o => this._computeItem(appConfig, o, rawBalances));
-                }
-            }
-
-            _computeItem(appConfig, order, rawBalances) {
-                let tokenb = this._getToken(order.orginalOrder.tokenB, appConfig);
-                let tokens = this._getToken(order.orginalOrder.tokenS, appConfig);
-
-                order.totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.totalDealedAmountB, tokenb) : this.numberFormat(order.totalDealedAmountS, tokens);
-                order.totalCanceled = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) / this.numberFormat(order.orginalOrder.amountS, tokens) * this.numberFormat(order.totalCancelledAmountS, tokens) : this.numberFormat(order.totalCancelledAmountS, tokens);
-                order.dealedAndCanceled = order.totalDealed + order.totalCanceled
-                order.total = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) : this.numberFormat(order.orginalOrder.amountS, tokens);
-
-
-
-                if (this.market) {
-                    let marketConfig = this.getMarket(this.market);
-                    if (marketConfig) {
-                        order.typeClass = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'green' : 'red';
-                        order.typeTitle = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'Buy' : 'Sell';
-                        if (order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx) {
-                            let tempS = order.orginalOrder.tokenS,
-                                tempB = order.orginalOrder.tokenB,
-                                tempAmountS = order.orginalOrder.amountB,
-                                tempAmountB = order.orginalOrder.amountS,
-                                tempDealedAmountS = order.totalDealedAmountS,
-                                tempDealedAmountB = order.totalDealedAmountB;
-                            order.orginalOrder.tokenS = tempB;
-                            order.orginalOrder.amountS = tempAmountB;
-                            order.totalDealedAmountS = tempDealedAmountB;
-                            order.orginalOrder.tokenB = tempS;
-                            order.totalDealedAmountB = tempDealedAmountS;
-                            order.orginalOrder.amountB = tempAmountS;
-                        }
-                    } else {
-                        var detail = { text: "not supportd market:"+this.market, category: "error", duration: 8000 };
-                        this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
-                        this.dispatchEvent(new CustomEvent('nout-found', {
-                            bubbles: true,
-                            composed: true,
-                            detail: {msg: "not found market:" + this.market}
-                        }));
-                    }
-                } else {
-                    order.typeTitle = order.orginalOrder.tokenS.toUpperCase() + "⇢" + order.orginalOrder.tokenB.toUpperCase();
+                    return;
                 }
 
-                order.tokenB = order.orginalOrder.tokenB.toUpperCase();
-                order.amountB = this.numberFormat(order.orginalOrder.amountB, tokenb);
-                order.price = this.getPrice(order.orginalOrder.amountB, order.orginalOrder.amountS);
-                order.pricePrecision = tokenb.pricePrecision;
-                order.volumnPrecisionB = tokenb.volumnPrecision;
+                const order = new Order(data);
+                const amount = target.buyNoMoreThanAmountB ? target.amountB : target.amountS;
+                const cancelData = order.cancel(amount, this.wallet.privateKey);
 
-                order.tokenS = order.orginalOrder.tokenS.toUpperCase();
-                order.amountS = this.numberFormat(order.orginalOrder.amountS, tokens);
-                order.volumnPrecisionS = tokens.volumnPrecision;
-                order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB, tokens);
-                order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS, tokens);
-                order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS, tokens);
+                const rawTx = {
+                    to: contractAddress,
+                    gasPrice: '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16),
+                    gasLimit: '0x14820',
+                    value: '0x0',
+                    data: cancelData
+                };
 
-                return order;
-            }
-
-            _getToken(tokenName, appConfig) {
-                let pricePrecision = appConfig.marketConfig.defaultPricePrecision,
-                    volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
-                let marketConfig = this.getMarket(tokenName + "-WETH");
-                if (marketConfig) {
-                    pricePrecision = marketConfig.pricePrecision;
+                const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
+                if (ETHBalance < (Number(rawTx.gasLimit) * Number(rawTx.gasPrice))) {
+                    const detail = {
+                        text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                        category: "warning",
+                        duration: 8000
+                    };
+                    this.dispatchEvent(new CustomEvent('notification', {
+                        bubbles: true,
+                        composed: true,
+                        detail: detail
+                    }));
+                    return;
                 }
-                const tokenxConfig = appConfig.tokenMap[tokenName.toUpperCase()];
 
-                tokenxConfig.pricePrecision = pricePrecision;
-                tokenxConfig.volumnPrecision = tokenxConfig.precision || volumnPrecision;
+                var detail = { raws: [{ "raw": JSON.stringify(rawTx), "subTitle": "Cancel Order" }] };
+                this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
 
-                tokenxConfig.digits = tokenxConfig.digits || 18;
-                tokenxConfig.token = tokenxConfig.token || tokenName.toUpperCase();
-                return tokenxConfig;
-            }
-
-            numberFormat(num, token) {
-                if (!num) return 0;
-                const size = Number(num);
-                return (size / Number('1e' + token.digits));
-            }
-
-            getPrice(b, s) {
-                if (b && s && s !== 0) {
-                    return (b / s);
-                }
-                return 0;
-            }
-
-            go() {
-                this.$.ajax.generateRequest();
+            } catch (e) {
+                var detail = { text: e.message, category: "error", duration: 8000 }
+                this.dispatchEvent(new CustomEvent('notification', {
+                    bubbles: true,
+                    composed: true,
+                    detail: detail
+                }));
             }
         }
 
-        window.customElements.define(OrderTable.is, OrderTable);
+
+        _computeRest(rawBalances, tokenb, tokens, order) {
+            if (rawBalances) {
+
+                const balances = _.keyBy(rawBalances.result.tokens, 'token');
+
+                const balance = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(balances[tokenb.token].balance, tokenb) : this.numberFormat(balances[tokens.token].balance, tokens);
+                const allowance = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(balances[tokenb.token].allowance, tokenb) : this.numberFormat(balances[tokens.token].allowance, tokens);
+
+                const balanceRest = balance >= allowance ? allowance : balance;
+                const orderRest = order.total - order.totalDealedAndCanceled;
+
+                let rest = balanceRest >= orderRest ? orderRest : balanceRest;
+
+                if (rest < 0) {
+                    rest = 0;
+                }
+
+                return rest;
+
+            }
+        }
+
+        _computeOrders(appConfig, resp, rawBalances) {
+            if (appConfig && resp && resp.result.data) {
+                return _.map(resp.result.data, o => this._computeItem(appConfig, o, rawBalances));
+            }
+        }
+
+        _computeItem(appConfig, order, rawBalances) {
+            let tokenb = this._getToken(order.orginalOrder.tokenB, appConfig);
+            let tokens = this._getToken(order.orginalOrder.tokenS, appConfig);
+
+            order.totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.totalDealedAmountB, tokenb) : this.numberFormat(order.totalDealedAmountS, tokens);
+            order.totalCanceled = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) / this.numberFormat(order.orginalOrder.amountS, tokens) * this.numberFormat(order.totalCancelledAmountS, tokens) : this.numberFormat(order.totalCancelledAmountS, tokens);
+            order.dealedAndCanceled = order.totalDealed + order.totalCanceled
+            order.total = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) : this.numberFormat(order.orginalOrder.amountS, tokens);
+
+
+
+            if (this.market) {
+                let marketConfig = this.getMarket(this.market);
+                if (marketConfig) {
+                    order.typeClass = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'green' : 'red';
+                    order.typeTitle = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'Buy' : 'Sell';
+                    if (order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx) {
+                        let tempS = order.orginalOrder.tokenS,
+                            tempB = order.orginalOrder.tokenB,
+                            tempAmountS = order.orginalOrder.amountB,
+                            tempAmountB = order.orginalOrder.amountS,
+                            tempDealedAmountS = order.totalDealedAmountS,
+                            tempDealedAmountB = order.totalDealedAmountB;
+                        order.orginalOrder.tokenS = tempB;
+                        order.orginalOrder.amountS = tempAmountB;
+                        order.totalDealedAmountS = tempDealedAmountB;
+                        order.orginalOrder.tokenB = tempS;
+                        order.totalDealedAmountB = tempDealedAmountS;
+                        order.orginalOrder.amountB = tempAmountS;
+                    }
+                } else {
+                    var detail = { text: "Market is not supported: " + this.market, category: "error", duration: 8000 };
+                    this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
+                    this.dispatchEvent(new CustomEvent('nout-found', {
+                        bubbles: true,
+                        composed: true,
+                        detail: { msg: "not found market:" + this.market }
+                    }));
+                }
+            } else {
+                order.typeTitle = order.orginalOrder.tokenS.toUpperCase() + "⇢" + order.orginalOrder.tokenB.toUpperCase();
+            }
+
+            order.tokenB = order.orginalOrder.tokenB.toUpperCase();
+            order.amountB = this.numberFormat(order.orginalOrder.amountB, tokenb);
+            order.price = this.getPrice(order.orginalOrder.amountB, order.orginalOrder.amountS);
+            order.pricePrecision = tokenb.pricePrecision;
+            order.volumnPrecisionB = tokenb.volumnPrecision;
+
+            order.tokenS = order.orginalOrder.tokenS.toUpperCase();
+            order.amountS = this.numberFormat(order.orginalOrder.amountS, tokens);
+            order.volumnPrecisionS = tokens.volumnPrecision;
+            order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB, tokens);
+            order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS, tokens);
+            order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS, tokens);
+
+            return order;
+        }
+
+        _getToken(tokenName, appConfig) {
+            let pricePrecision = appConfig.marketConfig.defaultPricePrecision,
+                volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
+            let marketConfig = this.getMarket(tokenName + "-WETH");
+            if (marketConfig) {
+                pricePrecision = marketConfig.pricePrecision;
+            }
+            const tokenxConfig = appConfig.tokenMap[tokenName.toUpperCase()];
+
+            tokenxConfig.pricePrecision = pricePrecision;
+            tokenxConfig.volumnPrecision = tokenxConfig.precision || volumnPrecision;
+
+            tokenxConfig.digits = tokenxConfig.digits || 18;
+            tokenxConfig.token = tokenxConfig.token || tokenName.toUpperCase();
+            return tokenxConfig;
+        }
+
+        numberFormat(num, token) {
+            if (!num) return 0;
+            const size = Number(num);
+            return (size / Number('1e' + token.digits));
+        }
+
+        getPrice(b, s) {
+            if (b && s && s !== 0) {
+                return (b / s);
+            }
+            return 0;
+        }
+
+        go() {
+            this.$.ajax.generateRequest();
+        }
+    }
+
+    window.customElements.define(OrderTable.is, OrderTable);
     </script>
 </dom-module>

@@ -23,6 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         paper-tabs {
             height: 32px;
             text-transform: none;
+            margin-bottom: 16px;
         }
 
         .sections {
@@ -38,11 +39,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             .sections {
                 padding-top: 32px;
             }
+            .sections[unresolved] {
+                padding-top: 96px;
+            }
         }
         </style>
         <loopr-page>
             <loopr-toolbar slot="secondary-toolbar" active-tab="history"></loopr-toolbar>
-            <div class="sections">
+            <div class="sections" unresolved>
                 <paper-card transparent>
                     <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
                         <paper-tab name="trades"><a styleless href="/#/history/trades/{{third}}">Trades</a></paper-tab>
@@ -96,12 +100,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computedPage(page) {
-            if(page && "history" === page) return page;
+            if (page && "history" === page) return page;
         }
 
         _computedSubpage(page, subpage) {
-            if(page && "history" === page){
-                if(subpage){
+            if (page && "history" === page) {
+                if (subpage) {
                     return subpage;
                 } else {
                     return "trades";
@@ -110,11 +114,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computedThird(page, subpage, third) {
-            if(page && "history" === page && subpage && third) return third;
+            if (page && "history" === page && subpage && third) return third;
         }
 
         _computeSelected(page, subpage) {
-            if("history" != page) return;
+            if ("history" != page) return;
             if (subpage === 'trades' || subpage === 'rings' || subpage === 'orders' || subpage === 'stats') {
                 return subpage;
             } else {
@@ -123,9 +127,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        go() {
-            const page = this.$.pages.selectedItem;
-            if (page && page.go) page.go();
+        go(selectedPage) {
+            if (this.page && this.page === "history" && selectedPage && selectedPage.go) {
+                selectedPage.go();
+            }
         }
     }
 

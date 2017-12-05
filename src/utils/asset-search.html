@@ -4,20 +4,19 @@
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
-            vaadin-text-field {
-               --valo-text-field-border-radius : 5px;
-            }
-            .label {
-                height: 44px;
-            }
+         :host {
+            display: block;
+        }
+
+        vaadin-text-field {
+            --valo-text-field-border-radius: 5px;
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <div class="horizontal end layout">
-            <div class="label horizontal center layout"><iron-icon icon="icons:search"></iron-icon></div>
-            <vaadin-text-field id="search" value="{{keyword}}" placeholder="Token"></vaadin-text-field>
+            <vaadin-text-field id="search" value="{{keyword}}" placeholder="Token">
+                <iron-icon slot="prefix" icon="icons:search"></iron-icon>
+            </vaadin-text-field>
         </div>
     </template>
     <script>
@@ -50,14 +49,14 @@
             };
         }
 
-        ready(){
+        ready() {
             super.ready();
         }
 
         _computeResult(sources, keyword) {
-            if(sources){
-                if(keyword){
-                    return sources.filter(function(item){
+            if (sources) {
+                if (keyword) {
+                    return sources.filter(function(item) {
                         return ((item.token.indexOf(keyword.toUpperCase()) > -1) || (item.name.toUpperCase().indexOf(keyword.toUpperCase()) > -1));
                     });
                 } else {

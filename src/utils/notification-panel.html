@@ -64,9 +64,9 @@
             return {};
         }
 
-        ready(){
+        ready() {
             super.ready();
-            if(!navigator.cookieEnabled){
+            if (!navigator.cookieEnabled) {
                 // set duration to 0 to forbidden paper-toast auto-close
                 var detail = { text: "Cookies are blocked or not supported by your browser. You must enable cookies to use Loopr", category: "error", duration: 0 }
                 this.showOnBottom(detail);
