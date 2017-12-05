@@ -23,6 +23,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .increase {
             color: var(--app-red-color);
         }
+
+        @media(min-width:1024px) {
+            .sections {
+                padding-top: 32px;
+            }
+            .sections[unresolved] {
+                padding-top: 96px;
+            }
+        }
         </style>
         <loopr-page>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -32,7 +41,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </loopr-toolbar>
             <div class="sections" unresolved>
                 <paper-card transparent>
-                    <div class="horizontal start layout">
+                    <div class="horizontal end layout">
                         <market-tab sources="{{tickers}}" results="{{searchResult}}" searched="{{searched}}"></market-tab>
                         <div class="flex"></div>
                         <market-search sources="{{tickers}}" results="{{searchResult}}" searched="{{searched}}" placeholder="Market"></market-search>
