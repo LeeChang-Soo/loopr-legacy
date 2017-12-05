@@ -114,7 +114,7 @@
 
             async show(detail) {
 
-                const relay = new Relay('http://127.0.0.1:8545');
+                const relay = new Relay('http://10.137.111.250:8083/rpc');
                 let nonce = await relay.getTransactionCount(this.wallet.address);
 
                 const rawTxs = _.map(detail.raws, function (raw) {
@@ -146,7 +146,7 @@
             }
 
             sendTx() {
-                const relay = new Relay('http://127.0.0.1:8545');
+                const relay = new Relay('http://10.137.111.250:8083/rpc');
 
                 async.forEach(this.detail.raws, async function (raw) {
                     const result = await relay.sendSignedTx(raw.signed);
@@ -157,7 +157,7 @@
                         composed: true,
                         detail: detail
                     }));
-                }, function (err) {
+                }.bind(this), function (err) {
                     var detail = {text: err.message, category: "error", duration: 8000};
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,

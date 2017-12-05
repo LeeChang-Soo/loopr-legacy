@@ -121,13 +121,6 @@
                 return 'order-dialog';
             }
 
-            /**
-             * detail:[
-             *  {"raw":"raw datas", "subTitle":"Cancel Older Authorization"},
-             *  {"raw":"raw datas", "subTitle":"Authorization"}
-             * ]
-             * @returns {{detail: Object, signed: String}}
-             */
             static get properties() {
                 return {
                     detail: Object,
@@ -140,12 +133,12 @@
             }
 
             _hasSubTitle(item) {
-                return item.subTitle != ""
+                return item.subTitle !== ""
             }
 
             async show(detail) {
 
-                const relay = new Relay('http://127.0.0.1:8545');
+                const relay = new Relay('http://10.137.111.250:8083/rpc');
                 let nonce = await relay.getTransactionCount(this.wallet.address);
 
                 const rawTxs = _.map(detail.raws, function (raw) {
@@ -179,7 +172,7 @@
 
             async placeOrder() {
 
-                const relay = new Relay('http://10.137.109.245:8083/rpc');
+                const relay = new Relay('http://10.137.111.250:8083/rpc');
                 async.forEachOf(this.detail.raws, async function (raw) {
                     const result = await relay.sendSignedTx(raw.signed);
                     var detail = {
@@ -221,9 +214,6 @@
                                detail
                            }));
                        }
-
-
-
                     }
                 }.bind(this));
             }
