@@ -127,7 +127,7 @@
                             Your balance is [[tokensBalance]]. Your allowance is [[tokensAllowance]].
                             <template is="dom-if" if="[[isAllowanceWarn(tokensAllowance,tokens)]]">
                                 <a href="/#/approve/[[tokens.token]]" tabindex="-1"> Set allowance to
-                                    [[[[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]]]] </a>
+                                    [[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]] </a>
                             </template>
                             <br> [[_showAmountInfo(tokens, sellAmount, priceQuote,settingsLrcFee)]]
                         </template>
