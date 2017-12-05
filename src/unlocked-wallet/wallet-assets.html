@@ -31,6 +31,10 @@
             padding-top: 0;
         }
 
+        .sections[unresolved] {
+            padding-top: 0;
+        }
+
         .summary {
             font-size: 1em;
             font-weight: 500;
@@ -77,12 +81,14 @@
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
                         <template>
-                            <div class="horiziontal layout">[[item.token]]</div></template>
+                            <div class="horiziontal layout">[[item.token]]</div>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="50px">
                         <template class="header">Name</template>
                         <template>
-                            <div class="horiziontal layout">[[item.name]]</div></template>
+                            <div class="horiziontal layout">[[item.name]]</div>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
@@ -123,7 +129,9 @@
             </paper-card>
             <paper-card transparent>
                 <div class="horizontal start layout">
-                    <div class="search"><asset-search sources="{{erc20Tokens}}" results="{{result}}" searched="{{searched}}"></asset-search></div>
+                    <div class="search">
+                        <asset-search sources="{{erc20Tokens}}" results="{{result}}" searched="{{searched}}"></asset-search>
+                    </div>
                     <div class="split"></div>
                     <div class="hidebalance horizontal center layout">
                         <a href="javascript:void(0)" on-click="_hideOrShowTips">{{hideOrShowTips}}</a>
@@ -136,12 +144,14 @@
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
                         <template>
-                            <div class="horiziontal layout">[[item.token]]</div></template>
+                            <div class="horiziontal layout">[[item.token]]</div>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column width="50px">
                         <template class="header">Name</template>
                         <template>
-                            <div class="horiziontal layout">[[item.name]]</div></template>
+                            <div class="horiziontal layout">[[item.name]]</div>
+                        </template>
                     </vaadin-grid-column>
                     <vaadin-grid-column>
                         <template class="header">Balance</template>
@@ -212,8 +222,8 @@
             };
         }
 
-        _hideOrShowTips(){
-            if(this.hideBalance) {
+        _hideOrShowTips() {
+            if (this.hideBalance) {
                 this.hideBalance = false;
                 this.result = this._computeZeroBalance(this.erc20Tokens, false);
             } else {
@@ -223,11 +233,11 @@
         }
 
         _computeTips(hideBalance, searched) {
-            if(searched) {
+            if (searched) {
                 this.hideBalance = false;
                 return 'Hide 0 Balances';
             } else {
-                if(hideBalance) {
+                if (hideBalance) {
                     return 'Show 0 Balances';
                 } else {
                     return 'Hide 0 Balances';
@@ -236,9 +246,9 @@
         }
 
         _computeZeroBalance(erc20Tokens, hideBalance) {
-            if(erc20Tokens){
-                if(hideBalance){
-                    return erc20Tokens.filter(function(item){
+            if (erc20Tokens) {
+                if (hideBalance) {
+                    return erc20Tokens.filter(function(item) {
                         return Number(item.balanceValue) > 0;
                     });
                 } else {
@@ -254,7 +264,7 @@
                     var item = i;
                     const tokenConfig = this.appConfig.tokenMap[i.token];
                     if (!tokenConfig) {
-                        console.error('Data error, no token:'+i.token+" config");
+                        console.error('Data error, no token:' + i.token + " config");
                         return null;
                     }
 
@@ -287,7 +297,7 @@
         _isWETH(token) { return token === 'WETH'; }
 
         go() {
-            if("wallet" === this.page){
+            if ("wallet" === this.page) {
                 this.$.ajax.generateRequest();
             }
         }

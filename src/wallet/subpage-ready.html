@@ -19,6 +19,9 @@
             .sections {
                 padding-top: 32px;
             }
+            .sections[unresolved] {
+                padding-top: 96px;
+            }
         }
 
         paper-tabs {
@@ -32,7 +35,7 @@
         }
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
-        <div class="sections">
+        <div class="sections" unresolved>
             <paper-card transparent>
                 <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
                     <paper-tab name="assets"><a styleless href="/#/wallet/assets">Assets</a></paper-tab>
@@ -41,7 +44,7 @@
                 </paper-tabs>
             </paper-card>
             <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
-                <wallet-assets name="assets" page="{{page}}" subpage="{{subpage}}"></wallet-assets>
+                <wallet-assets name="assets" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-assets>
                 <wallet-trades name="trades" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-trades>
                 <wallet-orders name="orders" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-orders>
             </iron-pages>
@@ -72,12 +75,12 @@
             };
         }
 
-        ready(){
+        ready() {
             super.ready();
         }
 
         _computeSelected(page, subpage) {
-            if (page && "wallet" === page){
+            if (page && "wallet" === page) {
                 if (subpage && subpage === 'assets' || subpage === 'orders' || subpage === 'trades') {
                     return subpage;
                 } else {
@@ -88,7 +91,7 @@
         }
 
         go(selectedPage) {
-            if(this.page && this.page === "wallet" && this.wallet && selectedPage && selectedPage.go) {
+            if (this.page && this.page === "wallet" && this.wallet && selectedPage && selectedPage.go) {
                 selectedPage.go();
             }
         }

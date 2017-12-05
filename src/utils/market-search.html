@@ -4,15 +4,17 @@
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
-            vaadin-text-field {
-               --valo-text-field-border-radius : 5px;
-            }
-            iron-icon {
-                color: var(--app-text-color-light);
-            }
+         :host {
+            display: block;
+        }
+
+        vaadin-text-field {
+            --valo-text-field-border-radius: 5px;
+        }
+
+        iron-icon {
+            color: var(--app-text-color-light);
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <div class="horizontal end layout">
@@ -51,18 +53,18 @@
             };
         }
 
-        ready(){
+        ready() {
             super.ready();
         }
 
-        _tabChange(value){
+        _tabChange(value) {
             this.keyword = '';
         }
 
         _computeResult(sources, keyword) {
-            if(sources){
-                if(keyword){
-                    return sources.filter(function(item){
+            if (sources) {
+                if (keyword) {
+                    return sources.filter(function(item) {
                         return item.market.indexOf(keyword.toUpperCase()) > -1;
                     });
                 } else {
