@@ -373,10 +373,9 @@
             let tokenb = this._getToken(order.orginalOrder.tokenB, appConfig);
             let tokens = this._getToken(order.orginalOrder.tokenS, appConfig);
             order.total = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) : this.numberFormat(order.orginalOrder.amountS, tokens);
-            order.totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? order.total - this.numberFormat(order.remainedAmountB, tokenb) : order.total - this.numberFormat(order.remainedAmountS, tokens);
+            order.totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.dealedAmountB, tokenb) : this.numberFormat(order.dealedAmountS, tokens);
             if(order.status === 'ORDER_CANCEL' || order.status === 'ORDER_CUTOFF') {
-                order.totalCanceled = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) / this.numberFormat(order.orginalOrder.amountS, tokens) * this.numberFormat(order.totalCancelledAmountS, tokens) : this.numberFormat(order.totalCancelledAmountS, tokens);
-            } else {
+                order.totalCanceled = order.total - order.totalDealed;
                 order.totalCanceled = 0;
             }
             order.dealedAndCanceled = order.totalDealed + order.totalCanceled;

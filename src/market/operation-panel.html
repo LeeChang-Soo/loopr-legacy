@@ -432,7 +432,7 @@
                     data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.digits)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 10 * 24 * 3600;
-                    data.salt = Math.round(Math.random() * 1e18);
+                    data.salt = Math.round(Math.random() * 1e8);
                     if (!this.lrc) {
                         const detail = {
                             text: 'Can\'t get LRC Config',
@@ -660,7 +660,7 @@
                     data.amountB = '0x' + Number((Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     data.ttl = 30 * 24 * 3600;
-                    data.salt = Math.round(Math.random() * 1e18);
+                    data.salt = Math.round(Math.random() * 1e8);
 
                     if (!this.lrc) {
                         const detail = {text: 'Can\'t get LRC Config', category: "warning", duration: 5000};
