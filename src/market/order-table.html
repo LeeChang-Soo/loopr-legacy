@@ -227,8 +227,10 @@
         }
         _computeParams(market, filterMine, settingsVersion,currentPage){
             const params = {};
-            if(market && settingsVersion){
-                params.market = market;
+            if(settingsVersion){
+                if(market) {
+                    params.market = market;
+                }
                 params.contractVersion = settingsVersion;
                 if(filterMine && this.wallet){
                     params.address = this.wallet.address;
@@ -374,7 +376,7 @@
             order.totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? order.total - this.numberFormat(order.remainedAmountB, tokenb) : order.total - this.numberFormat(order.remainedAmountS, tokens);
             if(order.status === 'ORDER_CANCEL' || order.status === 'ORDER_CUTOFF') {
                 order.totalCanceled = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) / this.numberFormat(order.orginalOrder.amountS, tokens) * this.numberFormat(order.totalCancelledAmountS, tokens) : this.numberFormat(order.totalCancelledAmountS, tokens);
-            }else{
+            } else {
                 order.totalCanceled = 0;
             }
             order.dealedAndCanceled = order.totalDealed + order.totalCanceled;
