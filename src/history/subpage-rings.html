@@ -12,16 +12,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
-            div.long-hash {
-                width: 130px;
-            }
+         :host {
+            display: block;
+        }
+
+        div.long-hash {
+            width: 130px;
+        }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-
         <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
             <vaadin-grid-column width="60px">
                 <template class="header">
@@ -87,7 +87,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
             <vaadin-grid-column width="60px">
                 <template class="header">Time</template>
-                <template><time-str seconds="[[item.timestamp]]"></time-str></template>
+                <template>
+                    <time-str seconds="[[item.timestamp]]"></time-str>
+                </template>
             </vaadin-grid-column>
         </vaadin-grid>
         <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
@@ -120,12 +122,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        ready(){
+        ready() {
             super.ready();
         }
 
-        _computePage(resp){
-            if(resp){
+        _computePage(resp) {
+            if (resp) {
                 let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
                 this.totalPage = Math.max(2, pageSize);;
                 this.currentPage = resp.result.pageIndex;

@@ -20,6 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             color: white;
             background-color: var(--google-grey-700);
         }
+
         paper-icon-button {
             color: white;
         }
@@ -76,12 +77,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         signToSend() {
-            var detail = { raws: [{"raw":"raw message"}] };
+            var detail = { raws: [{ "raw": "raw message" }] };
             this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
         }
 
-        signToSendWithTwo(){
-            var detail = { raws: [{"raw":"cancle datas", "subTitle":"Cancel Older Authorization"}, {"raw":"authorize datas", "subTitle":"Authorization"}] };
+        signToSendWithTwo() {
+            var detail = { raws: [{ "raw": "cancle datas", "subTitle": "Cancel Older Authorization" }, { "raw": "authorize datas", "subTitle": "Authorization" }] };
             this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
         }
 
@@ -94,7 +95,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        deleteWallet(){
+        deleteWallet() {
             this.wallet = null;
         }
     }

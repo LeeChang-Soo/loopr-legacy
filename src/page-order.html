@@ -46,13 +46,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <paper-item class="flex">
                             <paper-item-body two-line>
                                 <div class="title"> Filled Sell Amount</div>
-                                <div secondary><pretty-number v="[[orderItem.totalDealedAmountS]]" d=[[orderItem.precisionS]] postfix="[[orderItem.tokenS]]"></pretty-number></div>
+                                <div secondary>
+                                    <pretty-number v="[[orderItem.totalDealedAmountS]]" d=[[orderItem.precisionS]] postfix="[[orderItem.tokenS]]"></pretty-number>
+                                </div>
                             </paper-item-body>
                         </paper-item>
                         <paper-item class="flex">
                             <paper-item-body two-line>
                                 <div class="title"> Filled Buy Amount</div>
-                                <div secondary><pretty-number v="[[orderItem.totalDealedAmountB]]" d=[[orderItem.precisionB]] postfix="[[orderItem.tokenB]]"></pretty-number></div>
+                                <div secondary>
+                                    <pretty-number v="[[orderItem.totalDealedAmountB]]" d=[[orderItem.precisionB]] postfix="[[orderItem.tokenB]]"></pretty-number>
+                                </div>
                             </paper-item-body>
                         </paper-item>
                         <paper-item class="flex">
@@ -88,7 +92,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 orderItem: {
                     type: Object,
-                    computed:'_computeOrder(appConfig, resp)'
+                    computed: '_computeOrder(appConfig, resp)'
                 }
             };
         }
@@ -97,13 +101,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computedHash(page, subpage) {
-            if(page && subpage && page === "order") {
+            if (page && subpage && page === "order") {
                 return subpage;
             }
         }
 
-        _computeOrder(appConfig, resp){
-            if(appConfig && resp) {
+        _computeOrder(appConfig, resp) {
+            if (appConfig && resp) {
                 let data = resp.result.data;
                 let tokenS = this.getTokenByName(data.orginalOrder.tokenS);
                 let tokenB = this.getTokenByName(data.orginalOrder.tokenB);
@@ -115,14 +119,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 let dealedS = this.toNumber(data.totalDealedAmountS, tokenS);
                 let dealedB = this.toNumber(data.totalDealedAmountB, tokenB);
                 let result = {
-                    tokenS: tokenS.unit, amountS: amountS, precisionS: tokenS.precision, totalDealedAmountS: dealedS,
-                    tokenB: tokenB.unit, amountB: amountB, precisionB: tokenB.precision, totalDealedAmountB: dealedB,
+                    tokenS: tokenS.unit,
+                    amountS: amountS,
+                    precisionS: tokenS.precision,
+                    totalDealedAmountS: dealedS,
+                    tokenB: tokenB.unit,
+                    amountB: amountB,
+                    precisionB: tokenB.precision,
+                    totalDealedAmountB: dealedB,
                     status: data.status
                 };
                 return result;
             }
         }
-        _update(){
+        _update() {
             this.ring = this._computeOrder(this.appConfig, this.resp)
         }
     }
