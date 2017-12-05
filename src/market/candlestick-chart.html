@@ -12,10 +12,12 @@
             height: 400px;
             min-width: 1000px;
         }
+
         #price {
             height: 50%;
             min-width: 1000px;
         }
+
         #volume {
             height: 50%;
             min-width: 1000px;
@@ -27,8 +29,7 @@
                 <div id="volume"></div>
             </div>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}"
-                                loading="{{loading}}"></loopr-ajax>
+            <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
         </div>
     </template>
     <script>
@@ -51,7 +52,7 @@
             var thisChart = this.chart;
 
             if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
-                Highcharts.each(Highcharts.charts, function (chart) {
+                Highcharts.each(Highcharts.charts, function(chart) {
                     if (chart !== thisChart) {
                         if (chart.xAxis[0].setExtremes) { // It is null while updating
                             chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, { trigger: 'syncExtremes' });
@@ -62,19 +63,19 @@
         }
 
         _respChanged(resp) {
-            if(!resp) return;
+            if (!resp) return;
             this._chart(resp);
         }
 
-        _chart(resp){
-            resp.xData = Highcharts.map(resp.result, function (val, j) {
+        _chart(resp) {
+            resp.xData = Highcharts.map(resp.result, function(val, j) {
                 //return (new Date(val[0])).toUTCString()
                 return val[0];
             });
-            resp.price = Highcharts.map(resp.result, function (val, j) {
+            resp.price = Highcharts.map(resp.result, function(val, j) {
                 return val[1];
             });
-            resp.volume = Highcharts.map(resp.result, function (val, j) {
+            resp.volume = Highcharts.map(resp.result, function(val, j) {
                 return val[5];
             });
             let title = this.market.toUpperCase()
@@ -88,7 +89,7 @@
                 xAxis: [{
                     type: 'datetime',
                     labels: {
-                        formatter: function () {
+                        formatter: function() {
                             //console.log(Highcharts.dateFormat('%A, %b %e, %Y', this.value));
                             return Highcharts.dateFormat('%b %e, %Y', this.value);
                         }
