@@ -184,7 +184,7 @@
                 filterMine: Boolean,
 
                 params:{
-                    type:String,
+                    type:Object,
                     computed:'_computeParams(market, filterMine, settingsVersion,currentPage)'
                 },
                 displayMode: {
@@ -225,7 +225,8 @@
                 }
             }
         }
-        _computeParams(market, filterMine, settingsVersion,currentPage){
+        _computeParams(market, filterMine, settingsVersion, currentPage){
+
             const params = {};
             if(settingsVersion){
                 if(market) {
@@ -236,8 +237,7 @@
                     params.address = this.wallet.address;
                 }
                 params.pageIndex = currentPage || 1;
-
-                return JSON.stringify(params);
+                return [{contractVersion:'v1.0'}];
             }
         }
         _computedBalance(data) {

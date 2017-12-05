@@ -54,7 +54,7 @@
 
         _computeParams(relay, method, params) {
             if (relay && method && params) {
-                return { method: method, params: params, id: Math.ceil(Math.random() * 1e8) }
+                return JSON.stringify({ method: method, params: params, id: Math.ceil(Math.random() * 1e8) })
             }
         }
 
