@@ -56,10 +56,10 @@
     "prism-pagination": "Prhythm/prism-pagination#^2.0.2",
     "hot-ajax-paging": "mercmobily/hot-ajax-paging#^0.2.5",
     "bignumber.js": "^4.1.0",
-    "loopring.js": "git://github.com/Loopring/loopring.js.git#v0.0.1",
+    "loopring.js": "git://github.com/Loopring/loopring.js.git#v0.0.1b",
     "highcharts": "^6.0.2",
     "datetime-picker": "fooloomanzoo/datetime-picker#^2.5.0",
-    "axios":"0.17.1"
+    "axios": "^0.17.1"
   },
   "resolutions": {
     "polymer": "^2.0.0",
