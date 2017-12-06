@@ -313,12 +313,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-drawer-layout>
     </template>
     <script>
-    const keystore = require('keystore');
-    const privateKeyWallet = require('wallet');
-    const Validator = require('validator');
-    const signer = require('signer');
-    const Relay = require('relay');
-    const Order = require('order');
+        const keystore = loopring.keystore;
+        const privateKeyWallet = loopring.wallet;
+        const Validator = loopring.validator;
+        const signer = loopring.signer;
+        const Relay = loopring.relay;
+        const Order = loopring.order;
 
     class MyApp extends Polymer.Element {
         static get is() {
