@@ -81,8 +81,8 @@
             <vaadin-grid-column hidden$="[[hiddenBlockNum]]" width="45px">
                 <template class="header">Block</template>
                 <template>
-                    <a class="decorations" href="https://etherscan.io/block/[[item.blockNum]]" target="_blank">
-                        <div class="long-hash">[[item.blockNum]]</div>
+                    <a class="decorations" href="https://etherscan.io/block/[[item.blockNumber]]" target="_blank">
+                        <div class="long-hash">[[item.blockNumber]]</div>
                     </a>
                 </template>
             </vaadin-grid-column>
@@ -157,7 +157,7 @@
             <vaadin-grid-column hidden$="[[hiddenTime]]" width="95px">
                 <template class="header">Time</template>
                 <template>
-                    <time-str seconds="[[item.timestamp]]"></time-str>
+                    <time-str seconds="[[item.createTime]]"></time-str>
                 </template>
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
@@ -261,13 +261,11 @@
                 if(market) {
                     params.market = market;
                 }
-                console.log(JSON.stringify(params));
                 params.contractVersion = settingsVersion;
                 if(filterMine && this.wallet){
                     params.owner = this.wallet.address;
                 }
                 params.pageIndex = currentPage || 1;
-                console.log(JSON.stringify(params));
                 return [params];
             }
         }
@@ -339,9 +337,11 @@
                 item.ringLink = "#/ring/" + item.ringHash;
                 item.orderLink = "#/order/" + item.orderHash;
                 item.txLink = "https://etherscan.io/tx/" + item.txHash;
+                item.tokenS ='LRC';
+                item.tokenB ='WETH';
                 if (this.market) {
                     let marketConfig = this.getMarket(this.market);
-                    if (null != marketConfig) {
+                    if (null !== marketConfig) {
                         this.unitS = appConfig.tokenMap[marketConfig.tokenx].unit;
                         this.unitB = appConfig.tokenMap[marketConfig.tokeny].unit;
                         item.typeStyle = item.tokenS === marketConfig.tokenx ? 'red' : 'green';
@@ -353,7 +353,8 @@
                     }
                 } else {
                     item.buyOrSell = item.tokenS + "⇢" + item.tokenB;
-                    this._computePrecision(item, appConfig)
+                    this._computePrecision(item, appConfig);
+
                 }
                 let tokenS = this.getTokenByName(item.tokenS);
                 let tokenB = this.getTokenByName(item.tokenB);
@@ -375,7 +376,7 @@
                     item.marginSplitUnit = item.marginSplitToken.toUpperCase();
                     item.marginSplitPrecision = appConfig.marketConfig.defaultVolumePrecision;
                 }
-                item.marginSplit = Number(item.splitS || item.splitB);
+                item.marginSplit = Number(item.splitS || item.splitB) / Number('1e' + (marginSplitToken.digits ||'18'));
                 return item;
             }
         }
@@ -385,8 +386,8 @@
             if (item.tokenB === marketConfig.tokenx) {
                 let tempS = item.tokenS,
                     tempB = item.tokenB,
-                    tempAmountS = item.fillAmountS,
-                    tempAmountB = item.fillAmountB;
+                    tempAmountS = item.amountS,
+                    tempAmountB = item.amountB;
                 item.tokenS = tempB;
                 item.fillAmountS = tempAmountB;
                 item.tokenB = tempS;
@@ -442,7 +443,6 @@
         }
 
         _computeOrders(appConfig, resp) {
-            console.log(JSON.stringify(resp));
             if (resp && appConfig) {
                 this.totalPage = resp.result.data.length;
                 return _.map(resp.result.data, o => this._computeOrderItem(appConfig, o));
