@@ -65,7 +65,7 @@
     },
     "resolutions":
     {
-        "async": "^2.5.0"
+        "async": "^2.5.0",
         "iron-a11y-keys-behavior": "^v2.0.0",
         "iron-flex-layout": "^2.0.0",
         "iron-resizable-behavior": "^v2.0.0",
@@ -73,7 +73,7 @@
         "lodash": "^4.17.4",
         "paper-styles": "^2.0.0",
         "polymer": "^2.0.0",
-        "webcomponentsjs": "^v1.0.2",
+        "webcomponentsjs": "^v1.0.2"
     },
     "devDependencies":
     {
