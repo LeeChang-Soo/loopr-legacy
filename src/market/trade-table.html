@@ -60,7 +60,10 @@
         }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+
+
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column hidden$="[[hiddenRing]]" width="45px">
@@ -165,7 +168,8 @@
         <div class$="[[showPage]] horizontal end-justified layout ">
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
-        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderFills.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
+        <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderFills.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
+        <loopr-relay-ajax id="ajax" relay="http://10.137.105.117:8083/rpc" method="loopring_getFills" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
     </template>
     <script>
     class TradeTable extends AppConfigMixin(Polymer.Element) {
@@ -213,6 +217,10 @@
                 showPage: {
                     type: String,
                     value: "hidden"
+                },
+                params:{
+                    type:Object,
+                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion,currentPage)'
                 }
             };
         }
@@ -242,17 +250,50 @@
             }
         }
 
+        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage){
+
+            if(!this._isToReload(page, subpage)) {
+                return null;
+            }
+            let market = this._computedMarket(page, subpage, third);
+            const params = {};
+            if(settingsVersion) {
+                if(market) {
+                    params.market = market;
+                }
+                console.log(JSON.stringify(params));
+                params.contractVersion = settingsVersion;
+                if(filterMine && this.wallet){
+                    params.owner = this.wallet.address;
+                }
+                params.pageIndex = currentPage || 1;
+                console.log(JSON.stringify(params));
+                return [params];
+            }
+        }
+
+
         _computedMarket(page, subpage, third) {
             if (page && subpage) {
                 if (page === "market") {
                     return subpage;
                 } else if (page === "history" && subpage === "trades") {
                     if (third) return third;
-                } else if (page === "wallet" && subpage == "trades") {
+                } else if (page === "wallet" && subpage === "trades") {
                     if (third) return third;
                 }
             }
         }
+
+        _isToReload(page, subpage) {
+            if (page && subpage) {
+                if ((page === "market") || (page === "history" && subpage === "trades") || (page === "wallet" && subpage === "trades")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
 
         _showMore() {
             if (this.filterMine) {
@@ -265,7 +306,7 @@
         _computePage(resp) {
             if (resp) {
                 let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
-                this.totalPage = Math.max(2, pageSize);;
+                this.totalPage = Math.max(2, pageSize);
                 this.currentPage = resp.result.pageIndex;
                 this.pageRange = Math.min(3, pageSize);
                 this._pager();
@@ -319,11 +360,12 @@
                 if (!tokenS || !tokenB) {
                     return;
                 }
-                item.fillAmountS = this.toNumber(item.fillAmountS, tokenS);
-                item.fillAmountB = this.toNumber(item.fillAmountB, tokenB);
+                item.fillAmountS = this.toNumber(item.amountS, tokenS);
+                item.fillAmountB = this.toNumber(item.amountB, tokenB);
                 item.fee = Number(item.fee);
-                item.price = this.calPrice(item.fillAmountB, item.fillAmountS);
+                item.price = this.calPrice(item.amountB, item.amountS);
                 item.feeLrc = Number(item.feeLrc);
+                item.marginSplitToken = item.splitS ? item.tokenS : item.tokenB;
                 let marginSplitToken = appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
                 if (marginSplitToken) {
                     item.marginSplitUnit = marginSplitToken.unit;
@@ -333,7 +375,7 @@
                     item.marginSplitUnit = item.marginSplitToken.toUpperCase();
                     item.marginSplitPrecision = appConfig.marketConfig.defaultVolumePrecision;
                 }
-                item.marginSplit = Number(item.marginSplit);
+                item.marginSplit = Number(item.splitS || item.splitB);
                 return item;
             }
         }
@@ -400,6 +442,7 @@
         }
 
         _computeOrders(appConfig, resp) {
+            console.log(JSON.stringify(resp));
             if (resp && appConfig) {
                 this.totalPage = resp.result.data.length;
                 return _.map(resp.result.data, o => this._computeOrderItem(appConfig, o));
