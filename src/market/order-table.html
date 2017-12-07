@@ -237,7 +237,7 @@
                 }
                 params.contractVersion = settingsVersion;
                 if(filterMine && this.wallet){
-                    params.address = this.wallet.address;
+                    params.owner = this.wallet.address;
                 }
                 params.pageIndex = currentPage || 1;
                 return [params];
