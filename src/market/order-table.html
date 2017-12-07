@@ -284,9 +284,7 @@
 
         _computePage(resp) {
             if (resp) {
-                let pageCount = Math.ceil(resp.result.total / resp.result.pageSize);
-                //this.totalPage = Math.max(2, pageCount); // min 2 pages will show pager if has only one page datas
-                this.totalPage = pageCount; // hidden pager when only has one page datas
+                this.totalPage = Math.ceil(resp.result.total / resp.result.pageSize); // hidden pager when only has one page datas
                 this.currentPage = resp.result.pageIndex;
                 this.pageRange = Math.min(3, pageCount);
                 this._pager();

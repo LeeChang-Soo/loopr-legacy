@@ -128,8 +128,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         _computePage(resp) {
             if (resp) {
-                let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
-                this.totalPage = Math.max(2, pageSize);;
+                this.totalPage = Math.ceil(resp.result.total / resp.result.pageSize); // hidden pager when only has one page datas
                 this.currentPage = resp.result.pageIndex;
                 this.pageRange = Math.min(3, pageSize);
                 this._pager();
