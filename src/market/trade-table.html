@@ -62,7 +62,7 @@
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
 
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
@@ -81,7 +81,7 @@
             <vaadin-grid-column hidden$="[[hiddenBlockNum]]" width="45px">
                 <template class="header">Block</template>
                 <template>
-                    <a class="decorations" href="https://etherscan.io/block/[[item.blockNumber]]" target="_blank">
+                    <a class="decorations" href="https://etherscan.io/block/[[item.blockNum]]" target="_blank">
                         <div class="long-hash">[[item.blockNumber]]</div>
                     </a>
                 </template>
@@ -220,7 +220,7 @@
                 },
                 params:{
                     type:Object,
-                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion,currentPage)'
+                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet)'
                 }
             };
         }
@@ -250,7 +250,7 @@
             }
         }
 
-        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage){
+        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet){
 
             if(!this._isToReload(page, subpage)) {
                 return null;
@@ -262,8 +262,8 @@
                     params.market = market;
                 }
                 params.contractVersion = settingsVersion;
-                if(filterMine && this.wallet){
-                    params.owner = this.wallet.address;
+                if(filterMine && wallet){
+                    params.owner = wallet.address;
                 }
                 params.pageIndex = currentPage || 1;
                 return [params];
@@ -337,8 +337,6 @@
                 item.ringLink = "#/ring/" + item.ringHash;
                 item.orderLink = "#/order/" + item.orderHash;
                 item.txLink = "https://etherscan.io/tx/" + item.txHash;
-                item.tokenS ='LRC';
-                item.tokenB ='WETH';
                 if (this.market) {
                     let marketConfig = this.getMarket(this.market);
                     if (null !== marketConfig) {
@@ -353,8 +351,7 @@
                     }
                 } else {
                     item.buyOrSell = item.tokenS + "⇢" + item.tokenB;
-                    this._computePrecision(item, appConfig);
-
+                    this._computePrecision(item, appConfig)
                 }
                 let tokenS = this.getTokenByName(item.tokenS);
                 let tokenB = this.getTokenByName(item.tokenB);
