@@ -2,7 +2,7 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <dom-module id="loopr-relay-ajax">
     <template>
-        <iron-ajax id="ajax" auto url="[[url]]" headers='{"Content-Type":"application/json"}' method="POST" body="[[methodParams]]" handle-as="json" last-response="{{lastResponse}}" debounce-duration="300" loading="{{loading}}" timeout="{{timeout}}" on-error="_onError">
+        <iron-ajax id="ajax" url="[[url]]" headers='{"Content-Type":"application/json"}' method="POST" body="[[methodParams]]" handle-as="json" last-response="{{lastResponse}}" debounce-duration="300" loading="{{loading}}" timeout="{{timeout}}" on-error="_onError">
         </iron-ajax>
     </template>
     <script>
@@ -43,6 +43,18 @@
                     type: Object,
                     notify: true
                 }
+            }
+        }
+
+        static get observers() {
+            return [
+                '_isToReload(url, params)'
+            ];
+        }
+
+        _isToReload(url, params) {
+            if(url && params){
+                this.generateRequest();
             }
         }
 

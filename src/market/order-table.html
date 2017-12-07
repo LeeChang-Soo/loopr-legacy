@@ -80,8 +80,8 @@
                 </template>
                 <template>
                     <div class="left-aligned">
-                        <a href="#/order/[[item.orginalOrder.hash]]">
-                            <div class="long-hash"> [[item.orginalOrder.hash]]</div>
+                        <a href="#/order/[[item.originalOrder.hash]]">
+                            <div class="long-hash"> [[item.originalOrder.hash]]</div>
                         </a>
                     </div>
                 </template>
@@ -137,7 +137,7 @@
                 </template>
                 <template>
                     <div class="left-aligned">
-                        <time-str seconds="[[item.orginalOrder.timestamp]]"></time-str>
+                        <time-str seconds="[[item.originalOrder.timestamp]]"></time-str>
                     </div>
                 </template>
                 <template class="footer"></template>
@@ -148,7 +148,7 @@
                 </template>
                 <template>
                     <div class="operations">
-                        <a href="javascript:void(0)" order="[[item.orginalOrder]]" on-click="_cancel">Cancel</a>
+                        <a href="javascript:void(0)" order="[[item.originalOrder]]" on-click="_cancel">Cancel</a>
                     </div>
                 </template>
                 <template class="footer"></template>
@@ -162,9 +162,7 @@
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
         <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orders.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
-
-        <loopr-relay-ajax id="ajax" relay="http://10.137.111.250:8083/rpc" method="loopring_getOrders" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
-
+        <loopr-relay-ajax id="ajax" relay="http://10.137.105.117:8083/rpc" method="loopring_getOrders" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
     </template>
     <script>
     class OrderTable extends AppConfigMixin(Polymer.Element) {
@@ -185,7 +183,7 @@
 
                 params:{
                     type:Object,
-                    computed:'_computeParams(market, filterMine, settingsVersion,currentPage)'
+                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion,currentPage)'
                 },
                 displayMode: {
                     type: String
@@ -195,7 +193,8 @@
                     computed: '_computeOrders(appConfig, resp, balancesRaw)'
                 },
                 currentPage: {
-                    type: Number
+                    type: Number,
+                    value: 1
                 },
                 totalPage: {
                     type: Number
@@ -225,10 +224,14 @@
                 }
             }
         }
-        _computeParams(market, filterMine, settingsVersion, currentPage){
 
+        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage) {
+            if(!this._isToReload(page, subpage)) {
+                return null;
+            }
+            let market = this._computedMarket(page, subpage, third);
             const params = {};
-            if(settingsVersion){
+            if(settingsVersion) {
                 if(market) {
                     params.market = market;
                 }
@@ -237,15 +240,29 @@
                     params.address = this.wallet.address;
                 }
                 params.pageIndex = currentPage || 1;
-                return [{contractVersion:'v1.0'}];
+                return [params];
             }
         }
+
         _computedBalance(data) {
             if (data) {
                 return _.keyBy(data.result.tokens, o => o.token);
             }
         }
+
+        _isToReload(page, subpage) {
+            if (page && subpage) {
+                if ((page === "market") || (page === "history" && subpage === "orders") || (page === "wallet" && subpage == "orders")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         _computedMarket(page, subpage, third) {
+            if(!this._isToReload(page, subpage)) {
+                return;
+            }
             if (page && subpage) {
                 if (page === "market") {
                     return subpage;
@@ -267,10 +284,11 @@
 
         _computePage(resp) {
             if (resp) {
-                let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
-                this.totalPage = Math.max(2, pageSize);
+                let pageCount = Math.ceil(resp.result.total / resp.result.pageSize);
+                //this.totalPage = Math.max(2, pageCount); // min 2 pages will show pager if has only one page datas
+                this.totalPage = pageCount; // hidden pager when only has one page datas
                 this.currentPage = resp.result.pageIndex;
-                this.pageRange = Math.min(3, pageSize);
+                this.pageRange = Math.min(3, pageCount);
                 this._pager();
                 this._showPage();
             }
@@ -370,34 +388,46 @@
         }
 
         _computeItem(appConfig, order) {
-            let tokenb = this._getToken(order.orginalOrder.tokenB, appConfig);
-            let tokens = this._getToken(order.orginalOrder.tokenS, appConfig);
-            order.total = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.orginalOrder.amountB, tokenb) : this.numberFormat(order.orginalOrder.amountS, tokens);
-            order.totalDealed = order.orginalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.dealedAmountB, tokenb) : this.numberFormat(order.dealedAmountS, tokens);
-            if(order.status === 'ORDER_CANCEL' || order.status === 'ORDER_CUTOFF') {
+            let upperTokenB = order.originalOrder.tokenB.toUpperCase();
+            order.originalOrder.tokenB = upperTokenB;
+            let upperTokenS = order.originalOrder.tokenS.toUpperCase();
+            order.originalOrder.tokenS = upperTokenS;
+            let tokenb = this._getToken(upperTokenB, appConfig);
+            if(!tokenb) {
+                console.error("Token:["+upperTokenB+"] config not found");
+                return;
+            }
+            let tokens = this._getToken(upperTokenS, appConfig);
+            if(!tokens) {
+                console.error("Token:["+upperTokenS+"] config not found");
+                return;
+            }
+            order.total = order.originalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.originalOrder.amountB, tokenb) : this.numberFormat(order.originalOrder.amountS, tokens);
+            order.totalDealed = order.originalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.dealtAmountB, tokenb) : this.numberFormat(order.dealtAmountS, tokens);
+            if(order.status === 'ORDER_CANCELED' || order.status === 'ORDER_CUTOFF') {
                 order.totalCanceled = order.total - order.totalDealed;
+            } else {
                 order.totalCanceled = 0;
             }
             order.dealedAndCanceled = order.totalDealed + order.totalCanceled;
-
             if (this.market) {
                 let marketConfig = this.getMarket(this.market);
                 if (marketConfig) {
-                    order.typeClass = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'green' : 'red';
-                    order.typeTitle = order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx ? 'Buy' : 'Sell';
-                    if (order.orginalOrder.tokenB.toUpperCase() === marketConfig.tokenx) {
-                        let tempS = order.orginalOrder.tokenS,
-                            tempB = order.orginalOrder.tokenB,
-                            tempAmountS = order.orginalOrder.amountB,
-                            tempAmountB = order.orginalOrder.amountS,
-                            tempDealedAmountS = order.totalDealedAmountS,
-                            tempDealedAmountB = order.totalDealedAmountB;
-                        order.orginalOrder.tokenS = tempB;
-                        order.orginalOrder.amountS = tempAmountB;
-                        order.totalDealedAmountS = tempDealedAmountB;
-                        order.orginalOrder.tokenB = tempS;
-                        order.totalDealedAmountB = tempDealedAmountS;
-                        order.orginalOrder.amountB = tempAmountS;
+                    order.typeClass = upperTokenB === marketConfig.tokenx ? 'green' : 'red';
+                    order.typeTitle = upperTokenB === marketConfig.tokenx ? 'Buy' : 'Sell';
+                    if (upperTokenB === marketConfig.tokenx) {
+                        let tempS = upperTokenS,
+                            tempB = upperTokenB,
+                            tempAmountS = order.originalOrder.amountB,
+                            tempAmountB = order.originalOrder.amountS,
+                            tempDealedAmountS = order.dealtAmountS,
+                            tempDealedAmountB = order.dealtAmountB;
+                        order.originalOrder.tokenS = tempB;
+                        order.originalOrder.amountS = tempAmountB;
+                        order.dealtAmountS = tempDealedAmountB;
+                        order.originalOrder.tokenB = tempS;
+                        order.dealtAmountB = tempDealedAmountS;
+                        order.originalOrder.amountB = tempAmountS;
                     }
                 } else {
                     var detail = { text: "Market is not supported: " + this.market, category: "error", duration: 8000 };
@@ -405,26 +435,24 @@
                     this.dispatchEvent(new CustomEvent('nout-found', {
                         bubbles: true,
                         composed: true,
-                        detail: { msg: "not found market:" + this.market }
+                        detail: { msg: "Market is not supported: " + this.market }
                     }));
                 }
             } else {
-                order.typeTitle = order.orginalOrder.tokenS.toUpperCase() + "⇢" + order.orginalOrder.tokenB.toUpperCase();
+                order.typeTitle = upperTokenS + "⇢" + order.originalOrder.tokenB.toUpperCase();
             }
-
-            order.tokenB = order.orginalOrder.tokenB.toUpperCase();
-            order.amountB = this.numberFormat(order.orginalOrder.amountB, tokenb);
-            order.price = this.getPrice(order.orginalOrder.amountB, order.orginalOrder.amountS);
+            order.tokenB = upperTokenB;
+            order.amountB = this.numberFormat(order.originalOrder.amountB, tokenb);
+            order.price = this.getPrice(order.originalOrder.amountB, order.originalOrder.amountS);
             order.pricePrecision = tokenb.pricePrecision;
             order.volumnPrecisionB = tokenb.volumnPrecision;
-
-            order.tokenS = order.orginalOrder.tokenS.toUpperCase();
-            order.amountS = this.numberFormat(order.orginalOrder.amountS, tokens);
+            order.tokenS = upperTokenS;
+            order.amountS = this.numberFormat(order.originalOrder.amountS, tokens);
             order.volumnPrecisionS = tokens.volumnPrecision;
-            order.totalDealedAmountB = this.numberFormat(order.totalDealedAmountB, tokens);
-            order.totalDealedAmountS = this.numberFormat(order.totalDealedAmountS, tokens);
-            order.totalCancelledAmountS = this.numberFormat(order.totalCancelledAmountS, tokens);
-
+            order.dealtAmountB = this.numberFormat(order.dealtAmountB, tokens);
+            order.dealtAmountS = this.numberFormat(order.dealtAmountS, tokens);
+            order.cancelledAmountB = this.numberFormat(order.cancelledAmountB, tokenb);
+            order.cancelledAmountS = this.numberFormat(order.cancelledAmountS, tokens);
             return order;
         }
 
@@ -458,8 +486,8 @@
             return 0;
         }
 
-        go() {
-            this.$.ajax.generateRequest();
+        go() { //do not need to be called by outer component when iron-page change, "page" and "subpage" parameters change will load data automatically
+            //this.$.ajax.generateRequest();
         }
     }
 
