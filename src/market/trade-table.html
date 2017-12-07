@@ -337,6 +337,8 @@
                 item.ringLink = "#/ring/" + item.ringHash;
                 item.orderLink = "#/order/" + item.orderHash;
                 item.txLink = "https://etherscan.io/tx/" + item.txHash;
+                item.tokenB = "WETH";
+                item.tokenS = "LRC";
                 if (this.market) {
                     let marketConfig = this.getMarket(this.market);
                     if (null !== marketConfig) {
@@ -362,7 +364,7 @@
                 item.fillAmountB = this.toNumber(item.amountB, tokenB);
                 item.fee = Number(item.fee);
                 item.price = this.calPrice(item.amountB, item.amountS);
-                item.feeLrc = Number(item.feeLrc);
+                item.feeLrc = Number(item.lrcFee) / 1e18;
                 item.marginSplitToken = item.splitS ? item.tokenS : item.tokenB;
                 let marginSplitToken = appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
                 if (marginSplitToken) {
