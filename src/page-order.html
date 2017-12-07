@@ -22,7 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <simple-toolbar slot="secondary-toolbar" title="Order" id="[[hash]]" back-link="/#/history/orders"></simple-toolbar>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+            <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
             <div class="sections">
                 <paper-card transparent>Order Detail</paper-card>
                 <paper-card>
@@ -75,7 +75,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <loopr-footer></loopr-footer>
             </div>
         </loopr-page>
-        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/order.json" last-response="{{resp}}"></loopr-ajax>
+        <!--<loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/order.json" last-response="{{resp}}"></loopr-ajax>-->
+        <loopr-relay-ajax relay="http://10.137.105.117:8083/rpc" method="loopring_getOrders" params="[[orderDetailParams]]" last-response="{{orderDetailRaw}}"></loopr-relay-ajax>
     </template>
     <script>
     class PageOrder extends AppConfigMixin(Polymer.Element) {
@@ -92,12 +93,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 orderItem: {
                     type: Object,
-                    computed: '_computeOrder(appConfig, resp)'
+                    computed: '_computeOrder(appConfig, orderDetailRaw)'
+                },
+                orderDetailParams:{
+                    type:Object,
+                    computed:'_computeDetailParams(page, subpage, settingsVersion)'
                 }
             };
         }
+
         ready() {
             super.ready();
+        }
+
+        _computeDetailParams(page, subpage, settingsVersion) {
+            if(page && subpage && page === "order" && settingsVersion) {
+                const params = {};
+                params.contractVersion = settingsVersion;
+                params.orderHash = subpage;
+                return [params];
+            }
         }
 
         _computedHash(page, subpage) {
@@ -108,16 +123,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         _computeOrder(appConfig, resp) {
             if (appConfig && resp) {
-                let data = resp.result.data;
-                let tokenS = this.getTokenByName(data.orginalOrder.tokenS);
-                let tokenB = this.getTokenByName(data.orginalOrder.tokenB);
+                let data = resp.result.data[0];
+                let tokenS = this.getTokenByName(data.originalOrder.tokenS);
+                let tokenB = this.getTokenByName(data.originalOrder.tokenB);
                 if (!tokenS || !tokenB) {
                     return;
                 }
-                let amountS = this.toNumber(data.orginalOrder.amountS, tokenS);
-                let amountB = this.toNumber(data.orginalOrder.amountB, tokenB);
-                let dealedS = this.toNumber(data.totalDealedAmountS, tokenS);
-                let dealedB = this.toNumber(data.totalDealedAmountB, tokenB);
+                let amountS = this.toNumber(data.originalOrder.amountS, tokenS);
+                let amountB = this.toNumber(data.originalOrder.amountB, tokenB);
+                let dealedS = this.toNumber(data.dealtAmountS, tokenS);
+                let dealedB = this.toNumber(data.dealtAmountB, tokenB);
                 let result = {
                     tokenS: tokenS.unit,
                     amountS: amountS,
@@ -132,6 +147,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 return result;
             }
         }
+
         _update() {
             this.ring = this._computeOrder(this.appConfig, this.resp)
         }

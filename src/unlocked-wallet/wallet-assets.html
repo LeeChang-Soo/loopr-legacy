@@ -71,9 +71,11 @@
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
-        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}" loading={{loading}}></loopr-ajax>
+        <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}" loading={{loading}}></loopr-ajax>-->
+        <loopr-relay-ajax id="ajax" relay="http://10.137.105.117:8083/rpc" method="loopring_getBalance" params="[[params]]" last-response="{{balancesRaw}}" loading="{{loading}}"></loopr-relay-ajax>
         <div class="sections">
             <paper-card transparent>Ether</paper-card>
             <paper-card tablewrapper>
@@ -218,8 +220,21 @@
                 wallet: {
                     type: Object,
                     observer: '_walletChanged'
+                },
+                params:{
+                    type:Object,
+                    computed:'_computeParams(page, subpage, settingsVersion, wallet)'
                 }
             };
+        }
+
+        _computeParams(page, subpage, settingsVersion, wallet) {
+            if(page && page === 'wallet' && (!subpage || subpage === 'assets') && settingsVersion && wallet){
+                const params = {};
+                params.contractVersion = settingsVersion;
+                params.address = wallet.address;
+                return [params];
+            }
         }
 
         _hideOrShowTips() {
@@ -297,10 +312,10 @@
         _isWETH(token) { return token === 'WETH'; }
 
         go() {
-            if ("wallet" === this.page) {
-                this.hideBalance = false;
-                this.$.ajax.generateRequest();
-            }
+//            if ("wallet" === this.page) {
+//                this.hideBalance = false;
+//                this.$.ajax.generateRequest();
+//            }
         }
 
         _walletChanged(wallet) {
