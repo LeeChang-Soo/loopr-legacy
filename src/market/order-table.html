@@ -183,7 +183,7 @@
 
                 params:{
                     type:Object,
-                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion,currentPage)'
+                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet)'
                 },
                 displayMode: {
                     type: String
@@ -225,7 +225,7 @@
             }
         }
 
-        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage) {
+        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet) {
             if(!this._isToReload(page, subpage)) {
                 return null;
             }
@@ -236,8 +236,8 @@
                     params.market = market;
                 }
                 params.contractVersion = settingsVersion;
-                if(filterMine && this.wallet){
-                    params.owner = this.wallet.address;
+                if(filterMine && wallet){
+                    params.owner = wallet.address;
                 }
                 params.pageIndex = currentPage || 1;
                 return [params];

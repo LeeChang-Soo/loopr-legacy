@@ -62,7 +62,7 @@
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
 
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
@@ -205,7 +205,8 @@
                     computed: '_computeOrders(appConfig, resp)'
                 },
                 currentPage: {
-                    type: Number
+                    type: Number,
+                    value: 1
                 },
                 totalPage: {
                     type: Number
@@ -220,7 +221,7 @@
                 },
                 params:{
                     type:Object,
-                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion,currentPage)'
+                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet)'
                 }
             };
         }
@@ -250,24 +251,24 @@
             }
         }
 
-        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage){
-
+        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet){
             if(!this._isToReload(page, subpage)) {
                 return null;
             }
             let market = this._computedMarket(page, subpage, third);
             const params = {};
             if(settingsVersion) {
+                params.contractVersion = settingsVersion;
                 if(market) {
                     params.market = market;
                 }
-                console.log(JSON.stringify(params));
-                params.contractVersion = settingsVersion;
-                if(filterMine && this.wallet){
-                    params.owner = this.wallet.address;
+                if('order' === page && subpage){
+                    params.orderHash = subpage;
+                }
+                if(filterMine && wallet){
+                    params.owner = wallet.address;
                 }
                 params.pageIndex = currentPage || 1;
-                console.log(JSON.stringify(params));
                 return [params];
             }
         }
@@ -287,7 +288,7 @@
 
         _isToReload(page, subpage) {
             if (page && subpage) {
-                if ((page === "market") || (page === "history" && subpage === "trades") || (page === "wallet" && subpage === "trades")) {
+                if ((page === "market") || (page === "order") || (page === "history" && subpage === "trades") || (page === "wallet" && subpage === "trades")) {
                     return true;
                 }
             }
@@ -442,7 +443,6 @@
         }
 
         _computeOrders(appConfig, resp) {
-            console.log(JSON.stringify(resp));
             if (resp && appConfig) {
                 this.totalPage = resp.result.data.length;
                 return _.map(resp.result.data, o => this._computeOrderItem(appConfig, o));
