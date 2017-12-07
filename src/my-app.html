@@ -216,7 +216,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     app-toolbar iron-image {
-        width: 140px;
+        width: 200px;
         height: 32px;
     }
 
@@ -278,7 +278,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <!-- <div spacer></div> -->
                         <a styleless href="/#/">
                             <div main-title>
-                                <iron-image src="images/logo_white.png" sizing="contain"></iron-image>
+                                <iron-image src="images/logo.svg" sizing="contain"></iron-image>
                             </div>
                         </a>
                         <div condensed-title></div>
@@ -313,12 +313,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-drawer-layout>
     </template>
     <script>
-        const keystore = loopring.keystore;
-        const privateKeyWallet = loopring.wallet;
-        const Validator = loopring.validator;
-        const signer = loopring.signer;
-        const Relay = loopring.relay;
-        const Order = loopring.order;
+    const keystore = loopring.keystore;
+    const privateKeyWallet = loopring.wallet;
+    const Validator = loopring.validator;
+    const signer = loopring.signer;
+    const Relay = loopring.relay;
+    const Order = loopring.order;
 
     class MyApp extends Polymer.Element {
         static get is() {
