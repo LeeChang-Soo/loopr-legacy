@@ -72,10 +72,12 @@
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+        <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}" loading={{loading}}></loopr-ajax>-->
         <loopr-relay-ajax id="ajax" relay="[[relayUrl]]" method="loopring_getBalance" params="[[params]]" last-response="{{balancesRaw}}" loading="{{loading}}"></loopr-relay-ajax>
+        <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getPriceQuote" params="[[priceParams]]" last-response="{{priceQuoteRaw}}" loading="{{priceLoading}}"></loopr-relay-ajax>
         <div class="sections">
             <paper-card transparent>Ether</paper-card>
             <paper-card tablewrapper>
@@ -203,7 +205,7 @@
                 etherTokens: Array,
                 erc20Tokens: {
                     type: Array,
-                    computed: '_computeBalances(balancesRaw)'
+                    computed: '_computeBalances(balancesRaw, priceQuote)'
                 },
                 hideBalance: {
                     type: Boolean,
@@ -228,6 +230,15 @@
                 relayUrl: {
                     type: String,
                     computed: '_computeUrl(settingsRelay)'
+                },
+                priceParams: {
+                    type: Object,
+                    computed:'_computePriceParams(page, settingsCurrency)'
+                },
+                priceQuoteRaw: Object,
+                priceQuote: {
+                    type: Object,
+                    computed: '_computePriceQuote(priceQuoteRaw)'
                 }
             };
         }
@@ -238,6 +249,25 @@
                 params.contractVersion = settingsVersion;
                 params.owner = wallet.address;
                 return [params];
+            }
+        }
+
+        _computePriceParams(page, settingsCurrency) {
+            if(page && page === 'wallet' && settingsCurrency) {
+                return [settingsCurrency.toUpperCase()];
+            }
+        }
+
+        _computePriceQuote(priceQuoteRaw) {
+            if (priceQuoteRaw) {
+                var priceQuote = priceQuoteRaw.result;
+                priceQuote.priceMap = _.keyBy(priceQuote.tokens, o => o.token);
+                priceQuote.getPrice = function(token) {
+                    const t = priceQuote.priceMap[token];
+                    if (t) return t.price;
+                    else return 0;
+                }
+                return priceQuote;
             }
         }
 
@@ -276,8 +306,8 @@
             }
         }
 
-        _computeBalances(resp) {
-            if (resp) {
+        _computeBalances(resp, priceQuote) {
+            if (resp && priceQuote) {
                 var totalValue = 0;
                 const items = _.map(resp.result.tokens, function(i) {
                     var item = i;
@@ -287,16 +317,23 @@
                         return null;
                     }
 
-                    item.name = tokenConfig.name
+                    item.name = tokenConfig.name;
                     item.balanceValue = this.toNumber(i.balance, tokenConfig);
-                    item.allowanceValue = this.toNumber(i.allowance, tokenConfig);
+                    if(item.token != 'ETH') {
+                        item.allowanceValue = this.toNumber(i.allowance, tokenConfig);
+                        let allowanceWarn = this.toNumber(tokenConfig.allowanceWarn, tokenConfig);
+                        item.allowanceWarning = (item.allowanceValue < allowanceWarn);
+                    }
+
                     item.precision = tokenConfig.precision;
                     item.unit = tokenConfig.unit;
                     item.address = tokenConfig.address;
-                    let allowanceWarn = this.toNumber(tokenConfig.allowanceWarn, tokenConfig);
-                    item.allowanceWarning = (item.allowanceValue < allowanceWarn);
-                    item.price = this.priceQuote.getPrice(item.token);
-                    item.total = item.price * item.balanceValue;
+                    item.price = priceQuote.getPrice(item.token);
+                    if(item.price) {
+                        item.total = item.price * item.balanceValue;
+                    } else {
+                        item.total = 0;
+                    }
                     totalValue += item.total;
 
                     return item;

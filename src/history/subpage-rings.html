@@ -170,7 +170,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        _computeItem(appConfig, o) {console.log(appConfig.lrc.precision)
+        _computeItem(appConfig, o) {
             let lrcConfig = this.getTokenByName("LRC");
             o.lrcPrecision = appConfig.lrc.precision;
             o.totalLrcFee = this.toNumber(o.totalLrcFee, lrcConfig)
