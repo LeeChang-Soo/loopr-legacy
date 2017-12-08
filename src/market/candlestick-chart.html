@@ -65,10 +65,7 @@
 
         _computeParams(market, settingsVersion) {
             if(market && settingsVersion) {
-                const params = {};
-                params.contractVersion = settingsVersion;
-                params.market = market;
-                return [params];
+                return [market];
             }
         }
 

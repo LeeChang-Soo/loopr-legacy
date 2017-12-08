@@ -23,7 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
-        <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
+        <vaadin-grid aria-label="Basic Binding Example" items="[[rings]]">
             <vaadin-grid-column width="60px">
                 <template class="header">
                     <div class="left-aligned">Hash</div>
@@ -31,7 +31,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template>
                     <div class="left-aligned">
                         <a href="#/ring/[[item.ringhash]]">
-                            <div class="long-hash">[[item.ringhash]]</div>
+                            <div class="long-hash">[[item.ringHash]]</div>
                         </a>
                     </div>
                 </template>
@@ -70,8 +70,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </template>
                 <template>
                     <div class="left-aligned">
-                        <a href="//etherscan.io/tx/[[item.transactionHash]]" target="_blank">
-                            <div class="long-hash">[[item.transactionHash]]</div>
+                        <a href="//etherscan.io/tx/[[item.txHash]]" target="_blank">
+                            <div class="long-hash">[[item.txHash]]</div>
                         </a>
                     </div>
                 </template>
@@ -79,12 +79,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <vaadin-grid-column width="45px">
                 <template class="header">Lrc-Fee</template>
                 <template>
-                    <pretty-number v="[[item.totalLrcFee]]" d=[[appConfig.lrc.precision]]></pretty-number>
+                    <pretty-number v="[[item.totalLrcFee]]" d=[[item.lrcPrecision]]></pretty-number>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Block Num</template>
-                <template><a href="//etherscan.io/block/[[item.blockNum]]" styleless target="_blank"> [[tranHextoNum(item.blockNum)]] </a></template>
+                <template><a href="//etherscan.io/block/[[item.blockNumber]]" styleless target="_blank"> [[item.blockNumber]] </a></template>
             </vaadin-grid-column>
             <vaadin-grid-column width="60px">
                 <template class="header">Time</template>
@@ -124,6 +124,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     observer: '_computePage'
                 },
+                rings: {
+                    type: Object,
+                    computed: '_computeRings(appConfig, resp)'
+                },
                 params: {
                     type: Object,
                     computed:'_computeParams(page, subpage, currentPage, settingsVersion)'
@@ -158,6 +162,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.pageRange = Math.min(3, totalPage);
                 this._pager();
             }
+        }
+
+        _computeRings(appConfig, resp) {
+            if (appConfig && resp) {
+                return _.map(resp.result.data, o => this._computeItem(appConfig, o));
+            }
+        }
+
+        _computeItem(appConfig, o) {console.log(appConfig.lrc.precision)
+            let lrcConfig = this.getTokenByName("LRC");
+            o.lrcPrecision = appConfig.lrc.precision;
+            o.totalLrcFee = this.toNumber(o.totalLrcFee, lrcConfig)
+            return o;
         }
 
         tranHextoNum(hex) {

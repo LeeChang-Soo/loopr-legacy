@@ -229,20 +229,25 @@
         }
 
         _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet) {
-            if(!this._isToReload(page, subpage)) {
-                return null;
-            }
-            let market = this._computedMarket(page, subpage, third);
-            const params = {};
             if(settingsVersion) {
-                if(market) {
-                    params.market = market;
-                }
+                const params = {};
                 params.contractVersion = settingsVersion;
-                if(filterMine && wallet){
-                    params.owner = wallet.address;
-                }
                 params.pageIndex = currentPage || 1;
+                let market = this._computedMarket(page, subpage, third);
+                if (page === "market") {
+                    params.market = market;
+                } else if (page === "order" && subpage) {
+                    params.orderHash = subpage;
+                } else if (page === "history" && subpage === "orders") {
+                    params.market = market;
+                } else if (page === "wallet" && subpage === "orders") {
+                    params.market = market;
+                    if(filterMine && wallet){
+                        params.owner = wallet.address;
+                    }
+                } else {
+                    return null;
+                }
                 return [params];
             }
         }
@@ -253,19 +258,7 @@
             }
         }
 
-        _isToReload(page, subpage) {
-            if (page && subpage) {
-                if ((page === "market") || (page === "history" && subpage === "orders") || (page === "wallet" && subpage == "orders")) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         _computedMarket(page, subpage, third) {
-            if(!this._isToReload(page, subpage)) {
-                return;
-            }
             if (page && subpage) {
                 if (page === "market") {
                     return subpage;

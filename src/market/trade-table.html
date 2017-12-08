@@ -256,24 +256,30 @@
         }
 
         _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet){
-            if(!this._isToReload(page, subpage)) {
-                return null;
-            }
-            let market = this._computedMarket(page, subpage, third);
-            const params = {};
             if(settingsVersion) {
-                if(market) {
-                    params.market = market;
-                }
+                const params = {};
                 params.contractVersion = settingsVersion;
-                if(filterMine && wallet){
-                    params.owner = wallet.address;
-                }
                 params.pageIndex = currentPage || 1;
+                let market = this._computedMarket(page, subpage, third);
+                if (page === "market") {
+                    params.market = market;
+                } else if (page === "ring" && subpage) {
+                    params.ringHash = subpage;
+                } else if (page === "order" && subpage) {
+                     params.orderHash = subpage;
+                 } else if (page === "history" && subpage === "trades") {
+                    params.market = market;
+                } else if (page === "wallet" && subpage === "trades") {
+                    params.market = market;
+                    if(filterMine && wallet){
+                        params.owner = wallet.address;
+                    }
+                } else {
+                    return null;
+                }
                 return [params];
             }
         }
-
 
         _computedMarket(page, subpage, third) {
             if (page && subpage) {
@@ -286,16 +292,6 @@
                 }
             }
         }
-
-        _isToReload(page, subpage) {
-            if (page && subpage) {
-                if ((page === "market") || (page === "history" && subpage === "trades") || (page === "wallet" && subpage === "trades")) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
 
         _showMore() {
             if (this.filterMine) {

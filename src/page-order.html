@@ -69,7 +69,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </paper-card>
                 <paper-card transparent>Historial Trades</paper-card>
                 <paper-card>
-                    <trade-table name="myfills" display-mode="order" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></trade-table>
+                    <trade-table name="myfills" display-mode="order" page="{{computedPage}}" subpage="{{computedSubpage}}" third="{{third}}"></trade-table>
                 </paper-card>
                 <div class="footer-spacer"></div>
                 <loopr-footer></loopr-footer>
@@ -87,6 +87,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return {
                 page: String,
                 subpage: String,
+                computedPage: {
+                    type: String,
+                    computed: '_computedPage(page)'
+                },
+                computedSubpage: {
+                    type: String,
+                    computed: '_computedSubpage(page, subpage)'
+                },
                 hash: {
                     type: String,
                     computed: '_computedHash(page, subpage)'
@@ -110,6 +118,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             super.ready();
         }
 
+        _computedPage(page) {
+            if (page && "order" === page) return page;
+        }
+
+        _computedSubpage(page, subpage) {
+            if (page && "order" === page && subpage) return subpage;
+        }
+
         _computeDetailParams(page, subpage, settingsVersion) {
             if(page && subpage && page === "order" && settingsVersion) {
                 const params = {};
@@ -126,7 +142,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computeOrder(appConfig, resp) {
-            if (appConfig && resp) {
+            if (appConfig && resp && resp.result.data.length > 0) {
                 let data = resp.result.data[0];
                 let tokenS = this.getTokenByName(data.originalOrder.tokenS);
                 let tokenB = this.getTokenByName(data.originalOrder.tokenB);

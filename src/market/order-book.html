@@ -25,7 +25,7 @@
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <div class="vertical layout">
             <div class="horizontal layout">
                 <div class="asks flex">
@@ -67,7 +67,7 @@
                                 </template>
                             </vaadin-grid-column>
                             <vaadin-grid-column width="50px">
-                                <template class="header">Price（[[priceUnit]])</template>
+                                <template class="header">Price ([[priceUnit]])</template>
                                 <template>
                                     <pretty-number class="ask" v="[[item.price]]" d=[[marketConfig.pricePrecision]]></pretty-number>
                                 </template>
@@ -83,8 +83,8 @@
                 </div>
             </div>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <!--<iron-ajax auto id="ajax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/orderbook.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>-->
-            <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderbook.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
+            <!--<loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderbook.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
+            <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getDepth" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
         </div>
     </template>
     <script>
@@ -95,16 +95,36 @@
 
         static get properties() {
             return {
+                page: String,
+                subpage: String,
                 resp: Object,
+                depth: {
+                    type: Object,
+                    computed: '_computeDepth(resp)'
+                },
                 processed: {
                     type: Object,
-                    computed: '_process(resp)'
+                    computed: '_process(resp, tokenx, tokeny)'
                 },
-                tokenx: String,
-                tokeny: String,
+                tokenx: {
+                    type: String,
+                    computed: '_computeTokenX(page, subpage)'
+                },
+                tokeny: {
+                    type: String,
+                    computed: '_computeTokenY(page, subpage)'
+                },
                 market: {
                     type: String,
-                    computed: '_computeMarketId(tokenx, tokeny)'
+                    computed: '_computeMarketId(page, subpage)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
+                },
+                params:{
+                    type:Object,
+                    computed:'_computeParams(page, subpage, settingsVersion)'
                 }
             };
         }
@@ -113,15 +133,39 @@
             super.ready();
         }
 
-        _computeMarketId(tokenx, tokeny) {
-            return tokenx + "-" + tokeny;
+        _computeMarketId(page, subpage) {
+            if (page && 'market' === page && subpage) {
+                return subpage;
+            }
         }
 
-        _process(resp) {
-            if (resp) {
-                this.tokenxConfig = this.appConfig.tokenMap[this.tokenx];
-                this.tokenyConfig = this.appConfig.tokenMap[this.tokeny];
-                this.marketConfig = this.appConfig.marketMap[this.market];
+        _computeTokenX(page, subpage) {
+            if (page && 'market' === page && subpage) {
+                return subpage.split("-")[0];
+            }
+        }
+
+        _computeTokenY(page, subpage) {
+            if (page && 'market' === page && subpage) {
+                return subpage.split("-")[1];
+            }
+        }
+
+        _computeParams(page, subpage, settingsVersion) {
+            if (page && 'market' === page && subpage && settingsVersion) {
+                const params = {};
+                params.contractVersion = settingsVersion;
+                params.market = subpage;
+                params.length = 10;
+                return [params];
+            }
+        }
+
+        _process(resp, tokenx, tokeny) {
+            if (resp && tokenx && tokeny) {
+                this.tokenxConfig = this.appConfig.tokenMap[tokenx];
+                this.tokenyConfig = this.appConfig.tokenMap[tokeny];
+                this.marketConfig = this.appConfig.marketMap[tokenx + "-" + tokeny];
                 this.priceUnit = this.tokenxConfig.unit + "/" + this.tokenyConfig.unit;
 
                 const f = function(i) {
@@ -131,8 +175,8 @@
                 };
 
                 var processed = {};
-                processed.asks = _.map(resp.asks, f);
-                processed.bids = _.map(resp.bids, f);
+                processed.asks = _.map(resp.depth.sell, f);
+                processed.bids = _.map(resp.depth.buy, f);
                 return processed;
             }
         }

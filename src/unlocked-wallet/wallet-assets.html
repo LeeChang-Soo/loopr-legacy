@@ -236,7 +236,7 @@
             if(page && page === 'wallet' && (!subpage || subpage === 'assets') && settingsVersion && wallet){
                 const params = {};
                 params.contractVersion = settingsVersion;
-                params.address = wallet.address;
+                params.owner = wallet.address;
                 return [params];
             }
         }
