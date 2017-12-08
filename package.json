@@ -24,6 +24,7 @@
     "deploy": "bower uninstall loopring.js && bower install && echo '' > bower_components/font-roboto/roboto.html && polymer build && firebase deploy"
   },
   "dependencies": {
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "loopring.js": "0.0.6"
   }
 }

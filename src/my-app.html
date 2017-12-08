@@ -457,8 +457,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (cookieValues["settingsVersion"]) {
                     let currentVersion = cookieValues["settingsVersion"];
                     let warnedVersion = cookieValues["warnedVersion"];
-                    if (latestVersion != currentVersion) {
-                        if (!warnedVersion || warnedVersion != latestVersion) {
+                    if (latestVersion !== currentVersion) {
+                        if (!warnedVersion || warnedVersion !== latestVersion) {
                             var detail = {
                                 text: "Your current contract version is " + currentVersion + ", latest version " + latestVersion + " is available",
                                 category: "warning",
