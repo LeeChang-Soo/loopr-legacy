@@ -21,7 +21,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             padding-top: 0;
         }
         </style>
-        <cutoff-panel></cutoff-panel>
+        <cutoff-panel page="{{page}}" subpage="{{subpage}}"></cutoff-panel>
         <div class="sections">
             <paper-card transparent>Orders</paper-card>
             <paper-card>
@@ -42,7 +42,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         go() {
-            const page = this.$.orders.go();
+            //const page = this.$.orders.go();
         }
     }
 

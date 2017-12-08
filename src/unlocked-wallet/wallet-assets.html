@@ -75,7 +75,7 @@
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}" loading={{loading}}></loopr-ajax>-->
-        <loopr-relay-ajax id="ajax" relay="http://10.137.105.117:8083/rpc" method="loopring_getBalance" params="[[params]]" last-response="{{balancesRaw}}" loading="{{loading}}"></loopr-relay-ajax>
+        <loopr-relay-ajax id="ajax" relay="[[relayUrl]]" method="loopring_getBalance" params="[[params]]" last-response="{{balancesRaw}}" loading="{{loading}}"></loopr-relay-ajax>
         <div class="sections">
             <paper-card transparent>Ether</paper-card>
             <paper-card tablewrapper>
@@ -224,6 +224,10 @@
                 params:{
                     type:Object,
                     computed:'_computeParams(page, subpage, settingsVersion, wallet)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
                 }
             };
         }

@@ -76,7 +76,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </div>
         </loopr-page>
         <!--<loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/order.json" last-response="{{resp}}"></loopr-ajax>-->
-        <loopr-relay-ajax relay="http://10.137.105.117:8083/rpc" method="loopring_getOrders" params="[[orderDetailParams]]" last-response="{{orderDetailRaw}}"></loopr-relay-ajax>
+        <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getOrders" params="[[orderDetailParams]]" last-response="{{orderDetailRaw}}"></loopr-relay-ajax>
     </template>
     <script>
     class PageOrder extends AppConfigMixin(Polymer.Element) {
@@ -98,6 +98,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 orderDetailParams:{
                     type:Object,
                     computed:'_computeDetailParams(page, subpage, settingsVersion)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
                 }
             };
         }

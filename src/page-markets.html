@@ -36,7 +36,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <loopr-page>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-            <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+            <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
             <loopr-toolbar slot="secondary-toolbar" active-tab="markets">
             </loopr-toolbar>
             <div class="sections" unresolved>
@@ -86,8 +86,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </vaadin-grid-column>
                     </vaadin-grid>
                     <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-                    <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/tickers.json" last-response="{{resp}}" loading={{loading}}>
-                    </loopr-ajax>
+                    <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/tickers.json" last-response="{{resp}}" loading={{loading}}></loopr-ajax>-->
+                    <loopr-relay-ajax relay="[[relayUrl]]" method="loorping_getCandleTicks" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
                 </paper-card>
                 <paper-card transparent>
                     <span class="highlight">★</span> How can I get my token <a href="/#/doc/list-my-token">listed</a>?
@@ -103,6 +103,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+                page: String,
                 resp: Object,
                 tickers: {
                     type: Object,
@@ -110,8 +111,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 marketSelector: {
                     type: String
+                },
+                params: {
+                    type: Object,
+                    computed:'_computeParams(page, settingsVersion)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
                 }
             };
+        }
+
+        _computeParams(page, settingsVersion) {
+            if(page && page === 'markets' && settingsVersion) {
+                const params = {};
+                params.contractVersion = settingsVersion;
+                return [params];
+            }
         }
 
         _process(result) {
@@ -149,7 +166,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         go() {
             this.marketSelector = '';
-            this.$.ajax.generateRequest();
+            //this.$.ajax.generateRequest();
         }
     }
 
