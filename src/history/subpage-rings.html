@@ -22,6 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
             <vaadin-grid-column width="60px">
                 <template class="header">
@@ -93,8 +94,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
         </vaadin-grid>
         <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-        <!--<iron-ajax auto id="ajax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>-->
-        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
+        <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
+        <loopr-relay-ajax relay="http://10.137.105.117:8083/rpc" method="loopring_getRingMined" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
         <div class="horizontal end-justified layout ">
             <prism-square-pager id="pager" page="[[currentPage]]" count=[[totalPage]] range=[[pageRange]]></prism-square-pager>
         </div>
@@ -105,6 +106,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+                page: String,
+                subpage: String,
+                third: String,
                 currentPage: {
                     type: Number,
                     value: 1
@@ -119,12 +123,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 resp: {
                     type: Object,
                     observer: '_computePage'
+                },
+                params: {
+                    type: Object,
+                    computed:'_computeParams(page, subpage, third, currentPage, settingsVersion)'
                 }
             }
         }
 
         ready() {
             super.ready();
+        }
+
+        _computeParams(page, subpage, third, currentPage, settingsVersion) {
+            if (page && subpage && currentPage && settingsVersion) {
+                if (page === "history" && subpage === "rings") {
+                    const params = {};
+                    params.contractVersion = settingsVersion;
+                    if(third){
+                        params.market = third;
+                    }
+                    params.pageIndex = currentPage || 1;
+                    return [params];
+                }
+            }
         }
 
         _computePage(resp) {
@@ -144,7 +166,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         go() {
-            this.$.ajax.generateRequest();
+            //this.$.ajax.generateRequest();
         }
     }
 
