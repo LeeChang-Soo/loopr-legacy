@@ -95,7 +95,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </vaadin-grid>
         <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
         <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
-        <loopr-relay-ajax relay="http://10.137.105.117:8083/rpc" method="loopring_getRingMined" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
+        <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getRingMined" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
         <div class="horizontal end-justified layout ">
             <prism-square-pager id="pager" page="[[currentPage]]" count=[[totalPage]] range=[[pageRange]]></prism-square-pager>
         </div>
@@ -126,7 +126,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 params: {
                     type: Object,
-                    computed:'_computeParams(page, subpage, third, currentPage, settingsVersion)'
+                    computed:'_computeParams(page, subpage, currentPage, settingsVersion)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
                 }
             }
         }
@@ -135,14 +139,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             super.ready();
         }
 
-        _computeParams(page, subpage, third, currentPage, settingsVersion) {
+        _computeParams(page, subpage, currentPage, settingsVersion) {
             if (page && subpage && currentPage && settingsVersion) {
                 if (page === "history" && subpage === "rings") {
                     const params = {};
                     params.contractVersion = settingsVersion;
-                    if(third){
-                        params.market = third;
-                    }
                     params.pageIndex = currentPage || 1;
                     return [params];
                 }

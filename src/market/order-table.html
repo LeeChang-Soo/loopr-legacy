@@ -162,7 +162,7 @@
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
         <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orders.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
-        <loopr-relay-ajax id="ajax" relay="http://10.137.105.117:8083/rpc" method="loopring_getOrders" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
+        <loopr-relay-ajax id="ajax" relay="[[relayUrl]]" method="loopring_getOrders" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
     </template>
     <script>
     class OrderTable extends AppConfigMixin(Polymer.Element) {
@@ -211,6 +211,10 @@
                     type: Object,
                     computed: '_computedBalance(balancesRaw)'
                 },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
+                }
             };
         }
 

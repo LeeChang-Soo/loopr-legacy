@@ -87,7 +87,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </vaadin-grid>
                     <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
                     <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/tickers.json" last-response="{{resp}}" loading={{loading}}></loopr-ajax>-->
-                    <loopr-relay-ajax relay="http://10.137.105.117:8083/rpc" method="loorping_getCandleTicks" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
+                    <loopr-relay-ajax relay="[[relayUrl]]" method="loorping_getCandleTicks" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
                 </paper-card>
                 <paper-card transparent>
                     <span class="highlight">★</span> How can I get my token <a href="/#/doc/list-my-token">listed</a>?
@@ -115,6 +115,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 params: {
                     type: Object,
                     computed:'_computeParams(page, settingsVersion)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
                 }
             };
         }

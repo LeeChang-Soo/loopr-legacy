@@ -169,7 +169,7 @@
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
         <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderFills.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
-        <loopr-relay-ajax id="ajax" relay="http://10.137.105.117:8083/rpc" method="loopring_getFills" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
+        <loopr-relay-ajax id="ajax" relay="[[relayUrl]]" method="loopring_getFills" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
     </template>
     <script>
     class TradeTable extends AppConfigMixin(Polymer.Element) {
@@ -221,6 +221,10 @@
                 params:{
                     type:Object,
                     computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
                 }
             };
         }
