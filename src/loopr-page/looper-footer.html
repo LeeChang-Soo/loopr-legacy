@@ -13,6 +13,7 @@
         .social a {
             padding: 0 8px 0 8px;
             color: var(--app-text-color);
+            transition: all .3s ease;
         }
 
         .social a:hover {
@@ -41,9 +42,11 @@
             color: var(--app-text-color);
             display: inline-block;
             height: 24px;
+            
         }
 
         .menus a:hover {
+            transition: all 3s ease;
             color: var(--app-primary-color-dark);
         }
 
@@ -54,18 +57,11 @@
             height: 28px;
         }
 
-        iron-icon {
-            height: 32px;
-        }
-
         .title {
             font-weight: 700;
             text-transform: uppercase;
             color: var(--app-text-color);
             padding-bottom: 16px;
-        }
-        .lower {
-            margin-bottom: -4px;
         }
         </style>
         <div class="vertical center layout">
@@ -73,7 +69,7 @@
                 <a styleless target="_blank" href="https://github.com/loopring">
                     <iron-icon icon="media1:github"></iron-icon>
                 </a>
-                <a styleless target="_blank" class="lower" href="https://loopring.rocket.chat/">
+                <a styleless target="_blank" href="https://loopring.rocket.chat/">
                     <iron-icon icon="media2:rocketchat"></iron-icon>
                 </a>
                 <a styleless target="_blank" href="https://twitter.com/loopringorg">
@@ -82,7 +78,7 @@
                 <a styleless href="mailto:foundation@loopring.org">
                     <iron-icon icon="mail"></iron-icon>
                 </a>
-                <a styleless href="https://reddit.com/r/loopringorg">
+                <a styleless target="_blank" href="https://reddit.com/r/loopringorg">
                     <iron-icon icon="media3:reddit"></iron-icon>
                 </a>
                 <a styleless target="_blank" href="https://medium.com/loopring-protocol">
@@ -94,7 +90,7 @@
                 <a styleless target="_blank" href="https://t.me/loopringfans">
                     <iron-icon icon="media1:telegram"></iron-icon>
                 </a>
-                 <a styleless target="_blank" href="https://www.youtube.com/results?search_query=loopring">
+                <a styleless target="_blank" href="https://www.youtube.com/results?search_query=loopring">
                     <iron-icon icon="media4:youtube"></iron-icon>
                 </a>
             </div>
