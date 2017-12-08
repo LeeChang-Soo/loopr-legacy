@@ -77,7 +77,6 @@
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}" loading={{loading}}></loopr-ajax>-->
         <loopr-relay-ajax id="ajax" relay="[[relayUrl]]" method="loopring_getBalance" params="[[params]]" last-response="{{balancesRaw}}" loading="{{loading}}"></loopr-relay-ajax>
-        <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getPriceQuote" params="[[priceParams]]" last-response="{{priceQuoteRaw}}" loading="{{priceLoading}}"></loopr-relay-ajax>
         <div class="sections">
             <paper-card transparent>Ether</paper-card>
             <paper-card tablewrapper>
@@ -230,15 +229,6 @@
                 relayUrl: {
                     type: String,
                     computed: '_computeUrl(settingsRelay)'
-                },
-                priceParams: {
-                    type: Object,
-                    computed:'_computePriceParams(page, settingsCurrency)'
-                },
-                priceQuoteRaw: Object,
-                priceQuote: {
-                    type: Object,
-                    computed: '_computePriceQuote(priceQuoteRaw)'
                 }
             };
         }
@@ -249,25 +239,6 @@
                 params.contractVersion = settingsVersion;
                 params.owner = wallet.address;
                 return [params];
-            }
-        }
-
-        _computePriceParams(page, settingsCurrency) {
-            if(page && page === 'wallet' && settingsCurrency) {
-                return [settingsCurrency.toUpperCase()];
-            }
-        }
-
-        _computePriceQuote(priceQuoteRaw) {
-            if (priceQuoteRaw) {
-                var priceQuote = priceQuoteRaw.result;
-                priceQuote.priceMap = _.keyBy(priceQuote.tokens, o => o.token);
-                priceQuote.getPrice = function(token) {
-                    const t = priceQuote.priceMap[token];
-                    if (t) return t.price;
-                    else return 0;
-                }
-                return priceQuote;
             }
         }
 
