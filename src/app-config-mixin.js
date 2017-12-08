@@ -24,11 +24,11 @@ const AppConfigMixin = (superclass) => class extends superclass {
                     return market;
                 }
             } else {
-                console.log("error market: " + marketKey)
+                console.error("Not supported market: " + marketKey)
                 return null;
             }
         } else {
-            console.log("error market: " + marketKey)
+            console.error("Not supported market: " + marketKey)
             return null;
         }
     }
@@ -104,7 +104,7 @@ const AppConfigMixin = (superclass) => class extends superclass {
     }
 
     _computeUrl(settingsRelay) {
-        if(settingsRelay) {
+        if (settingsRelay) {
             return settingsRelay + "/rpc"
         }
     }
