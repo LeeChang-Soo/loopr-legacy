@@ -82,7 +82,7 @@
                 <template class="header">Block</template>
                 <template>
                     <a class="decorations" href="https://etherscan.io/block/[[item.blockNum]]" target="_blank">
-                        <div class="long-hash">[[item.blockNum]]</div>
+                        <div class="long-hash">[[item.blockNumber]]</div>
                     </a>
                 </template>
             </vaadin-grid-column>
@@ -157,7 +157,7 @@
             <vaadin-grid-column hidden$="[[hiddenTime]]" width="95px">
                 <template class="header">Time</template>
                 <template>
-                    <time-str seconds="[[item.timestamp]]"></time-str>
+                    <time-str seconds="[[item.createTime]]"></time-str>
                 </template>
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
@@ -205,8 +205,7 @@
                     computed: '_computeOrders(appConfig, resp)'
                 },
                 currentPage: {
-                    type: Number,
-                    value: 1
+                    type: Number
                 },
                 totalPage: {
                     type: Number
@@ -252,19 +251,17 @@
         }
 
         _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet){
+
             if(!this._isToReload(page, subpage)) {
                 return null;
             }
             let market = this._computedMarket(page, subpage, third);
             const params = {};
             if(settingsVersion) {
-                params.contractVersion = settingsVersion;
                 if(market) {
                     params.market = market;
                 }
-                if('order' === page && subpage){
-                    params.orderHash = subpage;
-                }
+                params.contractVersion = settingsVersion;
                 if(filterMine && wallet){
                     params.owner = wallet.address;
                 }
@@ -288,7 +285,7 @@
 
         _isToReload(page, subpage) {
             if (page && subpage) {
-                if ((page === "market") || (page === "order") || (page === "history" && subpage === "trades") || (page === "wallet" && subpage === "trades")) {
+                if ((page === "market") || (page === "history" && subpage === "trades") || (page === "wallet" && subpage === "trades")) {
                     return true;
                 }
             }
@@ -340,9 +337,11 @@
                 item.ringLink = "#/ring/" + item.ringHash;
                 item.orderLink = "#/order/" + item.orderHash;
                 item.txLink = "https://etherscan.io/tx/" + item.txHash;
+                item.tokenB = "WETH";
+                item.tokenS = "LRC";
                 if (this.market) {
                     let marketConfig = this.getMarket(this.market);
-                    if (null != marketConfig) {
+                    if (null !== marketConfig) {
                         this.unitS = appConfig.tokenMap[marketConfig.tokenx].unit;
                         this.unitB = appConfig.tokenMap[marketConfig.tokeny].unit;
                         item.typeStyle = item.tokenS === marketConfig.tokenx ? 'red' : 'green';
@@ -365,7 +364,7 @@
                 item.fillAmountB = this.toNumber(item.amountB, tokenB);
                 item.fee = Number(item.fee);
                 item.price = this.calPrice(item.amountB, item.amountS);
-                item.feeLrc = Number(item.feeLrc);
+                item.feeLrc = Number(item.lrcFee) / 1e18;
                 item.marginSplitToken = item.splitS ? item.tokenS : item.tokenB;
                 let marginSplitToken = appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
                 if (marginSplitToken) {
@@ -376,7 +375,7 @@
                     item.marginSplitUnit = item.marginSplitToken.toUpperCase();
                     item.marginSplitPrecision = appConfig.marketConfig.defaultVolumePrecision;
                 }
-                item.marginSplit = Number(item.splitS || item.splitB);
+                item.marginSplit = Number(item.splitS || item.splitB) / Number('1e' + (marginSplitToken.digits ||'18'));
                 return item;
             }
         }
@@ -386,8 +385,8 @@
             if (item.tokenB === marketConfig.tokenx) {
                 let tempS = item.tokenS,
                     tempB = item.tokenB,
-                    tempAmountS = item.fillAmountS,
-                    tempAmountB = item.fillAmountB;
+                    tempAmountS = item.amountS,
+                    tempAmountB = item.amountB;
                 item.tokenS = tempB;
                 item.fillAmountS = tempAmountB;
                 item.tokenB = tempS;
