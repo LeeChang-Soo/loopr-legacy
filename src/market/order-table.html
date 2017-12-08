@@ -180,7 +180,6 @@
                     computed: '_computedMarket(page, subpage, third)'
                 },
                 filterMine: Boolean,
-
                 params:{
                     type:Object,
                     computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet)'
@@ -288,9 +287,10 @@
 
         _computePage(resp) {
             if (resp) {
-                this.totalPage = Math.ceil(resp.result.total / resp.result.pageSize); // hidden pager when only has one page datas
+                let totalPage = Math.ceil(resp.result.total / resp.result.pageSize); // hidden pager when only has one page datas
+                this.totalPage = totalPage;
                 this.currentPage = resp.result.pageIndex;
-                this.pageRange = Math.min(3, pageCount);
+                this.pageRange = Math.min(3, totalPage);
                 this._pager();
                 this._showPage();
             }

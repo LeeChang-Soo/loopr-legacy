@@ -2,7 +2,7 @@
 <dom-module id="candlestick-chart" fit>
     <template>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <style include="shared-styles">
          :host {
             display: block;
@@ -24,12 +24,10 @@
         }
         </style>
         <div class="wrapper">
-            <div id="container">
-                <div id="price"></div>
-                <div id="volume"></div>
-            </div>
+            <div id="container"></div>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
+            <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/candleTick.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
+            <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getTrend" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
         </div>
     </template>
     <script>
@@ -38,8 +36,19 @@
 
         static get properties() {
             return {
+                page: String,
+                subpage: String,
                 market: {
-                    type: String
+                    type: String,
+                    computed: '_computedMarket(page, subpage)'
+                },
+                params: {
+                    type: Object,
+                    computed:'_computeParams(market, settingsVersion)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
                 },
                 resp: {
                     type: Object,
@@ -48,9 +57,23 @@
             };
         }
 
+        _computedMarket(page, subpage) {
+            if (page && "market" === page && subpage) {
+                return subpage;
+            }
+        }
+
+        _computeParams(market, settingsVersion) {
+            if(market && settingsVersion) {
+                const params = {};
+                params.contractVersion = settingsVersion;
+                params.market = market;
+                return [params];
+            }
+        }
+
         syncExtremes(e) {
             var thisChart = this.chart;
-
             if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
                 Highcharts.each(Highcharts.charts, function(chart) {
                     if (chart !== thisChart) {
@@ -68,15 +91,16 @@
         }
 
         _chart(resp) {
-            resp.xData = Highcharts.map(resp.result, function(val, j) {
+            let datas = resp.result.data;
+            resp.xData = Highcharts.map(datas, function(val, j) {
                 //return (new Date(val[0])).toUTCString()
-                return val[0];
+                return val.start;
             });
-            resp.price = Highcharts.map(resp.result, function(val, j) {
-                return val[1];
+            resp.price = Highcharts.map(datas, function(val, j) {
+                return val.open;
             });
-            resp.volume = Highcharts.map(resp.result, function(val, j) {
-                return val[5];
+            resp.volume = Highcharts.map(datas, function(val, j) {
+                return val.amount;
             });
             let title = this.market.toUpperCase()
             Highcharts.chart(this.$.container, {
@@ -157,7 +181,7 @@
         }
 
         go() {
-            this.$.ajax.generateRequest();
+            //this.$.ajax.generateRequest();
         }
     }
 

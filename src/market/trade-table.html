@@ -205,7 +205,8 @@
                     computed: '_computeOrders(appConfig, resp)'
                 },
                 currentPage: {
-                    type: Number
+                    type: Number,
+                    value: 1
                 },
                 totalPage: {
                     type: Number
@@ -255,7 +256,6 @@
         }
 
         _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet){
-
             if(!this._isToReload(page, subpage)) {
                 return null;
             }
@@ -307,10 +307,10 @@
 
         _computePage(resp) {
             if (resp) {
-                let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
-                this.totalPage = Math.max(2, pageSize);
+                let totalPage = Math.ceil(resp.result.total / resp.result.pageSize); // hidden pager when only has one page datas
+                this.totalPage = totalPage;
                 this.currentPage = resp.result.pageIndex;
-                this.pageRange = Math.min(3, pageSize);
+                this.pageRange = Math.min(3, totalPage);
                 this._pager();
                 this._showPage();
             }
@@ -468,7 +468,7 @@
         }
 
         go() {
-            this.$.ajax.generateRequest();
+            //this.$.ajax.generateRequest();
         }
     }
 

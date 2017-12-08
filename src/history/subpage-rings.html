@@ -152,9 +152,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         _computePage(resp) {
             if (resp) {
-                this.totalPage = Math.ceil(resp.result.total / resp.result.pageSize); // hidden pager when only has one page datas
+                let totalPage = Math.ceil(resp.result.total / resp.result.pageSize); // hidden pager when only has one page datas
+                this.totalPage = totalPage;
                 this.currentPage = resp.result.pageIndex;
-                this.pageRange = Math.min(3, pageSize);
+                this.pageRange = Math.min(3, totalPage);
                 this._pager();
             }
         }

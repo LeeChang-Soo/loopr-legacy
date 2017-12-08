@@ -37,6 +37,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
             <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+            <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
+            <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
             <loopr-toolbar slot="secondary-toolbar" active-tab="markets">
             </loopr-toolbar>
             <div class="sections" unresolved>
@@ -87,7 +89,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </vaadin-grid>
                     <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
                     <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/tickers.json" last-response="{{resp}}" loading={{loading}}></loopr-ajax>-->
-                    <loopr-relay-ajax relay="[[relayUrl]]" method="loorping_getCandleTicks" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
+                    <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getTicker" params="[[params]]" last-response="{{resp}}" loading="{{marketsLoading}}"></loopr-relay-ajax>
+                    <!--<loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>-->
+                    <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getPriceQuote" params="[[priceParams]]" last-response="{{priceQuoteRaw}}" loading="{{priceLoading}}"></loopr-relay-ajax>
                 </paper-card>
                 <paper-card transparent>
                     <span class="highlight">★</span> How can I get my token <a href="/#/doc/list-my-token">listed</a>?
@@ -119,15 +123,51 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 relayUrl: {
                     type: String,
                     computed: '_computeUrl(settingsRelay)'
-                }
+                },
+                loading: {
+                    type: Boolean,
+                    computed: '_computeLoading(marketsLoading, priceLoading)'
+                },
+                priceParams: {
+                    type: Object,
+                    computed:'_computePriceParams(page, settingsCurrency)'
+                },
+                priceQuoteRaw: Object,
+                priceQuote: {
+                    type: Object,
+                    computed: '_computePriceQuote(priceQuoteRaw)'
+                },
             };
         }
 
         _computeParams(page, settingsVersion) {
             if(page && page === 'markets' && settingsVersion) {
-                const params = {};
-                params.contractVersion = settingsVersion;
-                return [params];
+                return [settingsVersion];
+            }
+        }
+
+        _computePriceParams(page, settingsCurrency) {
+            if(page && page === 'markets' && settingsCurrency) {
+                return [settingsCurrency.toUpperCase()];
+            }
+        }
+
+        _computePriceQuote(priceQuoteRaw) {
+            if (priceQuoteRaw) {
+                var priceQuote = priceQuoteRaw.result;
+                priceQuote.priceMap = _.keyBy(priceQuote.tokens, o => o.token);
+                priceQuote.getPrice = function(token) {
+                    const t = priceQuote.priceMap[token];
+                    if (t) return t.price;
+                    else return 0;
+                }
+                return priceQuote;
+            }
+        }
+
+        _computeLoading(marketsLoading, priceLoading) {
+            if(marketsLoading && priceLoading) {
+                return true;
             }
         }
 
