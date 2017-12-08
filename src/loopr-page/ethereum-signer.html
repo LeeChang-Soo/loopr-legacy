@@ -17,7 +17,7 @@
             }
 
             async sign(raw) {
-                const relay = new Relay('http://10.137.111.250:8083/rpc');
+                const relay = new Relay(this.settingsRelay+"/rpc");
                 return await relay.generateTx(raw, this.wallet.privateKey);
             }
         }
