@@ -160,6 +160,9 @@
                 let tokenxConfig = appConfig.tokenMap[tokenx];
                 let tokenyConfig = appConfig.tokenMap[tokeny];
                 let marketConfig = appConfig.marketMap[tokenx + "-" + tokeny];
+                if (!tokenxConfig || !tokenyConfig || !marketConfig) {
+                    return;
+                }
 
                 const f = function(i) {
                     var item = {};
