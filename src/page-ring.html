@@ -19,9 +19,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
-        <!--<iron-ajax auto url="[[settingsRelay]]/Loopring/mock-relay-data/master/ringMined.json" handle-as="json" last-response="{{resp}}"></iron-ajax>-->
-        <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/ringMined.json" last-response="{{resp}}" loading={{loading}}>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+        <!--<loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/ringMined.json" last-response="{{resp}}" loading={{loading}}>-->
+        <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getRingMined" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
         </loopr-ajax>
         <loopr-page>
             <simple-toolbar slot="secondary-toolbar" title="Ring" id="[[hash]]" back-link="/#/history/rings"></simple-toolbar>
@@ -89,7 +89,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-card transparent>Recent Trades</paper-card>
                 <paper-card>
                     <div class="card-content">
-                        <trade-table display-mode="ring"></trade-table>
+                        <trade-table display-mode="ring" page="{{computedPage}}" subpage="{{computedSubpage}}"></trade-table>
                     </div>
                 </paper-card>
                 <div class="footer-spacer"></div>
@@ -98,7 +98,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </loopr-page>
     </template>
     <script>
-    class PageRing extends Polymer.Element {
+    class PageRing extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'page-ring';
         }
@@ -115,7 +115,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     observer: '_update',
                 },
-                ring: Object
+                ring: Object,
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
+                },
+                computedPage: {
+                    type: String,
+                    computed: '_computedPage(page)'
+                },
+                computedSubpage: {
+                    type: String,
+                    computed: '_computedSubpage(page, subpage)'
+                },
+                params:{
+                    type:Object,
+                    computed:'_computeParams(hash, settingsVersion)'
+                }
             };
         }
 
@@ -123,11 +139,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (page && subpage && page === "ring") return subpage;
         }
 
+        _computedPage(page) {
+            if (page && "ring" === page) return page;
+        }
+
+        _computedSubpage(page, subpage) {
+            if (page && "ring" === page && subpage) return subpage;
+        }
+
         tranHextoNum(hex) {
             if (hex) {
                 return Number(hex);
             }
             return '-1';
+        }
+
+        _computeParams(hash, settingsVersion) {
+            if (hash && settingsVersion) {
+                const params = {};
+                params.contractVersion = settingsVersion;
+                params.ringHash = hash;
+                return [params];
+            }
         }
 
         _update(resp) {

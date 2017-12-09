@@ -25,7 +25,7 @@
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <scary-cookie name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <div class="vertical layout">
             <div class="horizontal layout">
                 <div class="asks flex">
@@ -34,21 +34,21 @@
                     <div>
                         <vaadin-grid aria-label="Basic Binding Example" items="[[processed.bids]]">
                             <vaadin-grid-column width="50px">
-                                <template class="header">Amount ([[tokenxConfig.unit]])</template>
+                                <template class="header">Amount ([[processed.amountUnit]])</template>
                                 <template>
-                                    <pretty-number v="[[item.size]]" d=[[tokenxConfig.precision]]></pretty-number>
+                                    <pretty-number v="[[item.amount]]" d=[[processed.amountPrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                             <vaadin-grid-column width="50px">
-                                <template class="header">Price ([[priceUnit]])</template>
+                                <template class="header">Price ([[processed.priceUnit]])</template>
                                 <template>
-                                    <pretty-number class="bid" v="[[item.price]]" d=[[marketConfig.pricePrecision]]></pretty-number>
+                                    <pretty-number class="bid" v="[[item.price]]" d=[[processed.pricePrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                             <vaadin-grid-column width="50px">
-                                <template class="header">Size ([[tokenyConfig.unit]])</template>
+                                <template class="header">Size ([[processed.sizeUnit]])</template>
                                 <template>
-                                    <pretty-number v="[[item.total]]" d=[[tokenxConfig.precision]]></pretty-number>
+                                    <pretty-number v="[[item.size]]" d=[[processed.sizePrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                         </vaadin-grid>
@@ -61,21 +61,21 @@
                     <div>
                         <vaadin-grid aria-label="Basic Binding Example" items="[[processed.asks]]">
                             <vaadin-grid-column width="50px">
-                                <template class="header">Amount ([[tokenxConfig.unit]])</template>
+                                <template class="header">Amount ([[processed.amountUnit]])</template>
                                 <template>
-                                    <pretty-number v="[[item.size]]" d=[[tokenxConfig.precision]]></pretty-number>
+                                    <pretty-number v="[[item.amount]]" d=[[processed.amountPrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                             <vaadin-grid-column width="50px">
-                                <template class="header">Price [[priceUnit]])</template>
+                                <template class="header">Price ([[processed.priceUnit]])</template>
                                 <template>
-                                    <pretty-number class="ask" v="[[item.price]]" d=[[marketConfig.pricePrecision]]></pretty-number>
+                                    <pretty-number class="ask" v="[[item.price]]" d=[[processed.pricePrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                             <vaadin-grid-column width="50px">
-                                <template class="header">Size ([[tokenyConfig.unit]])</template>
+                                <template class="header">Size ([[processed.sizeUnit]])</template>
                                 <template>
-                                    <pretty-number v="[[item.total]]" d=[[tokenxConfig.precision]]></pretty-number>
+                                    <pretty-number v="[[item.size]]" d=[[processed.sizePrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                         </vaadin-grid>
@@ -83,8 +83,8 @@
                 </div>
             </div>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <!--<iron-ajax auto id="ajax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/orderbook.json" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>-->
-            <loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderbook.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
+            <!--<loopr-ajax relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderbook.json" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
+            <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getDepth" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
         </div>
     </template>
     <script>
@@ -95,16 +95,28 @@
 
         static get properties() {
             return {
+                page: String,
+                subpage: String,
                 resp: Object,
+                depth: {
+                    type: Object,
+                    computed: '_computeDepth(resp)'
+                },
                 processed: {
                     type: Object,
-                    computed: '_process(resp)'
+                    computed: '_process(page, subpage, appConfig, resp)'
                 },
-                tokenx: String,
-                tokeny: String,
                 market: {
                     type: String,
-                    computed: '_computeMarketId(tokenx, tokeny)'
+                    computed: '_computeMarketId(page, subpage)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
+                },
+                params:{
+                    type:Object,
+                    computed:'_computeParams(page, subpage, settingsVersion)'
                 }
             };
         }
@@ -113,26 +125,62 @@
             super.ready();
         }
 
-        _computeMarketId(tokenx, tokeny) {
-            return tokenx + "-" + tokeny;
+        _computeMarketId(page, subpage) {
+            if (page && 'market' === page && subpage) {
+                return subpage;
+            }
         }
 
-        _process(resp) {
-            if (resp) {
-                this.tokenxConfig = this.appConfig.tokenMap[this.tokenx];
-                this.tokenyConfig = this.appConfig.tokenMap[this.tokeny];
-                this.marketConfig = this.appConfig.marketMap[this.market];
-                this.priceUnit = this.tokenxConfig.unit + "/" + this.tokenyConfig.unit;
+        _computeTokenX(page, subpage) {
+            if (page && 'market' === page && subpage) {
+                return subpage.split("-")[0];
+            }
+        }
+
+        _computeTokenY(page, subpage) {
+            if (page && 'market' === page && subpage) {
+                return subpage.split("-")[1];
+            }
+        }
+
+        _computeParams(page, subpage, settingsVersion) {
+            if (page && 'market' === page && subpage && settingsVersion) {
+                const params = {};
+                params.contractVersion = settingsVersion;
+                params.market = subpage;
+                params.length = 10;
+                return [params];
+            }
+        }
+
+        _process(page, subpage, appConfig, resp) {
+            if (page && 'market' === page && subpage && appConfig && resp) {
+                let tokenx = subpage.split("-")[0];
+                let tokeny = subpage.split("-")[1];
+                let tokenxConfig = appConfig.tokenMap[tokenx];
+                let tokenyConfig = appConfig.tokenMap[tokeny];
+                let marketConfig = appConfig.marketMap[tokenx + "-" + tokeny];
+                if (!tokenxConfig || !tokenyConfig || !marketConfig) {
+                    return;
+                }
 
                 const f = function(i) {
-                    var item = i;
-                    item.total = i.size * i.price;
+                    var item = {};
+                    item.amount = Number(i[1]);
+                    item.price = Number(i[0]);
+                    item.size = item.amount * item.price;
                     return item;
                 };
 
                 var processed = {};
-                processed.asks = _.map(resp.asks, f);
-                processed.bids = _.map(resp.bids, f);
+                processed.amountUnit = tokenxConfig.unit;
+                processed.amountPrecision = tokenxConfig.precision;
+                processed.sizeUnit = tokenyConfig.unit;
+                processed.sizePrecision = tokenyConfig.precision;
+                processed.pricePrecision = marketConfig.pricePrecision;
+                processed.priceUnit = tokenxConfig.unit + "/" + tokenyConfig.unit;
+                processed.asks = _.map(resp.result.depth.sell, f);
+                processed.bids = _.map(resp.result.depth.buy, f);
                 return processed;
             }
         }

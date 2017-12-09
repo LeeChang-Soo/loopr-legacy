@@ -23,7 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <div class="sections">
             <paper-card>
-                <trade-table id="trades" filter-mine display-mode="wallet-trades" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></trade-table-market>
+                <trade-table id="trades" filter-mine display-mode="wallet-trades" page="{{computedPage}}" subpage="{{computedSubpage}}" third="{{computedThird}}"></trade-table-market>
             </paper-card>
         </div>
     </template>
@@ -34,12 +34,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return {
                 page: String,
                 subpage: String,
-                third: String
+                third: String,
+                computedPage: {
+                    type: String,
+                    computed: '_computedPage(page)'
+                },
+                computedSubpage: {
+                    type: String,
+                    computed: '_computedSubpage(page, subpage)'
+                },
+                computedThird: {
+                    type: String,
+                    computed: '_computedThird(page, subpage, third)'
+                }
             };
         }
 
+        _computedPage(page) {
+            if (page && "wallet" === page) return page;
+        }
+
+        _computedSubpage(page, subpage) {
+            if (page && "wallet" === page && subpage && subpage === "trades") return subpage;
+        }
+
+        _computedThird(page, subpage, third) {
+            if (page && "wallet" === page && subpage && subpage === "trades" && third) return third;
+        }
+
         go() {
-            this.$.trades.go();
+            //this.$.trades.go();
         }
     }
 

@@ -69,14 +69,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </paper-tabs>
                         -->
                         <iron-pages selected-item="{{selectedChart}}" selected="{{chartSelection}}" attr-for-selected="name">
-                            <candlestick-chart name="candle" market="{{market}}"></candlestick-chart>
-                            <depth-chart name="depth"></depth-chart>
+                            <candlestick-chart name="candle" page="{{computedPage}}" subpage="{{computedSubpage}}"></candlestick-chart>
+                            <!--<depth-chart name="depth"></depth-chart>-->
                         </iron-pages>
                     </div>
                 </paper-card>
                 <paper-card class="operation-panel-container">
                     <template is="dom-if" if="[[_isUnlocked(wallet)]]">
-                        <operation-panel market="{{market}}"></operation-panel>
+                        <operation-panel page="{{computedPage}}" subpage="{{computedSubpage}}"></operation-panel>
                     </template>
                     <div class$="walletlink [[isUnlockedClass(wallet)]]">
                         <a href="/#/wallet" class="walletlink">
@@ -85,7 +85,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </div>
                 </paper-card>
                 <paper-card>
-                    <order-book id="orderbook" tokenx="LRC" tokeny="WETH"></order-book>
+                    <order-book id="orderbook" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-book>
                 </paper-card>
                 <paper-card class="tables">
                     <div class="vertical layout">
@@ -98,11 +98,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </template>
                         </paper-tabs>
                         <iron-pages selected-item="{{selectedTable}}" selected="{{dataSelection}}" attr-for-selected="name">
-                            <trade-table name="trades" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></trade-table>
-                            <order-table name="orders" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></order-table>
+                            <trade-table name="trades" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></trade-table>
+                            <order-table name="orders" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
-                                <trade-table filter-mine name="mytrades" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></trade-table>
-                                <order-table filter-mine name="myorders" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></order-table>
+                                <trade-table filter-mine name="mytrades" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></trade-table>
+                                <order-table filter-mine name="myorders" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-table>
                             </template>
                         </iron-pages>
                     </div>
@@ -122,7 +122,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return {
                 page: String,
                 subpage: String,
-                third: String,
+                computedPage: {
+                    type: String,
+                    computed: '_computedPage(page)'
+                },
+                computedSubpage: {
+                    type: String,
+                    computed: '_computedSubpage(page, subpage)'
+                },
                 market: {
                     type: String,
                     computed: '_computedMarket(page, subpage)'
@@ -157,8 +164,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (page && "market" === page && subpage) return subpage;
         }
 
+        _computedPage(page) {
+            if (page && "market" === page) return page;
+        }
+
+        _computedSubpage(page, subpage) {
+            if (page && "market" === page && subpage) return subpage;
+        }
+
         _isUnlocked(wallet) {
-            console.log(wallet);
             return null !== this.wallet;
         }
 

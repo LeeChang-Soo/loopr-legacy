@@ -153,7 +153,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <div class="vertical layout start-justified">
                                 <paper-item class="flex" tabindex="-1">
                                     <paper-item-body two-line>
-                                        <div class="title"> Token Address</div>
+                                        <div class="title"> Account Address</div>
                                         <div secondary>
                                             [[wallet.address]]
                                         </div>
@@ -276,7 +276,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (selectedTokenBalance && amountShow) {
                     if (this._isNum(amount, selectedTokenBalance.precision) && amount <= Number(amountShow)) {
                         let num = Number(amount);
-                        if (selectedTokenBalance.defaultAllowance > num) {
+                        if (selectedTokenBalance.defaultAllowance > num * Number('1e'+selectedTokenBalance.digits)) {
                             return this._showAmountWarn(selectedTokenBalance)
                         } else {
                             return this._hiddenAmountWarn();
@@ -291,7 +291,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _showAmountWarn(selectedTokenBalance) {
                 this.showAmountWarn = "showWarn";
-                return "We suggest you to set above " + selectedTokenBalance.defaultAllowance;
+                return "We suggest you to set above " + (selectedTokenBalance.defaultAllowance/ Number('1e'+selectedTokenBalance.digits)) ;
             }
 
             _hiddenAmountWarn() {

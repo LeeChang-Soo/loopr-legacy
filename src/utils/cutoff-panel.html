@@ -71,21 +71,19 @@
                 </div>
             </paper-card>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="[[url]]" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
+            <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getCutoff" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
         </div>
     </template>
     <script>
-    class CutoffPanel extends Polymer.Element {
+    class CutoffPanel extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'cutoff-panel';
         }
 
         static get properties() {
             return {
-                url: {
-                    type: String,
-                    computed: '_computedUrl(wallet, settingsVersion)'
-                },
+                page: String,
+                subpage: String,
                 cutoff: {
                     type: Number,
                     computed: '_computeCutoff(resp)'
@@ -94,6 +92,14 @@
                     type: Object,
                     computed: '_computedBalance(balancesRaw)'
                 },
+                params: {
+                    type: Object,
+                    computed:'_computeParams(page, subpage, settingsVersion, wallet)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
+                }
             };
         }
 
@@ -101,16 +107,15 @@
             super.ready();
         }
 
+        _computeParams(page, subpage, settingsVersion, wallet) {
+            if(page && page === 'wallet' && subpage && subpage === 'orders' && settingsVersion && wallet) {
+                return [wallet.address, settingsVersion, "latest"];
+            }
+        }
 
         _computedBalance(data) {
             if (data) {
                 return _.keyBy(data.result.tokens, o => o.token);
-            }
-        }
-
-        _computedUrl(wallet, settingsVersion) {
-            if (wallet && settingsVersion) {
-                return "Loopring/mock-relay-data/master/getCutoff.json?address=" + wallet.address + "&version=" + settingsVersion;
             }
         }
 

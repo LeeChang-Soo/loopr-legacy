@@ -60,7 +60,10 @@
         }
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
+
         <!-- The array is set as the <vaadin-grid>'s "items" property -->
         <vaadin-grid aria-label="Basic Binding Example" items="[[orders]]">
             <vaadin-grid-column hidden$="[[hiddenRing]]" width="45px">
@@ -79,7 +82,7 @@
                 <template class="header">Block</template>
                 <template>
                     <a class="decorations" href="https://etherscan.io/block/[[item.blockNum]]" target="_blank">
-                        <div class="long-hash">[[item.blockNum]]</div>
+                        <div class="long-hash">[[item.blockNumber]]</div>
                     </a>
                 </template>
             </vaadin-grid-column>
@@ -154,7 +157,7 @@
             <vaadin-grid-column hidden$="[[hiddenTime]]" width="95px">
                 <template class="header">Time</template>
                 <template>
-                    <time-str seconds="[[item.timestamp]]"></time-str>
+                    <time-str seconds="[[item.createTime]]"></time-str>
                 </template>
             </vaadin-grid-column>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
@@ -165,7 +168,8 @@
         <div class$="[[showPage]] horizontal end-justified layout ">
             <prism-square-pager id="pager" page="[[currentPage]]" count="[[totalPage]]" range="[[pageRange]]"></prism-square-pager>
         </div>
-        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderFills.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
+        <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/orderFills.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
+        <loopr-relay-ajax id="ajax" relay="[[relayUrl]]" method="loopring_getFills" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
     </template>
     <script>
     class TradeTable extends AppConfigMixin(Polymer.Element) {
@@ -201,7 +205,8 @@
                     computed: '_computeOrders(appConfig, resp)'
                 },
                 currentPage: {
-                    type: Number
+                    type: Number,
+                    value: 1
                 },
                 totalPage: {
                     type: Number
@@ -213,6 +218,14 @@
                 showPage: {
                     type: String,
                     value: "hidden"
+                },
+                params:{
+                    type:Object,
+                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
                 }
             };
         }
@@ -242,13 +255,39 @@
             }
         }
 
+        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet){
+            if(settingsVersion) {
+                const params = {};
+                params.contractVersion = settingsVersion;
+                params.pageIndex = currentPage || 1;
+                let market = this._computedMarket(page, subpage, third);
+                if (page === "market" && subpage) {
+                    params.market = market;
+                } else if (page === "ring" && subpage) {
+                    params.ringHash = subpage;
+                } else if (page === "order" && subpage) {
+                     params.orderHash = subpage;
+                 } else if (page === "history" && subpage === "trades") {
+                    params.market = market;
+                } else if (page === "wallet" && subpage === "trades") {
+                    params.market = market;
+                    if(filterMine && wallet){
+                        params.owner = wallet.address;
+                    }
+                } else {
+                    return null;
+                }
+                return [params];
+            }
+        }
+
         _computedMarket(page, subpage, third) {
             if (page && subpage) {
-                if (page === "market") {
+                if (page === "market" && subpage) {
                     return subpage;
                 } else if (page === "history" && subpage === "trades") {
                     if (third) return third;
-                } else if (page === "wallet" && subpage == "trades") {
+                } else if (page === "wallet" && subpage === "trades") {
                     if (third) return third;
                 }
             }
@@ -264,10 +303,10 @@
 
         _computePage(resp) {
             if (resp) {
-                let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
-                this.totalPage = Math.max(2, pageSize);;
+                let totalPage = Math.ceil(resp.result.total / resp.result.pageSize); // hidden pager when only has one page datas
+                this.totalPage = totalPage;
                 this.currentPage = resp.result.pageIndex;
-                this.pageRange = Math.min(3, pageSize);
+                this.pageRange = Math.min(3, totalPage);
                 this._pager();
                 this._showPage();
             }
@@ -300,7 +339,7 @@
                 item.txLink = "https://etherscan.io/tx/" + item.txHash;
                 if (this.market) {
                     let marketConfig = this.getMarket(this.market);
-                    if (null != marketConfig) {
+                    if (null !== marketConfig) {
                         this.unitS = appConfig.tokenMap[marketConfig.tokenx].unit;
                         this.unitB = appConfig.tokenMap[marketConfig.tokeny].unit;
                         item.typeStyle = item.tokenS === marketConfig.tokenx ? 'red' : 'green';
@@ -319,11 +358,12 @@
                 if (!tokenS || !tokenB) {
                     return;
                 }
-                item.fillAmountS = this.toNumber(item.fillAmountS, tokenS);
-                item.fillAmountB = this.toNumber(item.fillAmountB, tokenB);
+                item.fillAmountS = this.toNumber(item.amountS, tokenS);
+                item.fillAmountB = this.toNumber(item.amountB, tokenB);
                 item.fee = Number(item.fee);
-                item.price = this.calPrice(item.fillAmountB, item.fillAmountS);
-                item.feeLrc = Number(item.feeLrc);
+                item.price = this.calPrice(item.amountB, item.amountS);
+                item.feeLrc = Number(item.lrcFee) / 1e18;
+                item.marginSplitToken = (item.splitS && Number(item.splitS)) ? item.tokenS : item.tokenB;
                 let marginSplitToken = appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
                 if (marginSplitToken) {
                     item.marginSplitUnit = marginSplitToken.unit;
@@ -333,7 +373,7 @@
                     item.marginSplitUnit = item.marginSplitToken.toUpperCase();
                     item.marginSplitPrecision = appConfig.marketConfig.defaultVolumePrecision;
                 }
-                item.marginSplit = Number(item.marginSplit);
+                item.marginSplit = Number(item.splitS || item.splitB) / Number('1e' + (marginSplitToken.digits ||'18'));
                 return item;
             }
         }
@@ -343,8 +383,8 @@
             if (item.tokenB === marketConfig.tokenx) {
                 let tempS = item.tokenS,
                     tempB = item.tokenB,
-                    tempAmountS = item.fillAmountS,
-                    tempAmountB = item.fillAmountB;
+                    tempAmountS = item.amountS,
+                    tempAmountB = item.amountB;
                 item.tokenS = tempB;
                 item.fillAmountS = tempAmountB;
                 item.tokenB = tempS;

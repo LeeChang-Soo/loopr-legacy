@@ -21,11 +21,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             padding-top: 0;
         }
         </style>
-        <cutoff-panel></cutoff-panel>
+        <cutoff-panel page="{{page}}" subpage="{{subpage}}"></cutoff-panel>
         <div class="sections">
             <paper-card transparent>Orders</paper-card>
             <paper-card>
-                <order-table id="orders" filter-mine display-mode="wallet-orders" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></order-table>
+                <order-table id="orders" filter-mine display-mode="wallet-orders" page="{{computedPage}}" subpage="{{computedSubpage}}" third="{{computedThird}}"></order-table>
             </paper-card>
         </div>
     </template>
@@ -37,12 +37,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return {
                 page: String,
                 subpage: String,
-                third: String
+                third: String,
+                computedPage: {
+                    type: String,
+                    computed: '_computedPage(page)'
+                },
+                computedSubpage: {
+                    type: String,
+                    computed: '_computedSubpage(page, subpage)'
+                },
+                computedThird: {
+                    type: String,
+                    computed: '_computedThird(page, subpage, third)'
+                }
             };
         }
 
+        _computedPage(page) {
+            if (page && "wallet" === page) return page;
+        }
+
+        _computedSubpage(page, subpage) {
+            if (page && "wallet" === page && subpage && subpage === "orders") return subpage;
+        }
+
+        _computedThird(page, subpage, third) {
+            if (page && "wallet" === page && subpage && subpage === "orders" && third) return third;
+        }
+
         go() {
-            const page = this.$.orders.go();
+            //const page = this.$.orders.go();
         }
     }
 

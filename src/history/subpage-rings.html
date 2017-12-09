@@ -22,7 +22,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
-        <vaadin-grid aria-label="Basic Binding Example" items="[[resp.result.data]]">
+        <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
+        <vaadin-grid aria-label="Basic Binding Example" items="[[rings]]">
             <vaadin-grid-column width="60px">
                 <template class="header">
                     <div class="left-aligned">Hash</div>
@@ -30,7 +31,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template>
                     <div class="left-aligned">
                         <a href="#/ring/[[item.ringhash]]">
-                            <div class="long-hash">[[item.ringhash]]</div>
+                            <div class="long-hash">[[item.ringHash]]</div>
                         </a>
                     </div>
                 </template>
@@ -53,12 +54,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
             <vaadin-grid-column width="60px">
                 <template class="header">
-                    <div class="left-aligned">Fee Recepient</div>
+                    <div class="left-aligned">Fee Recipient</div>
                 </template>
                 <template>
                     <div class="left-aligned">
-                        <a href="//etherscan.io/address/[[item.feeRecepient]]" target="_blank">
-                            <div class="long-hash">[[item.feeRecepient]]</div>
+                        <a href="//etherscan.io/address/[[item.feeRecipient]]" target="_blank">
+                            <div class="long-hash">[[item.feeRecipient]]</div>
                         </a>
                     </div>
                 </template>
@@ -69,8 +70,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </template>
                 <template>
                     <div class="left-aligned">
-                        <a href="//etherscan.io/tx/[[item.transactionHash]]" target="_blank">
-                            <div class="long-hash">[[item.transactionHash]]</div>
+                        <a href="//etherscan.io/tx/[[item.txHash]]" target="_blank">
+                            <div class="long-hash">[[item.txHash]]</div>
                         </a>
                     </div>
                 </template>
@@ -78,12 +79,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <vaadin-grid-column width="45px">
                 <template class="header">Lrc-Fee</template>
                 <template>
-                    <pretty-number v="[[item.totalLrcFee]]" d=[[appConfig.lrc.precision]]></pretty-number>
+                    <pretty-number v="[[item.totalLrcFee]]" d=[[item.lrcPrecision]]></pretty-number>
                 </template>
             </vaadin-grid-column>
             <vaadin-grid-column width="50px">
                 <template class="header">Block Num</template>
-                <template><a href="//etherscan.io/block/[[item.blockNum]]" styleless target="_blank"> [[tranHextoNum(item.blockNum)]] </a></template>
+                <template><a href="//etherscan.io/block/[[item.blockNumber]]" styleless target="_blank"> [[item.blockNumber]] </a></template>
             </vaadin-grid-column>
             <vaadin-grid-column width="60px">
                 <template class="header">Time</template>
@@ -93,8 +94,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </vaadin-grid-column>
         </vaadin-grid>
         <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-        <!--<iron-ajax auto id="ajax" url="[[settingsRelay]]/Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" handle-as="json" last-response="{{resp}}" loading="{{loading}}"></iron-ajax>-->
-        <loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>
+        <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/ringMined.json?page={{currentPage}}" last-response="{{resp}}" loading="{{loading}}"></loopr-ajax>-->
+        <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getRingMined" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
         <div class="horizontal end-justified layout ">
             <prism-square-pager id="pager" page="[[currentPage]]" count=[[totalPage]] range=[[pageRange]]></prism-square-pager>
         </div>
@@ -105,8 +106,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+                page: String,
+                subpage: String,
+                third: String,
                 currentPage: {
-                    type: Number
+                    type: Number,
+                    value: 1
                 },
                 totalPage: {
                     type: Number
@@ -118,6 +123,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 resp: {
                     type: Object,
                     observer: '_computePage'
+                },
+                rings: {
+                    type: Object,
+                    computed: '_computeRings(appConfig, resp)'
+                },
+                params: {
+                    type: Object,
+                    computed:'_computeParams(page, subpage, currentPage, settingsVersion)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
                 }
             }
         }
@@ -126,14 +143,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             super.ready();
         }
 
+        _computeParams(page, subpage, currentPage, settingsVersion) {
+            if (page && subpage && currentPage && settingsVersion) {
+                if (page === "history" && subpage === "rings") {
+                    const params = {};
+                    params.contractVersion = settingsVersion;
+                    params.pageIndex = currentPage || 1;
+                    return [params];
+                }
+            }
+        }
+
         _computePage(resp) {
             if (resp) {
-                let pageSize = Math.ceil(resp.result.total / resp.result.pageSize);
-                this.totalPage = Math.max(2, pageSize);;
+                let totalPage = Math.ceil(resp.result.total / resp.result.pageSize); // hidden pager when only has one page datas
+                this.totalPage = totalPage;
                 this.currentPage = resp.result.pageIndex;
-                this.pageRange = Math.min(3, pageSize);
+                this.pageRange = Math.min(3, totalPage);
                 this._pager();
             }
+        }
+
+        _computeRings(appConfig, resp) {
+            if (appConfig && resp) {
+                return _.map(resp.result.data, o => this._computeItem(appConfig, o));
+            }
+        }
+
+        _computeItem(appConfig, o) {
+            let lrcConfig = this.getTokenByName("LRC");
+            o.lrcPrecision = appConfig.lrc.precision;
+            o.totalLrcFee = this.toNumber(o.totalLrcFee, lrcConfig)
+            return o;
         }
 
         tranHextoNum(hex) {
@@ -144,7 +185,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         go() {
-            this.$.ajax.generateRequest();
+            //this.$.ajax.generateRequest();
         }
     }
 

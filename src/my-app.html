@@ -216,7 +216,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     app-toolbar iron-image {
-        width: 200px;
+        width: 140px;
         height: 32px;
     }
 
@@ -240,12 +240,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <txamountconfirm-dialog id="txamountconfirm"></txamountconfirm-dialog>
         <order-dialog id="orderdialog"></order-dialog>
         <!-- ajax -->
-        <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/config.json" last-response="{{appConfigRaw}}"></loopr-ajax>
-        <loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>
+        <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/testConfig.json" last-response="{{appConfigRaw}}"></loopr-ajax>
+        <!--<loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>-->
+        <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getPriceQuote" params="[[priceParams]]" last-response="{{priceQuoteRaw}}" loading="{{priceLoading}}"></loopr-relay-ajax>
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
-        <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
+        <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="settings-lang" value="{{settingsLang}}"></global-variable>
         <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
         <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
@@ -278,7 +279,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <!-- <div spacer></div> -->
                         <a styleless href="/#/">
                             <div main-title>
-                                <iron-image src="images/logo.svg" sizing="contain"></iron-image>
+                                <iron-image src="images/logo_white.png" sizing="contain"></iron-image>
                             </div>
                         </a>
                         <div condensed-title></div>
@@ -294,7 +295,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </div>
                 <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
                     <page-market name="market" page="{{page}}" subpage="{{pageId}}" third="{{thirdParam}}"></page-market>
-                    <page-markets name="markets"></page-markets>
+                    <page-markets name="markets" page="{{page}}"></page-markets>
                     <page-wallet id="walletPage" name="wallet" page="{{page}}" secondary-page="{{pageId}}" third="{{thirdParam}}"></page-wallet>
                     <page-ring name="ring" page="{{page}}" subpage="{{pageId}}"></page-ring>
                     <page-order name="order" page="{{page}}" subpage="{{pageId}}"></page-order>
@@ -313,14 +314,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-drawer-layout>
     </template>
     <script>
-    const keystore = loopring.keystore;
-    const privateKeyWallet = loopring.wallet;
-    const Validator = loopring.validator;
-    const signer = loopring.signer;
-    const Relay = loopring.relay;
-    const Order = loopring.order;
+        const keystore = loopring.keystore;
+        const privateKeyWallet = loopring.wallet;
+        const Validator = loopring.validator;
+        const signer = loopring.signer;
+        const Relay = loopring.relay;
+        const Order = loopring.order;
 
-    class MyApp extends Polymer.Element {
+    class MyApp extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'my-app';
         }
@@ -363,11 +364,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     computed: '_computeAppConfig(appConfigRaw)'
                 },
-                priceQuoteRaw: Object,
-                priceQuote: {
-                    type: Object,
-                    computed: '_computePriceQuote(priceQuoteRaw)'
-                },
                 wallet: {
                     type: Object,
                     observer: '_walletChanged'
@@ -379,6 +375,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 thirdParam: {
                     type: Object,
                     computed: '_computedThirdParam(thirdrouteData)'
+                },
+                priceParams: {
+                    type: Object,
+                    computed:'_computePriceParams(page, settingsCurrency)'
+                },
+                priceQuoteRaw: Object,
+                priceQuote: {
+                    type: Object,
+                    computed: '_computePriceQuote(priceQuoteRaw)'
+                },
+                relayUrl: {
+                    type: String,
+                    computed: '_computeUrl(settingsRelay)'
                 }
             };
         }
@@ -457,8 +466,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (cookieValues["settingsVersion"]) {
                     let currentVersion = cookieValues["settingsVersion"];
                     let warnedVersion = cookieValues["warnedVersion"];
-                    if (latestVersion != currentVersion) {
-                        if (!warnedVersion || warnedVersion != latestVersion) {
+                    if (latestVersion !== currentVersion) {
+                        if (!warnedVersion || warnedVersion !== latestVersion) {
                             var detail = {
                                 text: "Your current contract version is " + currentVersion + ", latest version " + latestVersion + " is available",
                                 category: "warning",
@@ -502,20 +511,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.$.loading.style.display = "none";
                 this.$.pages.style.display = "inherit";
                 return appConfig;
-            }
-        }
-
-        _computePriceQuote(priceQuoteRaw) {
-            if (priceQuoteRaw !== null) {
-                var priceQuote = priceQuoteRaw.result;
-                priceQuote.priceMap = _.keyBy(priceQuote.tokens, o => o.token);
-                priceQuote.getPrice = function(token) {
-                    const t = priceQuote.priceMap[token];
-                    if (t) return t.price;
-                    else return 0;
-                }
-
-                return priceQuote;
             }
         }
 
@@ -639,6 +634,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             } else {
                 this.$.lockButton.icon = "lock-open";
                 this.lockClass = "openned";
+            }
+        }
+
+        _computePriceParams(page, settingsCurrency) {
+            if(page && settingsCurrency) {
+                return [settingsCurrency.toUpperCase()];
+            }
+        }
+
+        _computePriceQuote(priceQuoteRaw) {
+            if (priceQuoteRaw) {
+                var priceQuote = priceQuoteRaw.result;
+                priceQuote.priceMap = _.keyBy(priceQuote.tokens, o => o.token);
+                priceQuote.getPrice = function(token) {
+                    const t = priceQuote.priceMap[token];
+                    if (t) return t.price;
+                    else return 0;
+                }
+                return priceQuote;
             }
         }
     }
