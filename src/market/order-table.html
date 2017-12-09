@@ -234,7 +234,7 @@
                 params.contractVersion = settingsVersion;
                 params.pageIndex = currentPage || 1;
                 let market = this._computedMarket(page, subpage, third);
-                if (page === "market") {
+                if (page === "market" && subpage) {
                     params.market = market;
                 } else if (page === "order" && subpage) {
                     params.orderHash = subpage;
@@ -260,7 +260,7 @@
 
         _computedMarket(page, subpage, third) {
             if (page && subpage) {
-                if (page === "market") {
+                if (page === "market" && subpage) {
                     return subpage;
                 } else if (page === "history" && subpage === "orders") {
                     if (third) return third;
@@ -482,7 +482,9 @@
         }
 
         go() {
-            this.$.ajax.generateRequest();
+            if(this.relayUrl && this.params) {
+                this.$.ajax.generateRequest();
+            }
         }
     }
 

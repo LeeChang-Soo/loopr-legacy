@@ -109,7 +109,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 resp: Object,
                 tickers: {
                     type: Object,
-                    computed: '_process(resp.result)'
+                    computed: '_process(appConfig, resp.result)'
                 },
                 marketSelector: {
                     type: String
@@ -131,8 +131,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        _process(result) {
-            if (result) {
+        _process(appConfig, result) {
+            if (appConfig && result) {
                 return _.map(result, function(i) {
                     var item = i;
                     if (i.change > 0) {
@@ -145,19 +145,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         item.changeClass = "";
                         item.changeStr = "0.0%";
                     }
-                    const marketConfig = this.appConfig.marketMap[i.market];
+                    const marketConfig = appConfig.marketMap[i.market];
                     if (marketConfig) {
                         item.pricePrecision = marketConfig.pricePrecision;
 
-                        const tokenxConfig = this.appConfig.tokenMap[marketConfig.tokenx];
+                        const tokenxConfig = appConfig.tokenMap[marketConfig.tokenx];
                         if (tokenxConfig) {
                             item.volumnPrecision = tokenxConfig.precision;
                         } else {
-                            item.volumnPrecision = this.appConfig.defaultVolumePrecision;
+                            item.volumnPrecision = appConfig.defaultVolumePrecision;
                         }
                     } else {
-                        item.pricePrecision = this.appConfig.defaultPricePrecision;
-                        item.volumnPrecision = this.appConfig.defaultVolumePrecision;
+                        item.pricePrecision = appConfig.defaultPricePrecision;
+                        item.volumnPrecision = appConfig.defaultVolumePrecision;
                     }
                     return item;
                 }.bind(this));

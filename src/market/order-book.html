@@ -104,7 +104,7 @@
                 },
                 processed: {
                     type: Object,
-                    computed: '_process(resp, tokenx, tokeny)'
+                    computed: '_process(appConfig, resp, tokenx, tokeny)'
                 },
                 tokenx: {
                     type: String,
@@ -161,11 +161,11 @@
             }
         }
 
-        _process(resp, tokenx, tokeny) {
-            if (resp && tokenx && tokeny) {
-                this.tokenxConfig = this.appConfig.tokenMap[tokenx];
-                this.tokenyConfig = this.appConfig.tokenMap[tokeny];
-                this.marketConfig = this.appConfig.marketMap[tokenx + "-" + tokeny];
+        _process(appConfig, resp, tokenx, tokeny) {
+            if (appConfig && resp && tokenx && tokeny) {
+                this.tokenxConfig = appConfig.tokenMap[tokenx];
+                this.tokenyConfig = appConfig.tokenMap[tokeny];
+                this.marketConfig = appConfig.marketMap[tokenx + "-" + tokeny];
                 this.priceUnit = this.tokenxConfig.unit + "/" + this.tokenyConfig.unit;
 
                 const f = function(i) {
@@ -175,8 +175,8 @@
                 };
 
                 var processed = {};
-                processed.asks = _.map(resp.depth.sell, f);
-                processed.bids = _.map(resp.depth.buy, f);
+                processed.asks = _.map(resp.result.depth.sell, f);
+                processed.bids = _.map(resp.result.depth.buy, f);
                 return processed;
             }
         }

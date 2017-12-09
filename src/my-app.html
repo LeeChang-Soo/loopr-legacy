@@ -240,7 +240,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <txamountconfirm-dialog id="txamountconfirm"></txamountconfirm-dialog>
         <order-dialog id="orderdialog"></order-dialog>
         <!-- ajax -->
-        <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/config.json" last-response="{{appConfigRaw}}"></loopr-ajax>
+        <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/testConfig.json" last-response="{{appConfigRaw}}"></loopr-ajax>
         <!--<loopr-ajax id="priceQuoteAjax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/price-quote.json?currency=[[settingsCurrency]]" last-response="{{priceQuoteRaw}}"></loopr-ajax>-->
         <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getPriceQuote" params="[[priceParams]]" last-response="{{priceQuoteRaw}}" loading="{{priceLoading}}"></loopr-relay-ajax>
         <!-- global vars -->

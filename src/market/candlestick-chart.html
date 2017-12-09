@@ -88,16 +88,16 @@
         }
 
         _chart(resp) {
-            let datas = resp.result.data;
+            let datas = resp.result;
             resp.xData = Highcharts.map(datas, function(val, j) {
                 //return (new Date(val[0])).toUTCString()
-                return val.start;
+                return val.Start;
             });
             resp.price = Highcharts.map(datas, function(val, j) {
-                return val.open;
+                return val.Open;
             });
             resp.volume = Highcharts.map(datas, function(val, j) {
-                return val.amount;
+                return val.Amount;
             });
             let title = this.market.toUpperCase()
             Highcharts.chart(this.$.container, {

@@ -69,8 +69,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </paper-tabs>
                         -->
                         <iron-pages selected-item="{{selectedChart}}" selected="{{chartSelection}}" attr-for-selected="name">
-                            <candlestick-chart name="candle" page="{{page}}" subpage="{{subpage}}"></candlestick-chart>
-                            <depth-chart name="depth"></depth-chart>
+                            <candlestick-chart name="candle" page="{{computedPage}}" subpage="{{computedSubpage}}"></candlestick-chart>
+                            <!--<depth-chart name="depth"></depth-chart>-->
                         </iron-pages>
                     </div>
                 </paper-card>
@@ -85,7 +85,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </div>
                 </paper-card>
                 <paper-card>
-                    <order-book id="orderbook" page="{{page}}" subpage="{{subpage}}"></order-book>
+                    <order-book id="orderbook" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-book>
                 </paper-card>
                 <paper-card class="tables">
                     <div class="vertical layout">
@@ -173,7 +173,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _isUnlocked(wallet) {
-            console.log(wallet);
             return null !== this.wallet;
         }
 
