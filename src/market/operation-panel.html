@@ -403,19 +403,19 @@
                     if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
                         return;
                     }
-//                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
-//                        const detail = {
-//                            text: 'Your address is not in white list, could not submit order',
-//                            category: "warning",
-//                            duration: 5000
-//                        };
-//                        this.dispatchEvent(new CustomEvent('notification', {
-//                            bubbles: true,
-//                            composed: true,
-//                            detail: detail
-//                        }));
-//                        return;
-//                    }
+                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
+                        const detail = {
+                            text: 'Your address is not in white list, could not submit order',
+                            category: "warning",
+                            duration: 5000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
 
                     let data = {};
                     const detail = {};
@@ -632,19 +632,19 @@
                     if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
                         return;
                     }
-//                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
-//                        const detail = {
-//                            text: 'Your address is not in white list, could not submit order',
-//                            category: "warning",
-//                            duration: 5000
-//                        };
-//                        this.dispatchEvent(new CustomEvent('notification', {
-//                            bubbles: true,
-//                            composed: true,
-//                            detail: detail
-//                        }));
-//                        return;
-//                    }
+                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
+                        const detail = {
+                            text: 'Your address is not in white list, could not submit order',
+                            category: "warning",
+                            duration: 5000
+                        };
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        return;
+                    }
                     const detail = {};
                     const data = {};
                     const raws = [];
@@ -671,7 +671,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = '0x' + this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits).toString(16);
+                    data.lrcFee = '0x' + (this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {

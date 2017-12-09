@@ -158,14 +158,14 @@
                         detail: detail
                     }));
                 }.bind(this), function (err) {
-                    if(err){
-                        var detail = {text: err.message, category: "error", duration: 8000};
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-                    }
+//                    if(err){
+//                        var detail = {text: err.message, category: "error", duration: 8000};
+//                        this.dispatchEvent(new CustomEvent('notification', {
+//                            bubbles: true,
+//                            composed: true,
+//                            detail: detail
+//                        }));
+//                    }
                 }.bind(this))
             }
         }
