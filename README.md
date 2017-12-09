@@ -1,4 +1,4 @@
-# Loopr - Ethereum Wallet and Loopring DEX
+# Loopr - ERC20 Wallet and Loopring DEX
 
 
 ### Setup
