@@ -224,7 +224,12 @@
 
             static get properties() {
                 return {
-                    market: String,
+                    page: String,
+                    subpage: String,
+                    market: {
+                        type: String,
+                        computed: '_computedMarket(page, subpage)'
+                    },
                     marketPrecision: {
                         type: Number,
                         computed: '_computePrecision(market,appConfig)'
@@ -284,6 +289,10 @@
             ready() {
                 super.ready();
                 this.$.buyAmount.focus();
+            }
+
+            _computedMarket(page, subpage) {
+                if (page && "market" === page && subpage) return subpage;
             }
 
             _changeTab() {
@@ -367,13 +376,13 @@
             }
 
             _computeBuyTotal(amount, price, tokenb) {
-                if (amount && price && Number(price) > 0) {
+                if (amount && price && Number(price) > 0 && tokenb) {
                     return Math.ceil((amount / price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
                 }
             }
 
             _computeSellTotal(amount, price, tokenb) {
-                if (amount && price && Number(price) > 0) {
+                if (amount && price && Number(price) > 0 && tokenb) {
                     return Math.floor((amount / price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
                 }
             }

@@ -283,13 +283,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         _initContract(appConfig, settingsVersion) {
             if (appConfig && settingsVersion) {
-                var _this = this;
-                this.contractAddress = appConfig.contractVersionMap[settingsVersion].address;
+                let contractAddress = "";
+                if (!appConfig.contractVersionMap[settingsVersion]) {
+                    let latestContract = appConfig.contracts[appConfig.contracts.length - 1];
+                    contractAddress = latestContract.address;
+                    this.settingsVersion = latestContract.version;
+                    this.$.version.value = latestContract.version;
+                    this._versionObsoletedWarn(settingsVersion, latestContract.version);
+                } else {
+                    contractAddress = appConfig.contractVersionMap[settingsVersion].address;
+                }
+                this.contractAddress = contractAddress;
                 this.$.version.addEventListener('value-changed', function() {
-                    _this.settingsVersion = _this.$.version.value;
-                    _this.contractAddress = appConfig.contractVersionMap[_this.settingsVersion].address;
-                });
+                    this.settingsVersion = this.$.version.value;
+                    let contractAddress = "";
+                    if (!appConfig.contractVersionMap[this.$.version.value]) {
+                        let latestContract = appConfig.contracts[appConfig.contracts.length - 1];
+                        contractAddress = latestContract.address;
+                        this.settingsVersion = latestContract.version;
+                        this.$.version.value = latestContract.version;
+                        this._versionObsoletedWarn(this.$.version.value, latestContract.version);
+                    } else {
+                        contractAddress = appConfig.contractVersionMap[this.$.version.value].address;
+                    }
+                    this.contractAddress = contractAddress;
+                }.bind(this));
             }
+        }
+
+        _versionObsoletedWarn(obsoletedVersion, latestVersion) {
+            var detail = { text: "The contract version:"+obsoletedVersion+" has been obsoleted, set latest:"+latestVersion+" instead", category: "warning", duration: 8000 }
+            this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
         }
 
         /**
