@@ -34,21 +34,21 @@
                     <div>
                         <vaadin-grid aria-label="Basic Binding Example" items="[[processed.bids]]">
                             <vaadin-grid-column width="50px">
-                                <template class="header">Amount ([[tokenxConfig.unit]])</template>
+                                <template class="header">Amount ([[processed.amountUnit]])</template>
                                 <template>
-                                    <pretty-number v="[[item.size]]" d=[[tokenxConfig.precision]]></pretty-number>
+                                    <pretty-number v="[[item.amount]]" d=[[processed.amountPrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                             <vaadin-grid-column width="50px">
-                                <template class="header">Price ([[priceUnit]])</template>
+                                <template class="header">Price ([[processed.priceUnit]])</template>
                                 <template>
-                                    <pretty-number class="bid" v="[[item.price]]" d=[[marketConfig.pricePrecision]]></pretty-number>
+                                    <pretty-number class="bid" v="[[item.price]]" d=[[processed.pricePrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                             <vaadin-grid-column width="50px">
-                                <template class="header">Size ([[tokenyConfig.unit]])</template>
+                                <template class="header">Size ([[processed.sizeUnit]])</template>
                                 <template>
-                                    <pretty-number v="[[item.total]]" d=[[tokenxConfig.precision]]></pretty-number>
+                                    <pretty-number v="[[item.size]]" d=[[processed.sizePrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                         </vaadin-grid>
@@ -61,21 +61,21 @@
                     <div>
                         <vaadin-grid aria-label="Basic Binding Example" items="[[processed.asks]]">
                             <vaadin-grid-column width="50px">
-                                <template class="header">Amount ([[tokenxConfig.unit]])</template>
+                                <template class="header">Amount ([[processed.amountUnit]])</template>
                                 <template>
-                                    <pretty-number v="[[item.size]]" d=[[tokenxConfig.precision]]></pretty-number>
+                                    <pretty-number v="[[item.amount]]" d=[[processed.amountPrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                             <vaadin-grid-column width="50px">
-                                <template class="header">Price ([[priceUnit]])</template>
+                                <template class="header">Price ([[processed.priceUnit]])</template>
                                 <template>
-                                    <pretty-number class="ask" v="[[item.price]]" d=[[marketConfig.pricePrecision]]></pretty-number>
+                                    <pretty-number class="ask" v="[[item.price]]" d=[[processed.pricePrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                             <vaadin-grid-column width="50px">
-                                <template class="header">Size ([[tokenyConfig.unit]])</template>
+                                <template class="header">Size ([[processed.sizeUnit]])</template>
                                 <template>
-                                    <pretty-number v="[[item.total]]" d=[[tokenxConfig.precision]]></pretty-number>
+                                    <pretty-number v="[[item.size]]" d=[[processed.sizePrecision]]></pretty-number>
                                 </template>
                             </vaadin-grid-column>
                         </vaadin-grid>
@@ -104,15 +104,7 @@
                 },
                 processed: {
                     type: Object,
-                    computed: '_process(appConfig, resp, tokenx, tokeny)'
-                },
-                tokenx: {
-                    type: String,
-                    computed: '_computeTokenX(page, subpage)'
-                },
-                tokeny: {
-                    type: String,
-                    computed: '_computeTokenY(page, subpage)'
+                    computed: '_process(page, subpage, appConfig, resp)'
                 },
                 market: {
                     type: String,
@@ -161,20 +153,32 @@
             }
         }
 
-        _process(appConfig, resp, tokenx, tokeny) {
-            if (appConfig && resp && tokenx && tokeny) {
-                this.tokenxConfig = appConfig.tokenMap[tokenx];
-                this.tokenyConfig = appConfig.tokenMap[tokeny];
-                this.marketConfig = appConfig.marketMap[tokenx + "-" + tokeny];
-                this.priceUnit = this.tokenxConfig.unit + "/" + this.tokenyConfig.unit;
+        _process(page, subpage, appConfig, resp) {
+            if (page && 'market' === page && subpage && appConfig && resp) {
+                let tokenx = subpage.split("-")[0];
+                let tokeny = subpage.split("-")[1];
+                let tokenxConfig = appConfig.tokenMap[tokenx];
+                let tokenyConfig = appConfig.tokenMap[tokeny];
+                let marketConfig = appConfig.marketMap[tokenx + "-" + tokeny];
+                if (!tokenxConfig || !tokenyConfig || !marketConfig) {
+                    return;
+                }
 
                 const f = function(i) {
-                    var item = i;
-                    item.total = i.size * i.price;
+                    var item = {};
+                    item.amount = Number(i[1]);
+                    item.price = Number(i[0]);
+                    item.size = item.amount * item.price;
                     return item;
                 };
 
                 var processed = {};
+                processed.amountUnit = tokenxConfig.unit;
+                processed.amountPrecision = tokenxConfig.precision;
+                processed.sizeUnit = tokenyConfig.unit;
+                processed.sizePrecision = tokenyConfig.precision;
+                processed.pricePrecision = marketConfig.pricePrecision;
+                processed.priceUnit = tokenxConfig.unit + "/" + tokenyConfig.unit;
                 processed.asks = _.map(resp.result.depth.sell, f);
                 processed.bids = _.map(resp.result.depth.buy, f);
                 return processed;
