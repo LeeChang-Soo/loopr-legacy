@@ -98,11 +98,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </template>
                         </paper-tabs>
                         <iron-pages selected-item="{{selectedTable}}" selected="{{dataSelection}}" attr-for-selected="name">
-                            <trade-table name="trades" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></trade-table>
-                            <order-table name="orders" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></order-table>
+                            <trade-table name="trades" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></trade-table>
+                            <order-table name="orders" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
-                                <trade-table filter-mine name="mytrades" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></trade-table>
-                                <order-table filter-mine name="myorders" display-mode="market" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></order-table>
+                                <trade-table filter-mine name="mytrades" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></trade-table>
+                                <order-table filter-mine name="myorders" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-table>
                             </template>
                         </iron-pages>
                     </div>
@@ -122,7 +122,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return {
                 page: String,
                 subpage: String,
-                third: String,
+                computedPage: {
+                    type: String,
+                    computed: '_computedPage(page)'
+                },
+                computedSubpage: {
+                    type: String,
+                    computed: '_computedSubpage(page, subpage)'
+                },
                 market: {
                     type: String,
                     computed: '_computedMarket(page, subpage)'
@@ -154,6 +161,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _computedMarket(page, subpage) {
+            if (page && "market" === page && subpage) return subpage;
+        }
+
+        _computedPage(page) {
+            if (page && "market" === page) return page;
+        }
+
+        _computedSubpage(page, subpage) {
             if (page && "market" === page && subpage) return subpage;
         }
 

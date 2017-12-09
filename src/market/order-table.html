@@ -481,8 +481,8 @@
             return 0;
         }
 
-        go() { //do not need to be called by outer component when iron-page change, "page" and "subpage" parameters change will load data automatically
-            //this.$.ajax.generateRequest();
+        go() {
+            this.$.ajax.generateRequest();
         }
     }
 
