@@ -121,8 +121,8 @@
 
         _computeCutoff(resp) {
             this.$.cutoff.datetime = "1970-01-01T00:00:00.000Z"; //set default datetime or it will not display correctly
-            if (resp && resp.result.data) {
-                return Number(resp.result.data) * 1000;
+            if (resp && resp.result) {
+                return Math.max(1, Number(resp.result) * 1000);
             } else {
                 return Number(1);
             }
