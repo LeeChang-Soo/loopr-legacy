@@ -2,21 +2,21 @@
   "entrypoint": "index.html",
   "shell": "src/my-app.html",
   "fragments": [
-    "src/page-markets.html",
-    "src/page-wallet.html",
-    "src/page-history.html",
-    "src/page-settings.html",
-    "src/page-market.html",
-    "src/page-ring.html",
-    "src/page-order.html",
-    "src/page-transfer.html",
+    "src/page-404.html",
     "src/page-approve.html",
     "src/page-convert.html",
-    "src/page-doc.html",
-    "src/page-404.html",
     "src/page-dev.html",
+    "src/page-doc.html",
     "src/page-generatewallet.html",
-    "src/page-unlockwallet.html"
+    "src/page-history.html",
+    "src/page-market.html",
+    "src/page-markets.html",
+    "src/page-order.html",
+    "src/page-ring.html",
+    "src/page-settings.html",
+    "src/page-transfer.html",
+    "src/page-unlockwallet.html",
+    "src/page-wallet.html"
   ],
   "sources": [
     "src/**/*",
@@ -24,14 +24,15 @@
   ],
   "extraDependencies": [
     "manifest.json",
-    "bower_components/webcomponentsjs/*"
+    "bower_components/webcomponentsjs/*",
+    "node_modules/bn.js/lib/bn.js"
   ],
-  "lint": {
+  "lint":
+  {
     "rules": ["polymer-2"]
   },
   "builds": [
     {
       "preset": "es5-bundled"
-    }
-  ]
+    }]
 }
