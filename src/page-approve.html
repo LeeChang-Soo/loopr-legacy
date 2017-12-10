@@ -393,7 +393,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _showOrHidden(amount, gasLimit, additionalData, amountShow, selectedTokenBalance) {
                 let validator = new Validator();
-                if (!amount ||!selectedTokenBalance || ! new RegExp(this.__numPatten(selectedTokenBalance.precision)).test(amount) || !gasLimit || !amountShow || amountShow < Number(amount) || !selectedTokenBalance) {
+                if (!amount ||!selectedTokenBalance || !(new RegExp(this._numPatten(selectedTokenBalance.precision)).test(amount)) || !gasLimit || !amountShow || amountShow < Number(amount) || !selectedTokenBalance) {
                     this._buttonDisable();
                     return false;
                 }
