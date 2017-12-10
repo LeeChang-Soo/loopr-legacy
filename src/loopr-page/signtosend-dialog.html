@@ -120,7 +120,7 @@
                 const rawTxs = _.map(detail.raws, function (raw) {
                     const rawTx = JSON.parse(raw.raw);
                     rawTx.nonce = rawTx.nonce || nonce;
-                    rawTx.chainId = 7107171;
+                    rawTx.chainId= 7107171;
                     nonce = '0x' + (Number(rawTx.nonce) + 1).toString(16);
 
                     raw.raw = JSON.stringify(rawTx);
