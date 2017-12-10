@@ -29,6 +29,7 @@
         "iron-pages": "PolymerElements/iron-pages#^2.0.0",
         "iron-selector": "PolymerElements/iron-selector#^2.0.0",
         "lodash": "^4.17.4",
+        "loopring.js": "git://github.com/Loopring/loopring.js.git#v0.0.1b",
         "marked-element": "PolymerElements/marked-element#^2.3.0",
         "moment": "^2.19.1",
         "paper-button": "PolymerElements/paper-button#^2.0.0",
