@@ -455,7 +455,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = '0x' + (Math.ceil(this.lrcFee * Number('1e' + this.lrc.precision)) / Number('1e'+ this.lrc.precision) * Number('1e' + this.lrc.digits)).toString(16);
+                    data.lrcFee = '0x' + (this._showLrcFee(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {
@@ -680,7 +680,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = '0x' + (Math.ceil(this.lrcFee * Number('1e' + this.lrc.precision)) / Number('1e'+ this.lrc.precision) * Number('1e' + this.lrc.digits)).toString(16);
+                    data.lrcFee = '0x' + (this._showLrcFee(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {
@@ -927,6 +927,13 @@
                 return Math.floor(amount * 100) / 100;
             }
 
+            _showLrcFee(amount) {
+
+                if(amount && this.lrc){
+                    return Math.ceil(amount * Number('1e' + this.lrc.precision)) / Number('1e'+ this.lrc.precision)
+                }
+            }
+
             _numFormat(amount, digits, precision) {
 
                 if (amount && digits && precision) {
@@ -941,7 +948,7 @@
                     let fee = amount * this.settingsLrcFee / 1000;
                     let lrcFee = fee / priceQuote.getPrice("LRC");
                     this.lrcFee = lrcFee;
-                    return "Estimated order value: " + this._showAmount(amount) + ' ' + priceQuote.currency + ". Estimated LRC fee value: " + this._showAmount(fee) + ' ' + priceQuote.currency + " (" + this._showAmount(amount) + ' * ' + settingsLrcFee + '‰, about ' + this._showAmount(lrcFee) + " LRC)";
+                    return "Estimated order value: " + this._showAmount(amount) + ' ' + priceQuote.currency + ". Estimated LRC fee value: " + this._showAmount(fee) + ' ' + priceQuote.currency + " (" + this._showAmount(amount) + ' * ' + settingsLrcFee + '‰, about ' + this._showLrcFee(lrcFee) + " LRC)";
                 }
             }
 
