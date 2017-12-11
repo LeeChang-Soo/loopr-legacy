@@ -219,13 +219,28 @@
                     type: String,
                     value: "hidden"
                 },
+                showSeeMore: {
+                    type: String,
+                    value: 'hiddenMore',
+                    computed: '_computeShowSeeMore(page, subpage, displayMode, totalPage, pageSize)'
+                },
                 params:{
                     type:Object,
-                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet)'
+                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet, pageSize)'
                 },
                 relayUrl: {
                     type: String,
                     computed: '_computeUrl(settingsRelay)'
+                },
+                pageSize: {
+                    type: Object,
+                    value: {
+                        "market": 5,
+                        "ring": 20,
+                        "order": 20,
+                        "history": 20,
+                        "wallet": 20
+                    }
                 }
             };
         }
@@ -255,7 +270,7 @@
             }
         }
 
-        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet){
+        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet, pageSize){
             if(settingsVersion) {
                 const params = {};
                 params.contractVersion = settingsVersion;
@@ -277,8 +292,18 @@
                 } else {
                     return null;
                 }
+                params.pageSize = pageSize[page];
                 return [params];
             }
+        }
+
+        _computeShowSeeMore(page, subpage, displayMode, totalPage, pageSize) {
+            if(page && subpage && displayMode && totalPage && pageSize) {
+                if (displayMode === "market" && totalPage >1) {
+                    return "showMore";
+                }
+            }
+            return "hiddenMore";
         }
 
         _computedMarket(page, subpage, third) {
@@ -317,11 +342,6 @@
                 this.showPage = "show";
             } else {
                 this.showPage = "hidden";
-            }
-            if (this.displayMode && this.displayMode === "market") {
-                this.showSeeMore = "showMore";
-            } else {
-                this.showSeeMore = "hiddenMore";
             }
         }
 
