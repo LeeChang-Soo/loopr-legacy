@@ -157,6 +157,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return {
                 page: String,
                 subpage: String,
+                redirect: {
+                    type: Boolean,
+                    computed: '_computeRedirect(page, subpage, wallet)'
+                },
+                wallet: {
+                    type: Object,
+                    observer: '_walletChanged'
+                },
                 token: {
                     type: String,
                     computed: '_computedToken(page, subpage, appConfig)'
@@ -202,13 +210,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (appConfig.tokenMap[subpage]) {
                     return subpage;
                 } else {
-                    var detail = { text: "Not supported token :" + subpage, category: "error", duration: 8000 }
-                    this.dispatchEvent(new CustomEvent('notification', {
-                        bubbles: true,
-                        composed: true,
-                        detail: detail
-                    }));
-                    window.location.href = "#/wallet/assets";
+//                    var detail = { text: "Not supported token :" + subpage, category: "error", duration: 8000 }
+//                    this.dispatchEvent(new CustomEvent('notification', {
+//                        bubbles: true,
+//                        composed: true,
+//                        detail: detail
+//                    }));
+//                    window.location.href = "#/wallet/assets";
                 }
             }
         }
@@ -270,10 +278,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         ready() {
-            //            if(!this.wallet){
-            //                window.location.href = "#/wallet"
-            //                return
-            //            }
             super.ready();
             var combobox = this.$.tokensSelector;
             var _this = this;
@@ -291,6 +295,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.$.send.click();
                 }
             }.bind(this));
+        }
+
+        _computeRedirect(page, subpage, wallet) {
+            if (page && subpage && page === 'transfer'){
+                if (!wallet) {
+                    window.location.href = "#/wallet";
+                }
+            }
+            return false;
+        }
+
+        _walletChanged(wallet) {
+            if (!wallet || !wallet.address) {
+                window.location.href = "#/wallet";
+            }
         }
 
         handleClick() {

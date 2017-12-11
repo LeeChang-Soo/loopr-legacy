@@ -104,10 +104,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         </style>
         <loopr-page>
-            <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
+            <global-variable key="app-config" value="{{appConfig}}"></global-variable>
             <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
-
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
@@ -202,6 +201,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 return {
                     page: String,
                     subpage: String,
+                    wallet: {
+                        type: Object,
+                        observer: '_walletChanged',
+                    },
+                    redirect: {
+                        type: Boolean,
+                        computed: '_computeRedirect(page, subpage, wallet)'
+                    },
                     token: {
                         type: String,
                         computed: '_computedToken(page, subpage, appConfig)'
@@ -250,18 +257,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 ]
             }
 
+            _computeRedirect(page, subpage, wallet) {
+                if (page && subpage && page === 'approve'){
+                    if (!wallet) {
+                        window.location.href = "#/wallet";
+                    }
+                }
+                return false;
+            }
+
+            _walletChanged(wallet) {
+                if (!wallet || !wallet.address) {
+                    window.location.href = "#/wallet";
+                }
+            }
+
             _computedToken(page, subpage, appConfig) {
                 if (page && "approve" === page && subpage && appConfig) {
                     if(appConfig.tokenMap[subpage]){
                         return subpage;
                     } else {
-                        var detail = {text: "Not supported token :"+subpage, category: "error", duration: 8000}
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-                        window.location.href = "#/wallet/assets";
+//                        var detail = {text: "Not supported token :"+subpage, category: "error", duration: 8000}
+//                        this.dispatchEvent(new CustomEvent('notification', {
+//                            bubbles: true,
+//                            composed: true,
+//                            detail: detail
+//                        }));
+//                        window.location.href = "#/wallet/assets";
                     }
                 }
             }

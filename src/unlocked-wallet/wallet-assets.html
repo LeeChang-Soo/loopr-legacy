@@ -133,11 +133,15 @@
             <paper-card transparent>
                 <div class="horizontal start layout">
                     <div class="search">
-                        <asset-search sources="{{erc20Tokens}}" results="{{result}}" searched="{{searched}}"></asset-search>
+                        <div class="horizontal end layout">
+                            <vaadin-text-field id="search" value="{{keyword}}" placeholder="Token">
+                                <iron-icon slot="prefix" icon="icons:search"></iron-icon>
+                            </vaadin-text-field>
+                        </div>
                     </div>
                     <div class="split"></div>
                     <div class="hidebalance horizontal center layout">
-                        <a href="javascript:void(0)" on-click="_hideOrShowTips">{{hideOrShowTips}}</a>
+                        <vaadin-checkbox checked="{{hideBalance}}">Hide 0 Balances</vaadin-checkbox>
                     </div>
                     <div class="flex"></div>
                 </div>
@@ -210,13 +214,10 @@
                     type: Boolean,
                     value: false
                 },
-                hideOrShowTips: {
-                    type: String,
-                    computed: '_computeTips(hideBalance, searched)',
-                    value: 'Hide 0 Balances'
-                },
+                keyword: String,
                 result: {
-                    type: Object
+                    type: Object,
+                    computed: '_computeResult(erc20Tokens, hideBalance, keyword)'
                 },
                 wallet: {
                     type: Object,
@@ -242,25 +243,18 @@
             }
         }
 
-        _hideOrShowTips() {
-            if (this.hideBalance) {
-                this.hideBalance = false;
-                this.result = this._computeZeroBalance(this.erc20Tokens, false);
-            } else {
-                this.hideBalance = true;
-                this.result = this._computeZeroBalance(this.erc20Tokens, true);
-            }
-        }
-
-        _computeTips(hideBalance, searched) {
-            if (searched) {
-                this.hideBalance = false;
-                return 'Hide 0 Balances';
-            } else {
+        _computeResult(erc20Tokens, hideBalance, keyword) {
+            if (erc20Tokens) {
+                let tempResult = erc20Tokens;
+                if (keyword) {
+                    tempResult = erc20Tokens.filter(function(item) {
+                        return ((item.token.indexOf(keyword.toUpperCase()) > -1) || (item.name.toUpperCase().indexOf(keyword.toUpperCase()) > -1));
+                    });
+                }
                 if (hideBalance) {
-                    return 'Show 0 Balances';
+                    return this._computeZeroBalance(tempResult, true);
                 } else {
-                    return 'Hide 0 Balances';
+                    return this._computeZeroBalance(tempResult, false);
                 }
             }
         }
@@ -311,13 +305,15 @@
                 }.bind(this));
 
                 this.totalValue = totalValue;
-                this.etherTokens = _.filter(items, function(i) {
+                let tempEtherTokens = _.filter(items, function(i) {
                     return i !== null && (i.token === 'WETH' || i.token === 'ETH');
                 });
+                this.etherTokens = _.sortBy(tempEtherTokens, [function(o) { return o.token; }]);
 
-                return _.filter(items, function(i) {
+                let tempERC20Tokens = _.filter(items, function(i) {
                     return i !== null && i.token !== 'WETH' && i.token !== 'ETH';
                 });
+                return _.sortBy(tempERC20Tokens, [function(o) { return o.token; }]);
             }
         }
 
