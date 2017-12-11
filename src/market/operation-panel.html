@@ -455,7 +455,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = '0x' + (this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16);
+                    data.lrcFee = '0x' + (Math.ceil(this.lrcFee * Number('1e' + this.lrc.precision)) / Number('1e'+ this.lrc.precision) * Number('1e' + this.lrc.digits)).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {
@@ -680,7 +680,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = '0x' + (this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16);
+                    data.lrcFee = '0x' + (Math.ceil(this.lrcFee * Number('1e' + this.lrc.precision)) / Number('1e'+ this.lrc.precision) * Number('1e' + this.lrc.digits)).toString(16);
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(this.settingsMarginSplit);
                     detail.order = {
@@ -916,12 +916,8 @@
                     if (lrc) {
                         const balance = balances[lrc.token.toUpperCase()] ? Number(balances[lrc.token.toUpperCase()].balance) : 0;
                         const allowance = balances[lrc.token.toUpperCase()].allowance ? Number(balances[lrc.token.toUpperCase()].allowance) : 0;
-//                             this.lrcBalance = Number(((balance ? balance : 0) / Number('1e' + lrc.digits)).toFixed(lrc.precision));
-//                        this.lrcAllowance = Number(((allowance ? allowance : 0) / Number('1e' + lrc.digits)).toFixed(lrc.precision));
-
-                        this.lrcBalance = 1000;
-                        this.lrcAllowance = 10;
-
+                        this.lrcBalance = Number(((balance ? balance : 0) / Number('1e' + lrc.digits)).toFixed(lrc.precision));
+                        this.lrcAllowance = Number(((allowance ? allowance : 0) / Number('1e' + lrc.digits)).toFixed(lrc.precision));
                     }
 
                 }
