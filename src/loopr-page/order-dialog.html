@@ -173,14 +173,11 @@
 
             async placeOrder() {
 
-
-                console.log('place order');
-
                 const relay = new Relay(this.settingsRelay+"/rpc");
-                async.forEachOf(this.detail.raws, async function (raw) {
+                async.each(this.detail.raws, async function (raw) {
                     const result = await relay.sendSignedTx(raw.signed);
                     if(!result.error){
-                        var detail = {
+                        const detail = {
                             text: "submit Tx successfully, the Tx hash is ",
                             category: "info",
                             duration: 8000,
@@ -201,16 +198,14 @@
                         }));
                     }
                 }.bind(this), async function (err) {
-//                    if (err) {
-//                        console.log(err);
-//                        var detail = {text: err.message, category: "error", duration: 8000};
-//                        this.dispatchEvent(new CustomEvent('notification', {
-//                            bubbles: true,
-//                            composed: true,
-//                            detail: detail
-//                        }));
-//                    } else {
-
+                    if (err && err.message.indexOf('known transaction') === -1) {
+                        const detail = {text: err.message, category: "error", duration: 8000};
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                    } else {
                        const result =  await relay.submitLoopringOrder(JSON.parse(this.detail.order.signed));
                        console.log("1"+JSON.stringify(result));
                        if(result.error){
@@ -229,7 +224,7 @@
                                detail
                            }));
                        }
-                  //  }
+                    }
                 }.bind(this));
             }
         }

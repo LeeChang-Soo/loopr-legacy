@@ -945,7 +945,7 @@
                     let fee = amount * this.settingsLrcFee / 1000;
                     let lrcFee = fee / priceQuote.getPrice("LRC");
                     this.lrcFee = lrcFee;
-                    return "Estimated order value: " + this._showAmount(amount) + ' ' + priceQuote.fiat + ". Estimated LRC fee value: " + this._showAmount(fee) + ' ' + priceQuote.fiat + " (" + this._showAmount(amount) + ' * ' + settingsLrcFee + '‰, about ' + this._showAmount(lrcFee) + " LRC)";
+                    return "Estimated order value: " + this._showAmount(amount) + ' ' + priceQuote.currency + ". Estimated LRC fee value: " + this._showAmount(fee) + ' ' + priceQuote.currency + " (" + this._showAmount(amount) + ' * ' + settingsLrcFee + '‰, about ' + this._showAmount(lrcFee) + " LRC)";
                 }
             }
 
