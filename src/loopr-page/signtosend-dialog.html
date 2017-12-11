@@ -149,24 +149,23 @@
             sendTx() {
                 const relay = new Relay(this.settingsRelay+"/rpc");
 
-                async.forEach(this.detail.raws, async function (raw) {
+                async.each(this.detail.raws, async function (raw) {
                     const result = await relay.sendSignedTx(raw.signed);
-
-                    var detail = { text: 'Submit tx successfully, Tx hash is', category: "info", duration: 8000, link: "https://etherscan.io/tx/" + result, linkText: result };
+                    const detail = { text: 'Submit tx successfully, Tx hash is', category: "info", duration: 8000, link: "https://etherscan.io/tx/" + result, linkText: result };
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
                         composed: true,
                         detail: detail
                     }));
                 }.bind(this), function (err) {
-//                    if(err){
-//                        var detail = {text: err.message, category: "error", duration: 8000};
-//                        this.dispatchEvent(new CustomEvent('notification', {
-//                            bubbles: true,
-//                            composed: true,
-//                            detail: detail
-//                        }));
-//                    }
+                    if(err  && !err.message.contains('known transaction')){
+                        const detail = {text: err.message, category: "error", duration: 8000};
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                    }
                 }.bind(this))
             }
         }
