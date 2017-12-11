@@ -182,7 +182,7 @@
                 filterMine: Boolean,
                 params:{
                     type:Object,
-                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet)'
+                    computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet, pageSize)'
                 },
                 displayMode: {
                     type: String
@@ -206,6 +206,11 @@
                     type: String,
                     value: "hidden"
                 },
+                showSeeMore: {
+                    type: String,
+                    value: 'hiddenMore',
+                    computed: '_computeShowSeeMore(page, subpage, displayMode, totalPage, pageSize)'
+                },
                 balances: {
                     type: Object,
                     computed: '_computedBalance(balancesRaw)'
@@ -213,6 +218,15 @@
                 relayUrl: {
                     type: String,
                     computed: '_computeUrl(settingsRelay)'
+                },
+                pageSize: {
+                    type: Object,
+                    value: {
+                        "market": 5,
+                        "order": 20,
+                        "history": 20,
+                        "wallet": 20
+                    }
                 }
             };
         }
@@ -228,8 +242,8 @@
             }
         }
 
-        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet) {
-            if(settingsVersion) {
+        _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet, pageSize) {
+            if(settingsVersion && pageSize) {
                 const params = {};
                 params.contractVersion = settingsVersion;
                 params.pageIndex = currentPage || 1;
@@ -248,8 +262,18 @@
                 } else {
                     return null;
                 }
+                params.pageSize = pageSize[page];
                 return [params];
             }
+        }
+
+        _computeShowSeeMore(page, subpage, displayMode, totalPage, pageSize) {
+            if(page && subpage && displayMode && totalPage && pageSize) {
+                if (displayMode === "market" && totalPage >1) {
+                    return "showMore";
+                }
+            }
+            return "hiddenMore";
         }
 
         _computedBalance(data) {
@@ -294,11 +318,6 @@
                 this.showPage = "show";
             } else {
                 this.showPage = "hidden";
-            }
-            if (this.displayMode && this.displayMode === "market") {
-                this.showSeeMore = "showMore";
-            } else {
-                this.showSeeMore = "hiddenMore";
             }
         }
 

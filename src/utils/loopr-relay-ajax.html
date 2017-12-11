@@ -73,6 +73,12 @@
         _onError(e) {
             if (e) {
                 this.error = e;
+                let errorMsg = "";
+                if (e.detail.error.message) {
+                    errorMsg = "error message:["+e.detail.error.message+"]";
+                }
+                var detail = { text: "An error occurred on the server when processing the URL:["+this.url+"/"+this.method+"] "+errorMsg+", please try again later", category: "error", duration: 30000 }
+                this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
             }
         }
 

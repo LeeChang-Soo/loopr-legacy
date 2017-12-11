@@ -5,7 +5,7 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <dom-module id="loopr-ajax">
     <template>
-        <iron-ajax id="ajax" auto url="[[url]]" handle-as="json" last-response="{{lastResponse}}" debounce-duration="300" loading={{loading}}></iron-ajax>
+        <iron-ajax id="ajax" auto url="[[url]]" handle-as="json" last-response="{{lastResponse}}" debounce-duration="300" loading="{{loading}}" timeout="{{timeout}}" on-error="_onError"></iron-ajax>
     </template>
     <script>
     class LooprAjax extends Polymer.Element {
@@ -29,6 +29,14 @@
                 loading: {
                     type: Boolean,
                     notify: true
+                },
+                timeout: {
+                    type: Number,
+                    value: 0
+                },
+                error: {
+                    type: Object,
+                    notify: true
                 }
             }
         }
@@ -36,6 +44,18 @@
         _computedUrl(relay, suffix) {
             if (relay && suffix) {
                 return relay + "/" + suffix;
+            }
+        }
+
+        _onError(e) {
+            if (e) {
+                this.error = e;
+                let errorMsg = "";
+                if (e.detail.error.message) {
+                    errorMsg = "error message:["+e.detail.error.message+"]";
+                }
+                var detail = { text: "An error occurred on the server when processing the URL:["+this.url+"] "+errorMsg+", please try again later", category: "error", duration: 30000 }
+                this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
             }
         }
 
