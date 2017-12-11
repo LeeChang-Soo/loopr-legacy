@@ -198,7 +198,7 @@
                         }));
                     }
                 }.bind(this), async function (err) {
-                    if (err && !err.message.contains('known transaction')) {
+                    if (err && err.message.indexOf('known transaction') === -1) {
                         const detail = {text: err.message, category: "error", duration: 8000};
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
