@@ -187,6 +187,9 @@
          */
         static get properties() {
             return {
+                route: {
+                    type: Object
+                },
                 page: String,
                 subpage: String,
                 third: String,
@@ -200,6 +203,7 @@
                 filterMine: {
                     type: Boolean
                 },
+                wallet: Object,
                 orders: {
                     type: Object,
                     computed: '_computeOrders(appConfig, resp)'
@@ -270,6 +274,18 @@
             }
         }
 
+        static get observers() {
+            return [
+                '_resetCurrentPage(route)'
+            ]
+        }
+
+        _resetCurrentPage(route) {
+            if (route) {
+                this.currentPage = 1;
+            }
+        }
+
         _computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet, pageSize){
             if(settingsVersion) {
                 const params = {};
@@ -278,6 +294,9 @@
                 let market = this._computedMarket(page, subpage, third);
                 if (page === "market" && subpage) {
                     params.market = market;
+                    if(filterMine && wallet){
+                        params.owner = wallet.address;
+                    }
                 } else if (page === "ring" && subpage) {
                     params.ringHash = subpage;
                 } else if (page === "order" && subpage) {

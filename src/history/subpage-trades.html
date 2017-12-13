@@ -22,13 +22,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div class="flex"></div>
             <!-- <market-selector></market-selector> -->
         </div>
-        <trade-table id="trades" display-mode="history-trades" page="{{computedPage}}" subpage="{{computedSubpage}}" third="{{computedThird}}"></trade-table>
+        <trade-table id="trades" display-mode="history-trades" route="{{route}}" page="{{computedPage}}" subpage="{{computedSubpage}}" third="{{computedThird}}"></trade-table>
     </template>
     <script>
     class SubpageTrades extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'subpage-trades'; }
         static get properties() {
             return {
+                route: {
+                    type: Object
+                },
                 page: String,
                 subpage: String,
                 third: String,

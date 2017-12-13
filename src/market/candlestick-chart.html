@@ -51,10 +51,15 @@
                     computed: '_computeUrl(settingsRelay)'
                 },
                 resp: {
-                    type: Object,
-                    observer: '_respChanged'
+                    type: Object
                 }
             };
+        }
+
+        static get observers() {
+            return [
+                '_respChanged(resp, market)'
+            ]
         }
 
         _computedMarket(page, subpage) {
@@ -82,12 +87,13 @@
             }
         }
 
-        _respChanged(resp) {
-            if (!resp) return;
-            this._chart(resp);
+        _respChanged(resp, market) {
+            if (resp && market) {
+                this._chart(resp, market);
+            }
         }
 
-        _chart(resp) {
+        _chart(resp, market) {
             let datas = resp.result;
             resp.xData = Highcharts.map(datas, function(val, j) {
                 //return (new Date(val[0])).toUTCString()
@@ -99,7 +105,7 @@
             resp.volume = Highcharts.map(datas, function(val, j) {
                 return val.Amount;
             });
-            let title = this.market.toUpperCase()
+            let title = market.toUpperCase();
             Highcharts.chart(this.$.container, {
                 chart: {
                     zoomType: 'xy'
