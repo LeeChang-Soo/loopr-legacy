@@ -16,7 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             display: block;
         }
         </style>
-        <order-table id="orders" display-mode="history-orders" page="{{computedPage}}" subpage="{{computedSubpage}}" third="{{computedThird}}"></order-table>
+        <order-table id="orders" display-mode="history-orders" route="{{route}}" page="{{computedPage}}" subpage="{{computedSubpage}}" third="{{computedThird}}"></order-table>
     </template>
     <script>
     class SubpageOrders extends AppConfigMixin(Polymer.Element) {
@@ -24,6 +24,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+                route: {
+                    type: Object
+                },
                 page: String,
                 subpage: String,
                 third: String,

@@ -106,6 +106,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+                route: {
+                    type: Object
+                },
                 page: String,
                 subpage: String,
                 third: String,
@@ -143,12 +146,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             super.ready();
         }
 
+        static get observers() {
+            return [
+                '_resetCurrentPage(route)'
+            ]
+        }
+
+        _resetCurrentPage(route) {
+            if (route) {
+                this.currentPage = 1;
+            }
+        }
+
         _computeParams(page, subpage, currentPage, settingsVersion) {
             if (page && subpage && currentPage && settingsVersion) {
                 if (page === "history" && subpage === "rings") {
                     const params = {};
                     params.contractVersion = settingsVersion;
                     params.pageIndex = currentPage || 1;
+                    params.pageSize = 20;
                     return [params];
                 }
             }
