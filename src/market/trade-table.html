@@ -203,6 +203,7 @@
                 filterMine: {
                     type: Boolean
                 },
+                wallet: Object,
                 orders: {
                     type: Object,
                     computed: '_computeOrders(appConfig, resp)'
@@ -293,6 +294,9 @@
                 let market = this._computedMarket(page, subpage, third);
                 if (page === "market" && subpage) {
                     params.market = market;
+                    if(filterMine && wallet){
+                        params.owner = wallet.address;
+                    }
                 } else if (page === "ring" && subpage) {
                     params.ringHash = subpage;
                 } else if (page === "order" && subpage) {

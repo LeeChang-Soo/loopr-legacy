@@ -40,8 +40,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        .tabs {
-            min-width:200px
+        .tabsContainer {
+            padding-right: 100px;
+            padding-left: 100px;
+        }
+
+        .filteredtTabs {
+            min-width:300px
         }
         </style>
         <loopr-page>
@@ -49,18 +54,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div class="sections" unresolved>
                 <paper-card transparent>
                     <template is="dom-if" if="[[!isFilterMarket]]">
-                        <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
-                            <paper-tab name="rings"><a styleless href="/#/history/rings">Rings</a></paper-tab>
-                            <paper-tab name="orders"><a styleless href="/#/history/orders">Orders</a></paper-tab>
-                            <paper-tab name="trades"><a styleless href="/#/history/trades">Trades</a></paper-tab>
-                            <!--<paper-tab name="stats"><a styleless href="/#/history/stats">Stats</a></paper-tab>-->
-                        </paper-tabs>
+                        <div class="tabsContainer">
+                            <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
+                                <paper-tab name="rings"><a styleless href="/#/history/rings">Rings</a></paper-tab>
+                                <paper-tab name="orders"><a styleless href="/#/history/orders">Orders</a></paper-tab>
+                                <paper-tab name="trades"><a styleless href="/#/history/trades">Trades</a></paper-tab>
+                                <!--<paper-tab name="stats"><a styleless href="/#/history/stats">Stats</a></paper-tab>-->
+                            </paper-tabs>
+                        </div>
                     </template>
                     <template is="dom-if" if="[[isFilterMarket]]">
-                        <div class="horizontal layout">
+                        <div class="tabsContainer horizontal layout">
                             <div class="horizontal layout center">{{computedThird}}</div>
                             <div class="flex"></div>
-                            <div class="tabs">
+                            <div class="filteredtTabs">
                                 <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
                                     <paper-tab name="orders"><a styleless href="/#/history/orders/{{computedThird}}">Orders</a></paper-tab>
                                     <paper-tab name="trades"><a styleless href="/#/history/trades/{{computedThird}}">Trades</a></paper-tab>

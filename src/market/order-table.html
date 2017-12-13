@@ -183,6 +183,7 @@
                     computed: '_computedMarket(page, subpage, third)'
                 },
                 filterMine: Boolean,
+                wallet: Object,
                 params:{
                     type:Object,
                     computed:'_computeParams(page, subpage, third, filterMine, settingsVersion, currentPage, wallet, pageSize)'
@@ -265,6 +266,9 @@
                 let market = this._computedMarket(page, subpage, third);
                 if (page === "market" && subpage) {
                     params.market = market;
+                    if(filterMine && wallet){
+                        params.owner = wallet.address;
+                    }
                 } else if (page === "order" && subpage) {
                     params.orderHash = subpage;
                 } else if (page === "history" && subpage === "orders") {
