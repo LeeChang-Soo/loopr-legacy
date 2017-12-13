@@ -98,11 +98,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </template>
                         </paper-tabs>
                         <iron-pages selected-item="{{selectedTable}}" selected="{{dataSelection}}" attr-for-selected="name">
-                            <trade-table name="trades" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></trade-table>
-                            <order-table name="orders" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-table>
+                            <trade-table name="trades" display-mode="market" route="{{route}}" page="{{computedPage}}" subpage="{{computedSubpage}}"></trade-table>
+                            <order-table name="orders" display-mode="market" route="{{route}}" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-table>
                             <template is="dom-if" if="{{_isUnlocked(wallet)}}">
-                                <trade-table filter-mine name="mytrades" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></trade-table>
-                                <order-table filter-mine name="myorders" display-mode="market" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-table>
+                                <trade-table filter-mine name="mytrades" display-mode="market" wallet="{{wallet}}" route="{{route}}" page="{{computedPage}}" subpage="{{computedSubpage}}"></trade-table>
+                                <order-table filter-mine name="myorders" display-mode="market" wallet="{{wallet}}" route="{{route}}" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-table>
                             </template>
                         </iron-pages>
                     </div>
