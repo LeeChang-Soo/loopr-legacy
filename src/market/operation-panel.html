@@ -39,6 +39,11 @@
                 height: 80px;
             }
 
+            balance-text-field {
+                min-width: 210px;
+                height: 80px;
+            }
+
             paper-button {
                 height: 36px;
                 width: 210px;
@@ -95,11 +100,11 @@
         <iron-pages selected="{{sellOrBuy}}" attr-for-selected="name">
             <div name="sell">
                 <div class="sell container">
-                    <vaadin-text-field id="sellAmount" label="[[tokens.token]] Quantity" value="{{sellAmount}}"
+                    <balance-text-field id="sellAmount" label="[[tokens.token]] Quantity" value="{{sellAmount}}"
                                        pattern="[[_numPatten(tokens.precision)]]"
-                                       error-message="sellAmountError">
+                                       error-message="sellAmountError"  max="[[tokensBalance]]" min="[[tokens.minTradeValue]]">
                         <div slot="suffix">[[tokens.unit]]</div>
-                    </vaadin-text-field>
+                    </balance-text-field>
                     <div class="seperator">&times;</div>
                     <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{sellPrice}}"
                                        pattern="[[_numPatten(marketPrecision)]]"
@@ -107,15 +112,18 @@
                         <div slot="suffix">[[tokens.unit]]/[[tokenb.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">=</div>
-                    <vaadin-text-field disabled label="[[tokenb.token]] Total" value="{{sellTotal}}"
+                    <balance-text-field disabled label="[[tokenb.token]] Total" value="{{sellTotal}}"
                                        error-message="[[sellTotalError]]">
                         <div slot="suffix">[[tokenb.unit]]</div>
-                    </vaadin-text-field>
+                    </balance-text-field>
                     <div class="seperator">&nbsp;</div>
                     <paper-button on-click="placeSellOrder" id="sellButton">Sell</paper-button>
                 </div>
                 <div class="balance">
                     <div class="error">
+                        <template is="dom-if" if="[[!isEnough(tokenb.minTradeValue,sellTotal)]]">
+                            The min trade value of [[tokenb.token]] must be bigger  than [[tokenb.minTradeValue]]
+                        </template>
                         <template is="dom-if"
                                   if="[[!bothNonEnough(sellAmount,tokensBalance,tokensAllowance,tokens,lrcFee)]]">
                             <template is="dom-if" if="[[!isBalanceEnough(sellAmount,tokensBalance,tokens,lrcFee)]]">
@@ -127,7 +135,7 @@
                             [[_showBothNonEnough(tokensBalance,tokensAllowance,tokens,sellAmount,lrcFee)]]
                         </template>
                         <template is="dom-if" if="[[!isEnoughFee(lrcFee,lrcBalance,tokens)]]">
-                            You have insufficient LRC balance( [[lrcBalance]]) to afford LRC fee, we will set Margin Split to be 100% if you continue to place order
+                            You have insufficient LRC balance([[lrcBalance]]) to afford LRC fee, we will set Margin Split to be 100% if you continue to place order
                         </template>
                     </div>
                     <div class="common">
@@ -156,11 +164,11 @@
             <!-- ----- -->
             <div name="buy">
                 <div class="buy container">
-                    <vaadin-text-field id="buyAmount" label="[[tokens.token]] Quantity" value="{{buyAmount}}"
+                    <balance-text-field id="buyAmount" label="[[tokens.token]] Quantity" value="{{buyAmount}}"
                                        pattern="[[_numPatten(tokens.precision)]]"
-                                       error-message="buyAmountError">
+                                       error-message="buyAmountError"  min="[[tokens.minTradeValue]]">
                         <div slot="suffix">[[tokens.unit]]</div>
-                    </vaadin-text-field>
+                    </balance-text-field>
                     <div class="seperator">&times;</div>
                     <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{buyPrice}}"
                                        pattern="[[_numPatten(marketPrecision)]]"
@@ -168,15 +176,18 @@
                         <div slot="suffix">[[tokens.unit]]/[[tokenb.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">=</div>
-                    <vaadin-text-field disabled label="[[tokenb.token]] Total" value="{{buyTotal}}"
+                    <balance-text-field disabled label="[[tokenb.token]] Total" value="{{buyTotal}}"
                                        error-message="[[buyTotalError]]">
                         <div slot="suffix">[[tokenb.unit]]</div>
-                    </vaadin-text-field>
+                    </balance-text-field>
                     <div class="seperator">&nbsp;</div>
                     <paper-button on-click="placeBuyOrder" id="buyButton">Buy</paper-button>
                 </div>
                 <div class="balance">
                     <div class="error">
+                        <template is="dom-if" if="[[!isEnough(tokenb.minTradeValue,buyTotal)]]">
+                            The min trade value of [[tokenb.token]] must be bigger  than [[tokenb.minTradeValue]]
+                        </template>
                         <template is="dom-if"
                                   if="[[!bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance,tokenb,lrcFee)]]">
                             <template is="dom-if" if="[[!isEnough(buyTotal,tokenbBalance)]]">
@@ -304,9 +315,9 @@
             }
 
             static get observers() {
-                return ['buyButtonState(buyAmount,tokens,buyPrice,marketPrecision,buyTotal,tokenbBalance,lrcBalance,lrcFee)',
+                return ['buyButtonState(buyAmount,tokenb,tokens,buyPrice,marketPrecision,buyTotal,tokenbBalance,lrcBalance,lrcFee)',
                     'computeTokenBalances(tokens,tokenb,lrc,balancesRaw)',
-                    'sellButtonState(sellAmount,tokens,sellPrice,marketPrecision,tokensBalance,sellTotal, lrcBalance, lrcFee)'];
+                    'sellButtonState(sellAmount,tokenb,tokens,sellPrice,marketPrecision,tokensBalance,sellTotal, lrcBalance, lrcFee)'];
             }
 
             _computePrecision(market, appConfig) {
@@ -316,13 +327,11 @@
             }
 
 
-            buyButtonState(buyAmount, tokenb, buyPrice, marketPrecision, buyTotal, tokenbBalance, lrcBalance, lrcFee) {
+            buyButtonState(buyAmount, tokenb,tokens, buyPrice, marketPrecision, buyTotal, tokenbBalance, lrcBalance, lrcFee) {
 
-                if ((tokenb && buyAmount && new RegExp(this._numPatten(tokenb.precision)).test(buyAmount.toString())
+                if (tokenb && tokens && buyAmount && new RegExp(this._numPatten(tokens.precision)).test(buyAmount.toString()) && Number(buyAmount) >= tokens.minTradeValue
                         && buyPrice && new RegExp(this._numPatten(marketPrecision)).test(buyPrice.toString())
-                        && buyTotal && Number(buyTotal) && tokenbBalance && Number(tokenbBalance) && lrcBalance>=0 && lrcFee>=0)
-                    && ((tokenb.token.toUpperCase() !== "LRC" && lrcBalance >= lrcFee && buyTotal <= tokenbBalance)
-                        || (tokenb.token.toUpperCase() === "LRC" && (lrcFee + buyTotal) <= tokenbBalance))) {
+                        && buyTotal && Number(buyTotal)>=tokenb.minTradeValue && tokenbBalance  && lrcBalance>=0 && lrcFee>=0 && buyTotal <= tokenbBalance) {
                     this.$.buyButton.disabled = false;
                     this.$.buyButton.style.backgroundColor = 'var(--paper-green-500)';
                 } else {
@@ -331,13 +340,11 @@
                 }
             }
 
-            sellButtonState(sellAmount, tokens, sellPrice, marketPrecision, tokensBalance, sellTotal, lrcBalance, lrcFee) {
+            sellButtonState(sellAmount, tokenb, tokens, sellPrice, marketPrecision, tokensBalance, sellTotal, lrcBalance, lrcFee) {
 
-                if ((tokens && sellAmount && new RegExp(this._numPatten(tokens.precision)).test(sellAmount.toString())
+                if (tokens && sellAmount && new RegExp(this._numPatten(tokens.precision)).test(sellAmount.toString()) && Number(sellAmount) >= tokens.minTradeValue
                         && marketPrecision && sellPrice && new RegExp(this._numPatten(marketPrecision)).test(sellPrice.toString())
-                        && tokensBalance && Number(tokensBalance) && sellTotal && lrcBalance >=0 && lrcFee >=0 )
-                    && ((tokens.token.toUpperCase() !== 'LRC' && Number(sellAmount) <= tokensBalance && lrcFee <= lrcBalance)
-                        || ((tokens.token.toUpperCase() === 'LRC') && (Number(sellAmount) + lrcFee) <= tokensBalance))) {
+                        && tokensBalance && Number(tokensBalance) && sellTotal && sellTotal >= tokenb.minTradeValue && lrcBalance >=0 && lrcFee >=0  &&  Number(sellAmount) <= tokensBalance) {
                     this.$.sellButton.disabled = false;
                     this.$.sellButton.style.backgroundColor = 'var(--paper-green-500)';
                 } else {
