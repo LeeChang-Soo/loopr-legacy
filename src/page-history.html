@@ -39,6 +39,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 padding-top: 96px;
             }
         }
+
+        .tabs {
+            min-width:200px
+        }
         </style>
         <loopr-page>
             <loopr-toolbar slot="secondary-toolbar" active-tab="history"></loopr-toolbar>
@@ -46,14 +50,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-card transparent>
                     <template is="dom-if" if="[[!isFilterMarket]]">
                         <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
-                            <paper-tab name="trades"><a styleless href="/#/history/trades">Trades</a></paper-tab>
                             <paper-tab name="rings"><a styleless href="/#/history/rings">Rings</a></paper-tab>
                             <paper-tab name="orders"><a styleless href="/#/history/orders">Orders</a></paper-tab>
+                            <paper-tab name="trades"><a styleless href="/#/history/trades">Trades</a></paper-tab>
                             <!--<paper-tab name="stats"><a styleless href="/#/history/stats">Stats</a></paper-tab>-->
                         </paper-tabs>
                     </template>
                     <template is="dom-if" if="[[isFilterMarket]]">
-                        <vaadin-checkbox checked="{{isFilterMarket}}">Filtered Market: {{computedThird}}</vaadin-checkbox>
+                        <div class="horizontal layout">
+                            <div class="horizontal layout center">{{computedThird}}</div>
+                            <div class="flex"></div>
+                            <div class="tabs">
+                                <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
+                                    <paper-tab name="orders"><a styleless href="/#/history/orders/{{computedThird}}">Orders</a></paper-tab>
+                                    <paper-tab name="trades"><a styleless href="/#/history/trades/{{computedThird}}">Trades</a></paper-tab>
+                                    <!--<paper-tab name="stats"><a styleless href="/#/history/stats">Stats</a></paper-tab>-->
+                                </paper-tabs>
+                            </div>
+                        </div>
                     </template>
                 </paper-card>
                 <paper-card>
@@ -110,8 +124,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             ]
         }
 
-        redirect(isFilterMarket, computedPage, computedSubpage) {
-            console.log(isFilterMarket+" "+computedPage+"/"+computedSubpage)
+        _redirect(isFilterMarket, computedPage, computedSubpage) {
             if(!isFilterMarket && computedPage && computedSubpage) {
                 window.location.href = "#/history/"+computedSubpage;
             }
@@ -121,7 +134,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (route) {
                 let params = this._returnParameters(route);
                 if (params && params.page && "history" === params.page && params.subpage && params.third) {
-                    console.log("to filter market...")
                     this.isFilterMarket = true;
                 } else {
                     this.isFilterMarket = false;
@@ -142,7 +154,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (params.subpage) {
                     return params.subpage;
                 } else {
-                    return "trades";
+                    return "rings";
                 }
             }
         }
@@ -159,7 +171,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     return params.subpage;
                 } else {
                     //TODO: send a 404 error event.
-                    return 'trades';
+                    return 'rings';
                 }
             }
         }
