@@ -106,6 +106,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+                route: {
+                    type: Object
+                },
                 page: String,
                 subpage: String,
                 third: String,
@@ -141,6 +144,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         ready() {
             super.ready();
+        }
+
+        static get observers() {
+            return [
+                '_resetCurrentPage(route)'
+            ]
+        }
+
+        _resetCurrentPage(route) {
+            if (route) {
+                this.currentPage = 1;
+            }
         }
 
         _computeParams(page, subpage, currentPage, settingsVersion) {

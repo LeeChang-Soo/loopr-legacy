@@ -172,6 +172,9 @@
 
         static get properties() {
             return {
+                route: {
+                    type: Object
+                },
                 page: String,
                 subpage: String,
                 third: String,
@@ -239,6 +242,18 @@
                 if ("wallet-orders" === displayMode) {
                     this.hiddenCancel = false;
                 }
+            }
+        }
+
+        static get observers() {
+            return [
+                '_resetCurrentPage(route)'
+            ]
+        }
+
+        _resetCurrentPage(route) {
+            if (route) {
+                this.currentPage = 1;
             }
         }
 

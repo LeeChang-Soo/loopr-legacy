@@ -187,6 +187,9 @@
          */
         static get properties() {
             return {
+                route: {
+                    type: Object
+                },
                 page: String,
                 subpage: String,
                 third: String,
@@ -267,6 +270,18 @@
                     //this.hiddenRing = true;
                     this.hiddenBlockNum = false;
                 }
+            }
+        }
+
+        static get observers() {
+            return [
+                '_resetCurrentPage(route)'
+            ]
+        }
+
+        _resetCurrentPage(route) {
+            if (route) {
+                this.currentPage = 1;
             }
         }
 
