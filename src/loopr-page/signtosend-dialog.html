@@ -167,8 +167,8 @@
                         }));
                     }
 
-                    if(err  && err.message.indexOf('known transaction') > -1){
-                        const detail = { text: 'Submit tx successfully, Tx hash is', category: "info", duration: 8000, link: "https://etherscan.io/tx/" + err.message.slice(err.message.indexOf('known transaction')), linkText: err.message.slice(err.message.indexOf('known transaction')) };
+                    if(err && err.message.indexOf('known transaction') > -1){
+                        const detail = { text: 'Submit tx successfully, Tx hash is', category: "info", duration: 8000, link: "https://etherscan.io/tx/0x" + err.message.slice(err.message.indexOf('known transaction')), linkText: '0x'+err.message.slice(err.message.indexOf('known transaction')) };
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
                             composed: true,
