@@ -39,6 +39,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
             <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
             <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
+            <scary-cookie id="favouriteMarkets" name="favourite-markets" value="{{favouriteMarkets}}"></scary-cookie>
             <loopr-toolbar slot="secondary-toolbar" active-tab="markets">
             </loopr-toolbar>
             <div class="sections" unresolved>
@@ -121,8 +122,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 relayUrl: {
                     type: String,
                     computed: '_computeUrl(settingsRelay)'
+                },
+                computedFavouriteMarkets: {
+                    type: Object
                 }
             };
+        }
+
+        ready() {
+            super.ready();
+            if (this.$.favouriteMarkets.value) {
+                this.computedFavouriteMarkets = JSON.parse(this.$.favouriteMarkets.value);
+            } else {
+                this.computedFavouriteMarkets = {}
+            }
         }
 
         _computeParams(page, settingsVersion) {
