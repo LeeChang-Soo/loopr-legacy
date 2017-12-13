@@ -201,8 +201,9 @@
 
         static get properties() {
             return {
-                page: String,
-                subpage: String,
+                route: {
+                    type: Object
+                },
                 priceQuote: Object,
                 totalValue: Number,
                 etherTokens: Array,
@@ -225,7 +226,7 @@
                 },
                 params:{
                     type:Object,
-                    computed:'_computeParams(page, subpage, settingsVersion, wallet)'
+                    computed:'_computeParams(route, settingsVersion, wallet)'
                 },
                 relayUrl: {
                     type: String,
@@ -234,8 +235,9 @@
             };
         }
 
-        _computeParams(page, subpage, settingsVersion, wallet) {
-            if(page && page === 'wallet' && (!subpage || subpage === 'assets') && settingsVersion && wallet){
+        _computeParams(route, settingsVersion, wallet) {
+            let parameters = this._returnParameters(route);
+            if(parameters && parameters.page && parameters.page === 'wallet' && (!parameters.subpage || parameters.subpage === 'assets') && settingsVersion && wallet){
                 const params = {};
                 params.contractVersion = settingsVersion;
                 params.owner = wallet.address;

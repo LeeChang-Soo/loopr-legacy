@@ -44,9 +44,9 @@
                 </paper-tabs>
             </paper-card>
             <iron-pages id="pages" selected="{{selectedTab}}" selected-item="{{selectedPage}}" attr-for-selected="name">
-                <wallet-assets name="assets" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-assets>
-                <wallet-trades name="trades" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-trades>
-                <wallet-orders name="orders" page="{{page}}" subpage="{{subpage}}" third="{{third}}"></wallet-orders>
+                <wallet-assets name="assets" route="{{route}}"></wallet-assets>
+                <wallet-trades name="trades" route="{{route}}"></wallet-trades>
+                <wallet-orders name="orders" route="{{route}}"></wallet-orders>
             </iron-pages>
         </div>
     </template>
@@ -56,17 +56,12 @@
 
         static get properties() {
             return {
-                page: String,
-                subpage: {
-                    type: String,
-                    reflectToAttribute: true,
-                    value: "assets",
-                    observer: 'go'
+                route: {
+                    type: Object
                 },
-                third: String,
                 selectedTab: {
                     type: String,
-                    computed: '_computeSelected(page, subpage)'
+                    computed: '_computeParameters(route)'
                 },
                 selectedPage: {
                     type: Object,
@@ -77,6 +72,26 @@
 
         ready() {
             super.ready();
+        }
+
+        static get observers() {
+            return [
+                '_computeParameters(route)'
+            ];
+        }
+
+        _computeParameters(route) {
+            if (route && route.path) {
+                let params = this._returnParameters(route);
+                if (params && params.page && "wallet" === params.page) {
+                    this.page = params.page;
+                    if(params.subpage && (params.subpage === "assets" || params.subpage === "orders" || params.subpage === "trades")) {
+                        return params.subpage;
+                    } else {
+                        return "assets";
+                    }
+                }
+            }
         }
 
         _computeSelected(page, subpage) {
@@ -91,7 +106,7 @@
         }
 
         go(selectedPage) {
-            if (this.page && this.page === "wallet" && this.wallet && selectedPage && selectedPage.go) {
+            if (selectedPage && selectedPage.go) {
                 selectedPage.go();
             }
         }

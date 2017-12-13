@@ -71,7 +71,7 @@
                 </div>
             </paper-card>
             <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-            <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getCutoff" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
+            <loopr-relay-ajax id="cutoff" relay="[[relayUrl]]" method="loopring_getCutoff" params="[[params]]" last-response="{{resp}}" loading="{{loading}}"></loopr-relay-ajax>
         </div>
     </template>
     <script>
@@ -82,8 +82,9 @@
 
         static get properties() {
             return {
-                page: String,
-                subpage: String,
+                route: {
+                    type: Object
+                },
                 cutoff: {
                     type: Number,
                     computed: '_computeCutoff(resp)'
@@ -94,7 +95,7 @@
                 },
                 params: {
                     type: Object,
-                    computed:'_computeParams(page, subpage, settingsVersion, wallet)'
+                    computed:'_computeParams(route, settingsVersion, wallet)'
                 },
                 relayUrl: {
                     type: String,
@@ -107,8 +108,9 @@
             super.ready();
         }
 
-        _computeParams(page, subpage, settingsVersion, wallet) {
-            if(page && page === 'wallet' && subpage && subpage === 'orders' && settingsVersion && wallet) {
+        _computeParams(route, settingsVersion, wallet) {
+            let params = this._returnParameters(route);
+            if(params && params.page && params.page === 'wallet' && params.subpage && params.subpage === 'orders' && settingsVersion && wallet) {
                 return [wallet.address, settingsVersion, "latest"];
             }
         }
@@ -172,6 +174,10 @@
                     detail: detail
                 }));
             }
+        }
+
+        go() {
+            //this.$.cutoff.generateRequest();
         }
 
     }

@@ -164,11 +164,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             static get properties() {
                 return {
-                    page: String,
-                    subpage: String,
+                    route: {
+                        type: Object
+                    },
                     redirect: {
                         type: Boolean,
-                        computed: '_computeRedirect(page, subpage, wallet)'
+                        computed: '_computeRedirect(route, wallet)'
                     },
                     wallet: {
                         type: Object,
@@ -181,7 +182,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     fromToken: {
                         type: String,
                         value: 'ETH',
-                        computed: '_computeFromToken(page, subpage, appConfig)'
+                        computed: '_computeFromToken(route, appConfig)'
                     },
                     fromImg: {
                         type: String,
@@ -243,33 +244,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 ]
             }
 
-            _computeRedirect(page, subpage, wallet) {
-                if (page && subpage && page === 'convert'){
-                    if (!wallet) {
-                        window.location.href = "#/wallet";
+            _computeRedirect(route, wallet) {
+                if (route) {
+                    let parameters = this._returnParameters(route);
+                    if (parameters && parameters.page && parameters.subpage && parameters.page === 'convert'){
+                        if (!wallet) {
+                            window.location.href = "#/wallet";
+                        }
                     }
                 }
                 return false;
             }
 
-            _computeFromToken(page, subpage, appConfig) {
-                if (page && "convert" === page && appConfig) {
-                    if (!subpage) {
+            _computeFromToken(route, appConfig) {
+                let parameters = this._returnParameters(route);
+                if (parameters && parameters.page && "convert" === parameters.page && appConfig) {
+                    if (!parameters.subpage) {
                         return "ETH";
-                    } else if ("ETH" === subpage || "WETH" === subpage) {
-                        return subpage;
+                    } else if ("ETH" === parameters.subpage || "WETH" === parameters.subpage) {
+                        return parameters.subpage;
                     } else {
-//                        var detail = {
-//                            text: "We only support convert between ETH and WETH",
-//                            category: "error",
-//                            duration: 8000
-//                        }
-//                        this.dispatchEvent(new CustomEvent('notification', {
-//                            bubbles: true,
-//                            composed: true,
-//                            detail: detail
-//                        }));
-//                        window.location.href = "#/wallet/assets";
+                        var detail = {
+                            text: "We only support convert between ETH and WETH",
+                            category: "error",
+                            duration: 8000
+                        }
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        window.location.href = "#/wallet/assets";
                     }
                 }
             }

@@ -192,26 +192,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 return 'page-approve';
             }
 
-            /**
-             * token : parent input parameter, lrc...
-             * selectedToken: current selected token contract address
-             * amount: current input amount
-             */
             static get properties() {
                 return {
-                    page: String,
-                    subpage: String,
+                    route: {
+                        type: Object
+                    },
                     wallet: {
                         type: Object,
                         observer: '_walletChanged',
                     },
                     redirect: {
                         type: Boolean,
-                        computed: '_computeRedirect(page, subpage, wallet)'
+                        computed: '_computeRedirect(route, wallet)'
                     },
                     token: {
                         type: String,
-                        computed: '_computedToken(page, subpage, appConfig)'
+                        computed: '_computedToken(route, appConfig)'
                     },
                     selectedTokenBalance: {
                         type: Object,
@@ -257,8 +253,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 ]
             }
 
-            _computeRedirect(page, subpage, wallet) {
-                if (page && subpage && page === 'approve'){
+            _computeRedirect(route, wallet) {
+                let parameters = this._returnParameters(route);
+                if (parameters && parameters.page && parameters.subpage && parameters.page === 'approve'){
                     if (!wallet) {
                         window.location.href = "#/wallet";
                     }
@@ -272,18 +269,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             }
 
-            _computedToken(page, subpage, appConfig) {
-                if (page && "approve" === page && subpage && appConfig) {
-                    if(appConfig.tokenMap[subpage]){
-                        return subpage;
+            _computedToken(route, appConfig) {
+                let parameters = this._returnParameters(route);
+                if (parameters && parameters.page && "approve" === parameters.page && parameters.subpage && appConfig) {
+                    if(appConfig.tokenMap[parameters.subpage]){
+                        return parameters.subpage;
                     } else {
-//                        var detail = {text: "Not supported token :"+subpage, category: "error", duration: 8000}
-//                        this.dispatchEvent(new CustomEvent('notification', {
-//                            bubbles: true,
-//                            composed: true,
-//                            detail: detail
-//                        }));
-//                        window.location.href = "#/wallet/assets";
+                        var detail = {text: "Not supported token :"+parameters.subpage, category: "error", duration: 8000}
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                        window.location.href = "#/wallet/assets";
                     }
                 }
             }

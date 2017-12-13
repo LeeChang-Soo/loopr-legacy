@@ -108,4 +108,36 @@ const AppConfigMixin = (superclass) => class extends superclass {
             return settingsRelay + "/rpc"
         }
     }
+
+    _computeUrlParameters(route, thisPage) {
+        if (route && route.path && thisPage) {
+            let parameters = route.path.split("/");
+            if (parameters[1] && thisPage === parameters[1]) {
+                this.page = parameters[1];
+                if (parameters[2]) {
+                    this.subpage = parameters[2];
+                }
+                if (parameters[3]) {
+                    this.third = parameters[3];
+                }
+            }
+        }
+    }
+
+    _returnParameters(route) {
+        if (route && route.path) {
+            let parameters = route.path.split("/");
+            let result = {};
+            if (parameters[1]) {
+                result.page = parameters[1];
+            }
+            if (parameters[2]) {
+                result.subpage = parameters[2];
+            }
+            if (parameters[3]) {
+                result.third = parameters[3];
+            }
+            return result;
+        }
+    }
 }

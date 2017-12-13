@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <dom-module id="loopr-relay-ajax">
     <template>
+        <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="settings-relayName" value="{{settingsRelayName}}"></global-variable>
         <iron-ajax id="ajax" url="[[url]]" headers='{"Content-Type":"application/json"}' method="POST" body="[[methodParams]]" handle-as="json" last-response="{{lastResponse}}" debounce-duration="300" loading="{{loading}}" timeout="{{timeout}}" on-error="_onError">
         </iron-ajax>
     </template>
@@ -48,12 +50,13 @@
 
         static get observers() {
             return [
-                '_isToReload(url, params)'
+                '_isToReload(url, method, params)',
+                '_isNotify(error, settingsRelayName)'
             ];
         }
 
-        _isToReload(url, params) {
-            if(url && params){
+        _isToReload(url, method, params) {
+            if(url && method && params){
                 this.generateRequest();
             }
         }
@@ -73,11 +76,17 @@
         _onError(e) {
             if (e) {
                 this.error = e;
-                let errorMsg = "";
                 if (e.detail.error.message) {
-                    errorMsg = "error message:["+e.detail.error.message+"]";
+                    //console.log( "Error message:["+e.detail.error.message+"]");
                 }
-                var detail = { text: "An error occurred on the server when processing the URL:["+this.url+"/"+this.method+"] "+errorMsg+", please try again later", category: "error", duration: 30000 }
+                console.error(e);
+            }
+        }
+
+        _isNotify(error, settingsRelayName) {
+            if (error && settingsRelayName) {
+                let message = "Failed to talk to the selected relay:["+settingsRelayName+"], you could try to switch Relay in page Settings or try again later"
+                var detail = { text: message, category: "error", duration: 30000 }
                 this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
             }
         }

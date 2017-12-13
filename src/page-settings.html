@@ -92,6 +92,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
             <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
             <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+            <global-variable key="settings-relayName" value="{{settingsRelayName}}"></global-variable>
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
             <global-variable key="settings-marginSplit" value="{{settingsMarginSplit}}"></global-variable>
@@ -227,9 +228,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             this.$.relay.addEventListener('value-changed', function(e) {
                 if (_this.$.relay.value) {
+                    _this.settingsRelayName = _this.$.relay.placeholder;
                     _this.settingsRelay = _this.$.relay.value || "//relay1.loopring.io";
                 }
-                console.log("relay change to:" + _this.settingsRelay);
+                console.log("relay change to:["+_this.settingsRelayName + "] url:[" + _this.settingsRelay+"]");
             });
 
             this.$.lrcFee.addEventListener('value-changed', function(e) {
