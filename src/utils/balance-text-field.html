@@ -9,6 +9,7 @@
         static get properties() {
             return {
                 max: Number,
+                min: Number,
                 message: {
                     type: String,
                     computed: '_computedMessage(errorMessage)',
@@ -26,6 +27,10 @@
             if (super.checkValidity()) {
                 if (this.max && Number(this.value) > this.max) {
                     this.errorMessage = ' You have insufficient Balance';
+                    return false;
+                }
+                if(this.min && Number(this.value) < this.min){
+                    this.errorMessage = ' must be bigger than ' + this.min;
                     return false;
                 }
                 return true;
