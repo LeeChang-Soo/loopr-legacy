@@ -65,28 +65,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </loopr-page>
     </template>
     <script>
-    class PageHistory extends Polymer.Element {
+    class PageHistory extends AppConfigMixin(Polymer.Element) {
         static get is() { return 'page-history'; }
         static get properties() {
             return {
-                page: String,
-                subpage: String,
-                third: String,
+                route: {
+                    type: Object
+                },
                 computedPage: {
                     type: String,
-                    computed: '_computedPage(page)'
+                    computed: '_computedPage(route)'
                 },
                 computedSubpage: {
                     type: String,
-                    computed: '_computedSubpage(page, subpage)'
+                    computed: '_computedSubpage(route)'
                 },
                 computedThird: {
                     type: String,
-                    computed: '_computedThird(page, subpage, third)'
+                    computed: '_computedThird(route)'
                 },
                 selectedTab: {
                     type: String,
-                    computed: '_computeSelected(page, subpage)'
+                    computed: '_computeSelected(route)'
                 },
                 selectedPage: {
                     type: Object,
@@ -95,36 +95,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             };
         }
 
-        _computedPage(page) {
-            if (page && "history" === page) return page;
+        _computedPage(route) {
+            let params = this._returnParameters(route);
+            if (params && params.page && "history" === params.page) return params.page;
         }
 
-        _computedSubpage(page, subpage) {
-            if (page && "history" === page) {
-                if (subpage) {
-                    return subpage;
+        _computedSubpage(route) {
+            let params = this._returnParameters(route);
+            if (params && params.page && "history" === params.page) {
+                if (params.subpage) {
+                    return params.subpage;
                 } else {
                     return "trades";
                 }
             }
         }
 
-        _computedThird(page, subpage, third) {
-            if (page && "history" === page && subpage && third) return third;
+        _computedThird(route) {
+            let params = this._returnParameters(route);
+            if (params && params.page && "history" === params.page && params.subpage && params.third) return params.third;
         }
 
-        _computeSelected(page, subpage) {
-            if ("history" != page) return;
-            if (subpage === 'trades' || subpage === 'rings' || subpage === 'orders' || subpage === 'stats') {
-                return subpage;
-            } else {
-                //TODO: send a 404 error event.
-                return 'trades';
+        _computeSelected(route) {
+            let params = this._returnParameters(route);
+            if (params && params.page && "history" === params.page) {
+                if (params.subpage && params.subpage === 'trades' || params.subpage === 'rings' || params.subpage === 'orders' || params.subpage === 'stats') {
+                    return params.subpage;
+                } else {
+                    //TODO: send a 404 error event.
+                    return 'trades';
+                }
             }
         }
 
         go(selectedPage) {
-            if (this.page && this.page === "history" && selectedPage && selectedPage.go) {
+            if (selectedPage && selectedPage.go) {
                 selectedPage.go();
             }
         }

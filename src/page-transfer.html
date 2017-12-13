@@ -155,11 +155,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
-                page: String,
-                subpage: String,
+                route: {
+                    type: Object
+                },
+                redirect: {
+                    type: Boolean,
+                    computed: '_computeRedirect(route, wallet)'
+                },
+                wallet: {
+                    type: Object,
+                    observer: '_walletChanged'
+                },
                 token: {
                     type: String,
-                    computed: '_computedToken(page, subpage, appConfig)'
+                    computed: '_computedToken(route, appConfig)'
                 },
                 amount: {
                     type: Number
@@ -197,12 +206,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             ]
         }
 
-        _computedToken(page, subpage, appConfig) {
-            if (page && "transfer" === page && subpage && appConfig) {
-                if (appConfig.tokenMap[subpage]) {
-                    return subpage;
+        _computeRedirect(route, wallet) {
+            if (route) {
+                let parameters = this._returnParameters(route);
+                if (parameters && parameters.page && parameters.subpage && parameters.page === 'transfer'){
+                    if (!wallet) {
+                        window.location.href = "#/wallet";
+                    }
+                }
+            }
+            return false;
+        }
+
+        _computedToken(route, appConfig) {
+            let parameters = this._returnParameters(route);
+            if (parameters && parameters.page && "transfer" === parameters.page && parameters.subpage && appConfig) {
+                if (appConfig.tokenMap[parameters.subpage]) {
+                    return parameters.subpage;
                 } else {
-                    var detail = { text: "Not supported token :" + subpage, category: "error", duration: 8000 }
+                    var detail = { text: "Not supported token :" + parameters.subpage, category: "error", duration: 8000 }
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
                         composed: true,
@@ -270,10 +292,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         ready() {
-            //            if(!this.wallet){
-            //                window.location.href = "#/wallet"
-            //                return
-            //            }
             super.ready();
             var combobox = this.$.tokensSelector;
             var _this = this;
@@ -291,6 +309,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.$.send.click();
                 }
             }.bind(this));
+        }
+
+        _walletChanged(wallet) {
+            if (!wallet || !wallet.address) {
+                window.location.href = "#/wallet";
+            }
         }
 
         handleClick() {

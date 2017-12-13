@@ -91,44 +91,48 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </loopr-page>
     </template>
     <script>
-    class PageDoc extends Polymer.Element {
+    class PageDoc extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'page-doc';
         }
 
         static get properties() {
             return {
-                page: String,
-                pageId: {
-                    type: String,
-                    reflectToAttriute: true
+                route: {
+                    type: Object
                 },
                 jsonUrl: {
                     type: String,
-                    computed: 'computeJsonUrl(page, pageId)'
+                    computed: 'computeJsonUrl(route)'
                 },
                 mdUrl: {
                     type: String,
-                    computed: 'computeMdUrl(page, pageId)'
+                    computed: 'computeMdUrl(route)'
                 }
             };
         }
 
-        computeJsonUrl(page, pageId) {
-            if (page && "doc" === page) {
-                let url = "";
-                if (pageId) url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/" + pageId + ".json";
-                else url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/home.json";
-                return url;
+        computeJsonUrl(route) {
+            if (route) {
+                let parameters = this._returnParameters(route);
+                if (parameters && parameters.page && "doc" === parameters.page) {
+                    let url = "";
+                    if (parameters.subpage) url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/" + parameters.subpage + ".json";
+                    else url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/home.json";
+                    return url;
+                }
             }
         }
 
-        computeMdUrl(page, pageId) {
-            if (page && "doc" === page) {
-                let url = "";
-                if (pageId) url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/" + pageId + ".md";
-                else url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/home.md";
-                return url;
+        computeMdUrl(route) {
+            if (route) {
+                let parameters = this._returnParameters(route);
+                if (parameters && parameters.page && "doc" === parameters.page) {
+                    let url = "";
+                    if (parameters.subpage) url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/" + parameters.subpage + ".md";
+                    else url = "//raw.githubusercontent.com/Loopring/loopr-docs/master/en/home.md";
+                    return url;
+                }
             }
         }
 

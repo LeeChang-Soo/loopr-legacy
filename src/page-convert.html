@@ -95,7 +95,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
-
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
 
@@ -165,8 +164,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             static get properties() {
                 return {
-                    page: String,
-                    subpage: String,
+                    route: {
+                        type: Object
+                    },
+                    redirect: {
+                        type: Boolean,
+                        computed: '_computeRedirect(route, wallet)'
+                    },
                     wallet: {
                         type: Object,
                         observer: '_walletChanged',
@@ -178,7 +182,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     fromToken: {
                         type: String,
                         value: 'ETH',
-                        computed: '_computeFromToken(page, subpage, appConfig)'
+                        computed: '_computeFromToken(route, appConfig)'
                     },
                     fromImg: {
                         type: String,
@@ -210,26 +214,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     valid: {
                         type: Boolean,
                         computed: '_formValid(amount, gasLimit,amountShow,fromTokenBalance)'
+                    },
+                    tokenConfig: {
+                        type: Object,
+                        value: {
+                            ETH: 'images/token/ether.png',
+                            WETH: 'images/token/ether_erc20.png'
+                        }
                     }
                 };
             }
 
             constructor() {
                 super();
-                let tokenConfig = {
-                    ETH: 'images/token/ether.png',
-                    WETH: 'images/token/ether_erc20.png'
-                }
-                this.tokenConfig = tokenConfig;
             }
 
             ready() {
-//            console.log(this.wallet)
-//            if(!this.wallet){
-//                console.log("return")
-//                window.location.href = "#/wallet"
-//                return;
-//            }
                 super.ready();
                 let _this = this;
                 this.$.gasLimit.addEventListener('value-changed', function () {
@@ -244,12 +244,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 ]
             }
 
-            _computeFromToken(page, subpage, appConfig) {
-                if (page && "convert" === page && appConfig) {
-                    if (!subpage) {
+            _computeRedirect(route, wallet) {
+                if (route) {
+                    let parameters = this._returnParameters(route);
+                    if (parameters && parameters.page && parameters.subpage && parameters.page === 'convert'){
+                        if (!wallet) {
+                            window.location.href = "#/wallet";
+                        }
+                    }
+                }
+                return false;
+            }
+
+            _computeFromToken(route, appConfig) {
+                let parameters = this._returnParameters(route);
+                if (parameters && parameters.page && "convert" === parameters.page && appConfig) {
+                    if (!parameters.subpage) {
                         return "ETH";
-                    } else if ("ETH" === subpage || "WETH" === subpage) {
-                        return subpage;
+                    } else if ("ETH" === parameters.subpage || "WETH" === parameters.subpage) {
+                        return parameters.subpage;
                     } else {
                         var detail = {
                             text: "We only support convert between ETH and WETH",

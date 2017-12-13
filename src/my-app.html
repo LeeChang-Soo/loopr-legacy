@@ -250,6 +250,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
         <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="settings-relayName" value="{{settingsRelayName}}"></global-variable>
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="settings-marginSplit" value="{{settingsMarginSplit}}"></global-variable>
@@ -257,6 +258,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <scary-cookie id="settingsCurrency" name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
         <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
         <scary-cookie id="settingsRelay" name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
+        <scary-cookie id="settingsRelayConfig" name="settings-relay-config" value="{{settingsRelayConfig}}"></scary-cookie>
         <scary-cookie id="settingsGasPrice" name="settings-gasPrice" value="{{settingsGasPrice}}"></scary-cookie>
         <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
         <scary-cookie id="warnedVersion" name="warned-version" value="{{warnedVersion}}"></scary-cookie>
@@ -293,19 +295,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <div>Loading configuration...</div>
                 </div>
                 <iron-pages id="pages" selected="[[page]]" attr-for-selected="name" selected-item="{{selectedPage}}" fallback-selection="404" role="main">
-                    <page-market name="market" page="{{page}}" subpage="{{pageId}}" third="{{thirdParam}}"></page-market>
+                    <page-market name="market" route="{{route}}"></page-market>
                     <page-markets name="markets" page="{{page}}"></page-markets>
-                    <page-wallet id="walletPage" name="wallet" page="{{page}}" secondary-page="{{pageId}}" third="{{thirdParam}}"></page-wallet>
-                    <page-ring name="ring" page="{{page}}" subpage="{{pageId}}"></page-ring>
-                    <page-order name="order" page="{{page}}" subpage="{{pageId}}"></page-order>
-                    <page-history name="history" page="{{page}}" subpage="{{pageId}}" third="{{thirdParam}}"></page-history>
-                    <page-convert name="convert" page="{{page}}" subpage="{{pageId}}"></page-convert>
-                    <page-approve name="approve" page="{{page}}" subpage="{{pageId}}"></page-approve>
-                    <page-transfer name="transfer" page="{{page}}" subpage="{{pageId}}"></page-transfer>
+                    <page-wallet id="walletPage" name="wallet" route="{{route}}"></page-wallet>
+                    <page-ring name="ring" route="{{route}}"></page-ring>
+                    <page-order name="order" route="{{route}}"></page-order>
+                    <page-history name="history" route="{{route}}"></page-history>
+                    <page-convert name="convert" route="{{route}}" wallet="{{wallet}}"></page-convert>
+                    <page-approve name="approve" route="{{route}}" wallet="{{wallet}}"></page-approve>
+                    <page-transfer name="transfer" route="{{route}}" wallet="{{wallet}}"></page-transfer>
                     <page-settings id="settings" name="settings"></page-settings>
                     <page-unlockwallet name="unlockwallet"></page-unlockwallet>
                     <page-generatewallet name="generatewallet"></page-generatewallet>
-                    <page-doc name="doc" page="{{page}}" page-id={{pageId}}></page-doc>
+                    <page-doc name="doc" route="{{route}}"></page-doc>
                     <page-dev name="dev"></page-dev>
                     <page-404 name="404"></page-404>
                 </iron-pages>
@@ -397,6 +399,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (this.$.settingsRelay.value) {
                 cookieValue["settingsRelay"] = this.$.settingsRelay.value;
             }
+            if (this.$.settingsRelayConfig.value) {
+                cookieValue["settingsRelayConfig"] = this.$.settingsRelayConfig.value;
+            }
             if (this.$.settingsCurrency.value) {
                 cookieValue["settingsCurrency"] = this.$.settingsCurrency.value;
             }
@@ -446,10 +451,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 } else {
                     this.settingsCurrency = appConfig.fiat[0].value;
                 }
+                let relay = "";
                 if (cookieValues["settingsRelay"]) {
-                    this.settingsRelay = cookieValues["settingsRelay"];
+                    relay = cookieValues["settingsRelay"];
                 } else {
-                    this.settingsRelay = appConfig.relays[0].value;
+                    relay = appConfig.relays[0].value;
+                }
+                this.settingsRelay = relay;
+                let relays = appConfig.relays;
+                if (cookieValues["settingsRelayConfig"]) {
+                    let cookieRelay = JSON.parse(cookieValues["settingsRelayConfig"]);
+                    relays = relays.concat(cookieRelay);
+                }
+                let filteredRelays = _.filter(relays, function(o) { return o.value.indexOf(relay) >-1 });
+                if (filteredRelays && filteredRelays.length >0){
+                    this.settingsRelayName = filteredRelays[0].label;
+                } else {
+                    this.settingsRelayName = "";
                 }
                 if (cookieValues["settingsLrcFee"]) {
                     this.settingsLrcFee = cookieValues["settingsLrcFee"];

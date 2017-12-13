@@ -32,23 +32,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
         </style>
+        <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <loopr-page>
             <loopr-toolbar slot="secondary-toolbar" active-tab="wallet"> </loopr-toolbar>
             <iron-pages id="pages" selected="[[selectedTab]]" selected-item="{{selectedPage}}" attr-for-selected="name" role="main">
                 <subpage-default name="default"></subpage-default>
-                <subpage-ready name="ready" page="{{page}}" subpage="{{secondaryPage}}" third="{{third}}"></subpage-ready>
+                <subpage-ready name="ready" route="{{route}}"></subpage-ready>
             </iron-pages>
             <div class="footer-spacer"></div>
             <loopr-footer></loopr-footer>
         </loopr-page>
     </template>
     <script>
-    class PageWallet extends Polymer.Element {
+    class PageWallet extends AppConfigMixin(Polymer.Element) {
         static get is() {
             return 'page-wallet';
         }
         static get properties() {
             return {
+                route: {
+                    type: Object
+                },
+                wallet: Object,
                 page: String,
                 secondaryPage: {
                     type: String,
@@ -74,6 +79,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         ready() {
             super.ready();
             this.addEventListener('reset-wallet', e => this.subpage = 'default');
+        }
+
+        static get observers() {
+            return [
+                '_computeParameters(route, wallet)'
+            ];
+        }
+
+        _computeParameters(route, wallet) {
+            if (route && route.path) {
+                let parameters = route.path.split("/");
+                if (parameters[1] && "wallet" === parameters[1]) {
+                    this.page = parameters[1];
+                    if (wallet) {
+                        this.subpage = "ready";
+                    } else {
+                        this.subpage = "default";
+                    }
+                }
+            }
         }
 
         _computeSelected(page, subpage) {

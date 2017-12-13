@@ -105,6 +105,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+                route: {
+                    type: Object
+                },
                 page: String,
                 subpage: String,
                 hash: {
@@ -133,6 +136,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     computed:'_computeParams(hash, settingsVersion)'
                 }
             };
+        }
+
+        static get observers() {
+            return [
+                '_computeUrlParameters(route, "ring")'
+            ];
         }
 
         _computedHash(page, subpage) {

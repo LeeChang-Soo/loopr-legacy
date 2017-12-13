@@ -21,7 +21,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             padding-top: 0;
         }
         </style>
-        <cutoff-panel page="{{page}}" subpage="{{subpage}}"></cutoff-panel>
+        <cutoff-panel id="cutoff" route="{{route}}"></cutoff-panel>
         <div class="sections">
             <paper-card transparent>Orders</paper-card>
             <paper-card>
@@ -35,38 +35,48 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
-                page: String,
-                subpage: String,
-                third: String,
+                route: {
+                    type: Object
+                },
                 computedPage: {
                     type: String,
-                    computed: '_computedPage(page)'
+                    computed: '_computePage(route)'
                 },
                 computedSubpage: {
                     type: String,
-                    computed: '_computedSubpage(page, subpage)'
+                    computed: '_computeSubpage(route)'
                 },
                 computedThird: {
                     type: String,
-                    computed: '_computedThird(page, subpage, third)'
+                    computed: '_computeThird(route)'
                 }
             };
         }
 
-        _computedPage(page) {
-            if (page && "wallet" === page) return page;
+        _computePage(route) {
+            let params = this._returnParameters(route);
+            if(params && params.page && params.page === 'wallet' && params.subpage && params.subpage === 'orders') {
+                return params.page;
+            }
         }
 
-        _computedSubpage(page, subpage) {
-            if (page && "wallet" === page && subpage && subpage === "orders") return subpage;
+        _computeSubpage(route) {
+            let params = this._returnParameters(route);
+            if(params && params.page && params.page === 'wallet' && params.subpage && params.subpage === 'orders') {
+                return params.subpage;
+            }
         }
 
-        _computedThird(page, subpage, third) {
-            if (page && "wallet" === page && subpage && subpage === "orders" && third) return third;
+        _computeThird(route) {
+            let params = this._returnParameters(route);
+            if(params && params.page && params.page === 'wallet' && params.subpage && params.subpage === 'orders') {
+                return params.third;
+            }
         }
 
         go() {
-            //const page = this.$.orders.go();
+            //this.$.orders.go();
+            //this.$.cutoff.go();
         }
     }
 

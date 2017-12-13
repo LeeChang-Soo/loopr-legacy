@@ -482,7 +482,9 @@
         }
 
         go() {
-            this.$.ajax.generateRequest();
+            if(this.relayUrl && this.params) {
+                this.$.ajax.generateRequest();
+            }
         }
     }
 
