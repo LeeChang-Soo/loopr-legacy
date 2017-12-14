@@ -109,7 +109,7 @@
                     <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{sellPrice}}"
                                        pattern="[[_numPatten(marketPrecision)]]"
                                        error-message="number with max [[marketPrecision]] precision">
-                        <div slot="suffix">[[tokens.unit]]/[[tokenb.unit]]</div>
+                        <div slot="suffix">[[tokenb.unit]]/[[tokens.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">=</div>
                     <balance-text-field disabled label="[[tokenb.token]] Total" value="{{sellTotal}}"
@@ -173,7 +173,7 @@
                     <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{buyPrice}}"
                                        pattern="[[_numPatten(marketPrecision)]]"
                                        error-message="number with max [[marketPrecision]] precision">
-                        <div slot="suffix">[[tokens.unit]]/[[tokenb.unit]]</div>
+                        <div slot="suffix">[[tokenb.unit]]/[[tokens.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">=</div>
                     <balance-text-field disabled label="[[tokenb.token]] Total" value="{{buyTotal}}"
@@ -384,13 +384,13 @@
 
             _computeBuyTotal(amount, price, tokenb) {
                 if (amount && price && Number(price) > 0 && tokenb) {
-                    return Math.ceil((amount / price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
+                    return Math.ceil((amount * price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
                 }
             }
 
             _computeSellTotal(amount, price, tokenb) {
                 if (amount && price && Number(price) > 0 && tokenb) {
-                    return Math.floor((amount / price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
+                    return Math.floor((amount * price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
                 }
             }
 
