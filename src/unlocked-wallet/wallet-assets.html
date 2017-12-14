@@ -67,12 +67,26 @@
         .hidebalance {
             height: 44px;
         }
+
+        .favorite {
+            --iron-icon-height: 20px;
+            --iron-icon-width: 20px;
+            --iron-icon-stroke-color: var(--paper-blue-500);
+            --iron-icon-fill-color: white;
+        }
+
+        .favoriteSelected {
+            --iron-icon-height: 20px;
+            --iron-icon-width: 20px;
+            --iron-icon-fill-color: var(--paper-amber-700);
+        }
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
+        <scary-cookie id="favoriteTokens" name="favorite-tokens" value="{{favoriteTokens}}"></scary-cookie>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
         <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}" loading={{loading}}></loopr-ajax>-->
@@ -132,6 +146,16 @@
             </paper-card>
             <paper-card transparent>
                 <div class="horizontal start layout">
+                    <div class="hidebalance horizontal layout center">
+                        <a href="javascript:void(0)" on-click="_filterFavorite"><iron-icon class$="{{favoriteClass}}" icon="icons:favorite"></iron-icon></a>
+                    </div>
+                    <div class="split"></div>
+                    <template is="dom-if" if="{{!isFilterFavorite}}">
+                        <div class="hidebalance horizontal center layout">
+                            <vaadin-checkbox checked="{{hideBalance}}">Hide 0 Balances</vaadin-checkbox>
+                        </div>
+                    </template>
+                    <div class="flex"></div>
                     <div class="search">
                         <div class="horizontal end layout">
                             <vaadin-text-field id="search" value="{{keyword}}" placeholder="Token">
@@ -139,15 +163,16 @@
                             </vaadin-text-field>
                         </div>
                     </div>
-                    <div class="split"></div>
-                    <div class="hidebalance horizontal center layout">
-                        <vaadin-checkbox checked="{{hideBalance}}">Hide 0 Balances</vaadin-checkbox>
-                    </div>
-                    <div class="flex"></div>
                 </div>
             </paper-card>
             <paper-card tablewrapper>
                 <vaadin-grid aria-label="Tokens" items="[[result]]">
+                    <vaadin-grid-column width="30px" flex-grow="0">
+                        <template class="header"></template>
+                        <template>
+                            <a href="javascript:void(0)" on-click="_addToFavorite"><iron-icon class$="{{item.favoriteClass}}" id$="[[item.token]]" icon="icons:favorite"></iron-icon></a>
+                        </template>
+                    </vaadin-grid-column>
                     <vaadin-grid-column width="30px">
                         <template class="header">Symbol</template>
                         <template>
@@ -201,6 +226,7 @@
 
         static get properties() {
             return {
+                cookieValues: Object,
                 route: {
                     type: Object
                 },
@@ -209,7 +235,7 @@
                 etherTokens: Array,
                 erc20Tokens: {
                     type: Array,
-                    computed: '_computeBalances(balancesRaw, priceQuote)'
+                    computed: '_computeBalances(balancesRaw, priceQuote, cookieValues)'
                 },
                 hideBalance: {
                     type: Boolean,
@@ -218,7 +244,7 @@
                 keyword: String,
                 result: {
                     type: Object,
-                    computed: '_computeResult(erc20Tokens, hideBalance, keyword)'
+                    computed: '_computeResult(erc20Tokens, hideBalance, keyword, cookieValues, isFilterFavorite)'
                 },
                 wallet: {
                     type: Object,
@@ -231,8 +257,28 @@
                 relayUrl: {
                     type: String,
                     computed: '_computeUrl(settingsRelay)'
+                },
+                isFilterFavorite: {
+                    type: Boolean,
+                    value: false
+                },
+                favoriteClass: {
+                    type: String,
+                    value: "favorite",
+                    computed: '_computeFavoriteClass(isFilterFavorite)'
                 }
             };
+        }
+
+        ready() {
+            super.ready();
+            let cookieValue = {};
+            if (this.$.favoriteTokens.value) {
+                cookieValue["favoriteTokens"] = this.$.favoriteTokens.value;
+            } else {
+                cookieValue["favoriteTokens"] = "";
+            }
+            this.cookieValues = cookieValue;
         }
 
         _computeParams(route, settingsVersion, wallet) {
@@ -245,37 +291,46 @@
             }
         }
 
-        _computeResult(erc20Tokens, hideBalance, keyword) {
-            if (erc20Tokens) {
+        _computeResult(erc20Tokens, hideBalance, keyword, cookieValues, isFilterFavorite) {
+            if (erc20Tokens && cookieValues) {
                 let tempResult = erc20Tokens;
+                let favoriteTokens = new Array();
+                if (this.cookieValues["favoriteTokens"]) {
+                    favoriteTokens = JSON.parse(this.cookieValues["favoriteTokens"]);
+                }
+                _.map(tempResult, function(i){
+                    if(favoriteTokens.indexOf(i.token) >-1){
+                        i.favoriteClass = "favoriteSelected";
+                    } else {
+                        i.favoriteClass = "favorite";
+                    }
+                });
+                if (isFilterFavorite) {
+                    tempResult = tempResult.filter(function(item) {
+                        return _.indexOf(favoriteTokens, item.token) >-1;
+                    });
+                }
                 if (keyword) {
-                    tempResult = erc20Tokens.filter(function(item) {
+                    return tempResult.filter(function(item) {
                         return ((item.token.indexOf(keyword.toUpperCase()) > -1) || (item.name.toUpperCase().indexOf(keyword.toUpperCase()) > -1));
                     });
-                }
-                if (hideBalance) {
-                    return this._computeZeroBalance(tempResult, true);
+                } else if(hideBalance && !isFilterFavorite) {
+                   return tempResult.filter(function(item) {
+                       return Number(item.balanceValue) > 0;
+                   });
                 } else {
-                    return this._computeZeroBalance(tempResult, false);
+                    return tempResult;
                 }
             }
         }
 
-        _computeZeroBalance(erc20Tokens, hideBalance) {
-            if (erc20Tokens) {
-                if (hideBalance) {
-                    return erc20Tokens.filter(function(item) {
-                        return Number(item.balanceValue) > 0;
-                    });
-                } else {
-                    return erc20Tokens;
-                }
-            }
-        }
-
-        _computeBalances(resp, priceQuote) {
-            if (resp && priceQuote) {
+        _computeBalances(resp, priceQuote, cookieValues) {
+            if (resp && priceQuote && cookieValues) {
                 var totalValue = 0;
+                let favoriteTokens = new Array();
+                if (cookieValues["favoriteTokens"]) {
+                    favoriteTokens = JSON.parse(cookieValues["favoriteTokens"]);
+                }
                 const items = _.map(resp.result.tokens, function(i) {
                     var item = i;
                     const tokenConfig = this.appConfig.tokenMap[i.token];
@@ -302,7 +357,11 @@
                         item.total = 0;
                     }
                     totalValue += item.total;
-
+                    if (_.indexOf(favoriteTokens, item.token) >-1) {
+                        item.favoriteClass = "favoriteSelected";
+                    } else {
+                        item.favoriteClass = "favorite";
+                    }
                     return item;
                 }.bind(this));
 
@@ -332,6 +391,51 @@
             if (wallet) {
                 this.$.ajax.generateRequest();
             }
+        }
+
+        _filterFavorite() {
+            if(this.isFilterFavorite) {
+                this.isFilterFavorite = false;
+            } else {
+                this.isFilterFavorite = true;
+            }
+        }
+
+        _computeFavoriteClass(isFilterFavorite) {
+            if (isFilterFavorite) {
+                return "favoriteSelected";
+            } else {
+                return "favorite";
+            }
+        }
+
+        _addToFavorite(e) {
+            if (!this.cookieValues || !this.appConfig){
+                console.error("Unkown error");
+                return;
+            }
+            let selectedToken = e.target.id;
+            if (!selectedToken || !this.appConfig.tokenMap[selectedToken]) {
+                console.error("Unsupported token:"+selectedToken);
+                return;
+            }
+            let favoriteTokens = new Array();
+            let tempCookieValues = this.cookieValues;
+            if (tempCookieValues["favoriteTokens"]) {
+                favoriteTokens = JSON.parse(tempCookieValues["favoriteTokens"]);
+            }
+            if (favoriteTokens.indexOf(selectedToken) >-1){
+                _.remove(favoriteTokens, function(n) {
+                    return n === selectedToken;
+                });
+                e.target.className = "favorite";
+            } else {
+                favoriteTokens.push(selectedToken);
+                e.target.className = "favoriteSelected";
+            }
+            this.favoriteTokens = JSON.stringify(favoriteTokens);
+            tempCookieValues["favoriteTokens"] = this.favoriteTokens;
+            this.cookieValues = tempCookieValues;
         }
     }
 

@@ -32,6 +32,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 padding-top: 96px;
             }
         }
+
+        .favoriteSelector {
+            height: 48px;
+        }
+
+        paper-tabs {
+            padding-left: 30px;
+        }
+
+        .favorite {
+            --iron-icon-height: 20px;
+            --iron-icon-width: 20px;
+            --iron-icon-stroke-color: var(--paper-blue-500);
+            --iron-icon-fill-color: white;
+        }
+
+        .favoriteSelected {
+            --iron-icon-height: 20px;
+            --iron-icon-width: 20px;
+            --iron-icon-fill-color: var(--paper-amber-700);
+        }
         </style>
         <loopr-page>
             <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -39,19 +60,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
             <global-variable key="settings-currency" value="{{settingsCurrency}}"></global-variable>
             <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
-            <scary-cookie id="favouriteMarkets" name="favourite-markets" value="{{favouriteMarkets}}"></scary-cookie>
+            <scary-cookie id="favoriteMarkets" name="favorite-markets" value="{{favoriteMarkets}}"></scary-cookie>
             <loopr-toolbar slot="secondary-toolbar" active-tab="markets">
             </loopr-toolbar>
             <div class="sections" unresolved>
                 <paper-card transparent>
                     <div class="horizontal start layout">
-                        <market-tab sources="{{tickers}}" results="{{searchResult}}" searched="{{searched}}" selected-tab="{{marketSelector}}"></market-tab>
+                        <div class="favoriteSelector horizontal layout center">
+                            <a href="javascript:void(0)" on-click="_filterFavorite"><iron-icon class$="{{favoriteClass}}" icon="icons:favorite"></iron-icon></a>
+                        </div>
+                        <paper-tabs selected="{{selectedTab}}" attr-for-selected="name">
+                            <template is="dom-repeat" items="[[tabs]]">
+                                <paper-tab name="[[item]]">[[item]]</paper-tab>
+                            </template>
+                            <!--<paper-tab name="favorite"><iron-icon class$="{{favoriteClass}}" icon="icons:favorite"></iron-icon></paper-tab>-->
+                        </paper-tabs>
                         <div class="flex"></div>
-                        <market-search sources="{{tickers}}" results="{{searchResult}}" searched="{{searched}}" selected-tab="{{marketSelector}}" placeholder="Market"></market-search>
+                        <div class="horizontal end layout">
+                            <vaadin-text-field id="search" value="{{keyword}}" placeholder="Market">
+                                <iron-icon slot="prefix" icon="icons:search"></iron-icon>
+                            </vaadin-text-field>
+                        </div>
                     </div>
                 </paper-card>
                 <paper-card>
-                    <vaadin-grid aria-label="Markets" items="[[searchResult]]">
+                    <vaadin-grid aria-label="Markets" items="[[result]]">
+                        <vaadin-grid-column width="30px" flex-grow="0">
+                            <template class="header"></template>
+                            <template><a href="javascript:void(0)" on-click="_addToFavorite"><iron-icon class$="{{item.favoriteClass}}" id$="[[item.market]]" icon="icons:favorite"></iron-icon></a></template>
+                        </vaadin-grid-column>
                         <vaadin-grid-column>
                             <template class="header">Market</template>
                             <template><a href="#/market/[[item.market]]">[[item.market]]</a></template>
@@ -106,11 +143,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         static get properties() {
             return {
+                cookieValues: Object,
                 page: String,
                 resp: Object,
                 tickers: {
                     type: Object,
-                    computed: '_process(appConfig, resp.result)'
+                    computed: '_process(appConfig, resp.result, cookieValues)'
                 },
                 marketSelector: {
                     type: String
@@ -123,19 +161,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: String,
                     computed: '_computeUrl(settingsRelay)'
                 },
-                computedFavouriteMarkets: {
-                    type: Object
+                selectedTab: {
+                    type: String
+                },
+                keyword: String,
+                tabs: {
+                    type: Object,
+                    notify: true,
+                    computed: '_computeTabs(tickers, keyword, selectedTab, isFilterFavorite)'
+                },
+                result: {
+                    type: Object,
+                    notify: true,
+                    computed: '_computeResult(tickers, keyword, selectedTab, isFilterFavorite, cookieValues)'
+                },
+                isFilterFavorite: Boolean,
+                favoriteClass: {
+                    type: String,
+                    value: "favorite",
+                    computed: '_computeFavoriteClass(isFilterFavorite)'
                 }
             };
         }
 
         ready() {
             super.ready();
-            if (this.$.favouriteMarkets.value) {
-                this.computedFavouriteMarkets = JSON.parse(this.$.favouriteMarkets.value);
+            let cookieValue = {};
+            if (this.$.favoriteMarkets.value) {
+                cookieValue["favoriteMarkets"] = this.$.favoriteMarkets.value;
             } else {
-                this.computedFavouriteMarkets = {}
+                cookieValue["favoriteMarkets"] = "";
             }
+            this.cookieValues = cookieValue;
         }
 
         _computeParams(page, settingsVersion) {
@@ -144,9 +201,65 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
 
-        _process(appConfig, result) {
-            if (appConfig && result) {
-                return _.map(result, function(i) {
+        _computeTabs(sources, keyword, selectedTab, isFilterFavorite) {
+            if (sources && !keyword && !isFilterFavorite) {
+                let markets = _.map(sources, o => o.market);
+                let tabs = new Array();
+                _.forEach(markets, function(market) {
+                    let tab = market.split("-")[1];
+                    if (tabs.indexOf(tab) === -1) {
+                        tabs.push(tab);
+                    }
+                });
+                if (tabs.length > 1) {
+                    if (!selectedTab) {
+                        this.selectedTab = tabs[0];
+                    }
+                    return tabs;
+                }
+            }
+        }
+
+        _computeResult(sources, keyword, selectedTab, isFilterFavorite, cookieValues) {
+            if (sources && cookieValues) {
+                let tempResult = sources;
+                let favoriteMarkets = new Array();
+                if (this.cookieValues["favoriteMarkets"]) {
+                    favoriteMarkets = JSON.parse(this.cookieValues["favoriteMarkets"]);
+                }
+                _.map(tempResult, function(i){
+                    if(favoriteMarkets.indexOf(i.market) >-1){
+                        i.favoriteClass = "favoriteSelected";
+                    } else {
+                        i.favoriteClass = "favorite";
+                    }
+                });
+                if (isFilterFavorite) {
+                    tempResult = tempResult.filter(function(item) {
+                        return _.indexOf(favoriteMarkets, item.market) >-1;
+                    });
+                }
+                if (keyword) {
+                    return tempResult.filter(function(item) {
+                        return item.market.indexOf(keyword.toUpperCase()) > -1;
+                    });
+                } else if (selectedTab && !isFilterFavorite) {
+                    return tempResult.filter(function(item) {
+                        return item.market.indexOf("-" + selectedTab.toUpperCase()) > -1;
+                    });
+                } else {
+                    return tempResult;
+                }
+            }
+        }
+
+        _process(appConfig, result, cookieValues) {
+            if (appConfig && result && cookieValues) {
+                let favoriteMarkets = new Array();
+                if (cookieValues["favoriteMarkets"]) {
+                    favoriteMarkets = JSON.parse(cookieValues["favoriteMarkets"]);
+                }
+                let filteredMarkets = _.map(result, function(i) {
                     var item = i;
                     if (i.change > 0) {
                         item.changeClass = "increase";
@@ -161,7 +274,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     const marketConfig = appConfig.marketMap[i.market];
                     if (marketConfig) {
                         item.pricePrecision = marketConfig.pricePrecision;
-
                         const tokenxConfig = appConfig.tokenMap[marketConfig.tokenx];
                         if (tokenxConfig) {
                             item.volumnPrecision = tokenxConfig.precision;
@@ -172,9 +284,63 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         item.pricePrecision = appConfig.defaultPricePrecision;
                         item.volumnPrecision = appConfig.defaultVolumePrecision;
                     }
+                    if (_.indexOf(favoriteMarkets, item.market) >-1) {
+                        item.favoriteClass = "favoriteSelected"
+                    } else {
+                        item.favoriteClass = "favorite"
+                    }
                     return item;
                 }.bind(this));
+                //TODO TEST CODE
+                filteredMarkets.push({market: "REP-LRC", interval: "", amount: 0, vol: 0, open: 0, favoriteClass: "favorite"})
+                console.log(filteredMarkets);
+                return _.sortBy(filteredMarkets, [function(o) { return o.market; }]);
             }
+        }
+
+        _filterFavorite() {
+            if(this.isFilterFavorite) {
+                this.isFilterFavorite = false;
+            } else {
+                this.isFilterFavorite = true;
+            }
+        }
+
+        _computeFavoriteClass(isFilterFavorite) {
+            if (isFilterFavorite) {
+                return "favoriteSelected";
+            } else {
+                return "favorite";
+            }
+        }
+
+        _addToFavorite(e) {
+            if (!this.cookieValues || !this.appConfig){
+                console.error("Unkown error");
+                return;
+            }
+            let selectedMarket = e.target.id;
+            if (!selectedMarket || !this.appConfig.marketMap[selectedMarket]) {
+                console.error("Unsupported market:"+selectedMarket);
+                return;
+            }
+            let favoriteMarkets = new Array();
+            let tempCookieValues = this.cookieValues;
+            if (tempCookieValues["favoriteMarkets"]) {
+                favoriteMarkets = JSON.parse(tempCookieValues["favoriteMarkets"]);
+            }
+            if (favoriteMarkets.indexOf(selectedMarket) >-1){
+                _.remove(favoriteMarkets, function(n) {
+                    return n === selectedMarket;
+                });
+                e.target.className = "favorite";
+            } else {
+                favoriteMarkets.push(selectedMarket);
+                e.target.className = "favoriteSelected";
+            }
+            this.favoriteMarkets = JSON.stringify(favoriteMarkets);
+            tempCookieValues["favoriteMarkets"] = this.favoriteMarkets;
+            this.cookieValues = tempCookieValues;
         }
 
         go() {

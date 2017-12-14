@@ -226,14 +226,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 console.log("currency change to:" + _this.settingsCurrency);
             });
 
-            this.$.relay.addEventListener('value-changed', function(e) {
-                if (_this.$.relay.value) {
-                    _this.settingsRelayName = _this.$.relay.placeholder;
-                    _this.settingsRelay = _this.$.relay.value || "//relay1.loopring.io";
-                }
-                console.log("relay change to:["+_this.settingsRelayName + "] url:[" + _this.settingsRelay+"]");
-            });
-
             this.$.lrcFee.addEventListener('value-changed', function(e) {
                 if (this._isLrcFee(this.$.lrcFee.value)) {
                     this.settingsLrcFee = this.$.lrcFee.value;
@@ -279,6 +271,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.settingsMarginSplit = appConfig.defaultMarginSplitPercentage;
                     this.$.settingsMarginSplit.value = appConfig.defaultMarginSplitPercentage;
                 }
+                let relays = appConfig.relays;
+                if (cookieValues["settingsRelayConfig"]) {
+                    let cookieRelay = JSON.parse(cookieValues["settingsRelayConfig"]);
+                    relays = relays.concat(cookieRelay);
+                }
+                this.$.relay.addEventListener('value-changed', function(e) {
+                    let currentValue = this.$.relay.value;
+                    if (currentValue) {
+                        let filtered = _.filter(relays, function(o) { return o.value.indexOf(currentValue) >-1; });
+                        if (filtered) {
+                            this.settingsRelayName = filtered[0].label;
+                        }
+                        this.settingsRelay = currentValue || "//relay1.loopring.io";
+                    }
+                    console.log("relay change to:["+this.settingsRelayName + "] url:[" + this.settingsRelay+"]");
+                }.bind(this));
             }
             return null;
         }
