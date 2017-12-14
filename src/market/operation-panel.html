@@ -81,6 +81,13 @@
                 color: var(--google-red-500);
             }
 
+            div.checkboxContainer {
+                @apply --layout-horizontal;
+                @apply --layout-justified;
+                @apply --layout-start;
+                padding: 0 32px 12px;
+            }
+
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
@@ -118,6 +125,11 @@
                     </balance-text-field>
                     <div class="seperator">&nbsp;</div>
                     <paper-button on-click="placeSellOrder" id="sellButton">Sell</paper-button>
+                </div>
+                <div class="sell checkboxContainer">
+                    <vaadin-checkbox checked id="sellbox">
+                       Buy no more than [[sellTotal]] [[tokenb.token]]
+                    </vaadin-checkbox>
                 </div>
                 <div class="balance">
                     <div class="error">
@@ -182,6 +194,11 @@
                     </balance-text-field>
                     <div class="seperator">&nbsp;</div>
                     <paper-button on-click="placeBuyOrder" id="buyButton">Buy</paper-button>
+                </div>
+                <div class="buy checkboxContainer">
+                    <vaadin-checkbox checked id="buybox">
+                        Buy no more than [[buyAmount]] [[tokens.token]]
+                    </vaadin-checkbox>
                 </div>
                 <div class="balance">
                     <div class="error">
@@ -464,7 +481,7 @@
                         return;
                     }
                     data.lrcFee = this.isEnoughFee(this.lrcFee, this.lrcBalance,this.tokenb) ? '0x' + (this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16) : '0x0';
-                    data.buyNoMoreThanAmountB = true;
+                    data.buyNoMoreThanAmountB = this.$.buybox.checked;
                     data.marginSplitPercentage = Number(data.lrcFee) !==0 ? Number(this.settingsMarginSplit) : 100;
                     detail.order = {
                         raw: JSON.stringify(data),
@@ -478,7 +495,7 @@
 
                     if (this.tokenb.token.toUpperCase() === 'LRC') {
 
-                        const require = Number(data.amounts) + this.lrcFee * Number('1e' + this.lrc.digits);
+                        const require = Number(data.amounts) + data.lrcFee * Number('1e' + this.lrc.digits);
 
                         if (require > allowance) {
 
@@ -555,11 +572,11 @@
                         }
 
 
-                        if (this.lrcFee > this.lrcAllowance) {
+                        if (data.lrcFee > this.lrcAllowance) {
 
                             const defaultlrc = Number(this.lrc.allowance);
                             const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = this.lrcFee * Number('1e' + this.lrc.digits);
+                            const lrcFee = data.lrcFee * Number('1e' + this.lrc.digits);
 
                             let lrcAmount;
                             if (defaultlrc >= lrcBalance) {
@@ -690,7 +707,7 @@
                         return;
                     }
                     data.lrcFee = this.isEnoughFee(this.lrcFee, this.lrcBalance,this.tokens) ? '0x' + (this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16) : '0x0';
-                    data.buyNoMoreThanAmountB = true;
+                    data.buyNoMoreThanAmountB = this.$.sellbox.checked;
                     data.marginSplitPercentage = Number(data.lrcFee) !==0 ? Number(this.settingsMarginSplit) : 100;
                     detail.order = {
                         raw: JSON.stringify(data),
@@ -705,7 +722,7 @@
 
                     if (this.tokens.token.toUpperCase() === 'LRC') {
 
-                        const require = Number(data.amountS) + this.lrcFee * Number('1e'+this.lrc.digits);
+                        const require = Number(data.amountS) + data.lrcFee * Number('1e'+this.lrc.digits);
 
                         if (require > allowance) {
                             let amount;
@@ -784,10 +801,10 @@
                         }
 
 
-                        if (this.lrcFee > this.lrcAllowance) {
+                        if (data.lrcFee > this.lrcAllowance) {
                             const defaultlrc = Number(this.lrc.allowance);
                             const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = this.lrcFee * Number('1e' + this.lrc.digits);
+                            const lrcFee = data.lrcFee * Number('1e' + this.lrc.digits);
 
                             let lrcAmount;
                             if (defaultlrc >= lrcBalance) {
