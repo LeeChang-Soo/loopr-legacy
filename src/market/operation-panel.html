@@ -478,7 +478,7 @@
 
                     if (this.tokenb.token.toUpperCase() === 'LRC') {
 
-                        const require = Number(data.amounts) + this.lrcFee * Number('1e' + this.lrc.digits);
+                        const require = Number(data.amounts) + data.lrcFee * Number('1e' + this.lrc.digits);
 
                         if (require > allowance) {
 
@@ -555,11 +555,11 @@
                         }
 
 
-                        if (this.lrcFee > this.lrcAllowance) {
+                        if (data.lrcFee > this.lrcAllowance) {
 
                             const defaultlrc = Number(this.lrc.allowance);
                             const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = this.lrcFee * Number('1e' + this.lrc.digits);
+                            const lrcFee = data.lrcFee * Number('1e' + this.lrc.digits);
 
                             let lrcAmount;
                             if (defaultlrc >= lrcBalance) {
@@ -705,7 +705,7 @@
 
                     if (this.tokens.token.toUpperCase() === 'LRC') {
 
-                        const require = Number(data.amountS) + this.lrcFee * Number('1e'+this.lrc.digits);
+                        const require = Number(data.amountS) + data.lrcFee * Number('1e'+this.lrc.digits);
 
                         if (require > allowance) {
                             let amount;
@@ -784,10 +784,10 @@
                         }
 
 
-                        if (this.lrcFee > this.lrcAllowance) {
+                        if (data.lrcFee > this.lrcAllowance) {
                             const defaultlrc = Number(this.lrc.allowance);
                             const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = this.lrcFee * Number('1e' + this.lrc.digits);
+                            const lrcFee = data.lrcFee * Number('1e' + this.lrc.digits);
 
                             let lrcAmount;
                             if (defaultlrc >= lrcBalance) {
