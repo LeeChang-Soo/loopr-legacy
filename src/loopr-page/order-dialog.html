@@ -201,7 +201,7 @@
                 }.bind(this), async function (err) {
 
                     if(err && err.message.indexOf('known transaction') > -1){
-                        const txHash = '0x' + err.message.slice(err.message.indexOf('known transaction') + 17);
+                        const txHash = '0x' + err.message.slice(err.message.indexOf('known transaction') + 19);
                         const detail = {
                             text: "Submit tx successfully, the Tx hash is ",
                             category: "info",
