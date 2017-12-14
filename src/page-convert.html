@@ -412,7 +412,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     tx.to = WETHConfig.address;
                     if (this.fromToken === 'ETH') {
                         tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
-                        tx.data = '0x';
+                        tx.data = '0xd0e30db0';
                         subTitle = 'Convert ETH to  WETH';
                         if (this.fromTokenBalance.balance < (Number(tx.value) + Number(tx.gasLimit) * Number(tx.gasPrice))) {
                             const detail = {
