@@ -478,7 +478,7 @@
 
                     if (this.tokenb.token.toUpperCase() === 'LRC') {
 
-                        const require = Number(data.amounts) + data.lrcFee * Number('1e' + this.lrc.digits);
+                        const require = Number(data.amounts) + data.lrcFee;
 
                         if (require > allowance) {
 
@@ -559,7 +559,7 @@
 
                             const defaultlrc = Number(this.lrc.allowance);
                             const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = data.lrcFee * Number('1e' + this.lrc.digits);
+                            const lrcFee = data.lrcFee ;
 
                             let lrcAmount;
                             if (defaultlrc >= lrcBalance) {
