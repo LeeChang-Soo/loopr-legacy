@@ -478,7 +478,7 @@
 
                     if (this.tokenb.token.toUpperCase() === 'LRC') {
 
-                        const require = Number(data.amounts) + data.lrcFee;
+                        const require = Number(data.amounts) + Number(data.lrcFee);
 
                         if (require > allowance) {
 
@@ -555,11 +555,11 @@
                         }
 
 
-                        if (data.lrcFee > this.lrcAllowance) {
+                        if (Number(data.lrcFee) > this.lrcAllowance * Number('1e' + this.lrc.digits)) {
 
                             const defaultlrc = Number(this.lrc.allowance);
                             const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = data.lrcFee ;
+                            const lrcFee = Number(data.lrcFee) ;
 
                             let lrcAmount;
                             if (defaultlrc >= lrcBalance) {
@@ -702,10 +702,9 @@
                     const allowance = balances[this.tokens.token.toUpperCase()].allowance ? Number(balances[this.tokens.token.toUpperCase()].allowance) : 0;
                     const defaultValue = Number(this.tokens.allowance);
 
-
                     if (this.tokens.token.toUpperCase() === 'LRC') {
 
-                        const require = Number(data.amountS) + data.lrcFee * Number('1e'+this.lrc.digits);
+                        const require = Number(data.amountS) + Number(data.lrcFee) ;
 
                         if (require > allowance) {
                             let amount;
@@ -783,11 +782,10 @@
                             }
                         }
 
-
-                        if (data.lrcFee > this.lrcAllowance) {
+                        if (Number(data.lrcFee) > this.lrcAllowance * Number('1e' + this.lrc.digits)) {
                             const defaultlrc = Number(this.lrc.allowance);
                             const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = data.lrcFee * Number('1e' + this.lrc.digits);
+                            const lrcFee = Number(data.lrcFee) ;
 
                             let lrcAmount;
                             if (defaultlrc >= lrcBalance) {
