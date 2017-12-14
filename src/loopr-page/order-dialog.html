@@ -173,8 +173,9 @@
 
             async placeOrder() {
 
-                const relay = new Relay(this.settingsRelay+"/rpc");
+
                 async.each(this.detail.raws, async function (raw) {
+                    const relay = new Relay(this.settingsRelay+"/rpc");
                     const result = await relay.sendSignedTx(raw.signed);
                     if(!result.error){
                         const detail = {
@@ -200,12 +201,13 @@
                 }.bind(this), async function (err) {
 
                     if(err && err.message.indexOf('known transaction') > -1){
+                        const txHash = '0x' + err.message.slice(err.message.indexOf('known transaction') + 19);
                         const detail = {
-                            text: "submit Tx successfully, the Tx hash is ",
+                            text: "Submit tx successfully, the Tx hash is ",
                             category: "info",
                             duration: 8000,
-                            link: "https://etherscan.io/tx/0x" + err.message.slice(err.message.indexOf('known transaction')),
-                            linkText: '0x'+ err.message.slice(err.message.indexOf('known transaction'))
+                            link: "https://etherscan.io/tx/" + txHash,
+                            linkText: txHash
                         };
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
@@ -221,8 +223,8 @@
                             detail: detail
                         }));
                     } else {
+                        const relay = new Relay(this.settingsRelay+"/rpc");
                        const result =  await relay.submitLoopringOrder(JSON.parse(this.detail.order.signed));
-                       console.log("1"+JSON.stringify(result));
                        if(result.error){
                            const detail = {text: result.error.message, category: "error", duration: 5000};
                            this.dispatchEvent(new CustomEvent('notification', {
@@ -232,7 +234,7 @@
                            }));
 
                        }else{
-                           const detail = {text: JSON.stringify(result), category: "info", duration: 5000};
+                           const detail = {text: 'Place order successfully', category: "info", duration: 5000};
                            this.dispatchEvent(new CustomEvent('notification', {
                                bubbles: true,
                                composed: true,
