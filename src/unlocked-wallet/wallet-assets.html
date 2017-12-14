@@ -68,6 +68,11 @@
             height: 44px;
         }
 
+        .favoriteSelector {
+            height: 44px;
+            padding-left: 25px;
+        }
+
         .favorite {
             --iron-icon-height: 20px;
             --iron-icon-width: 20px;
@@ -146,7 +151,7 @@
             </paper-card>
             <paper-card transparent>
                 <div class="horizontal start layout">
-                    <div class="hidebalance horizontal layout center">
+                    <div class="favoriteSelector horizontal layout center">
                         <a href="javascript:void(0)" on-click="_filterFavorite"><iron-icon class$="{{favoriteClass}}" icon="icons:favorite"></iron-icon></a>
                     </div>
                     <div class="split"></div>
