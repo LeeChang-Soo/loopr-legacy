@@ -56,15 +56,19 @@
 
                 <div class="content vertical layout">
                     <div class="horizontal start-justified layout">
-                        <a href="javascript:void(0)" on-click="open"></a>
+                        <a href="javascript:void(0)" on-click="open">
                         <template is="dom-if" if="{{_hasSubTitle(item)}}">
-                            <h3>[[item.subTitle]]</h3>
+                            <h5>[[item.subTitle]]</h5>
                         </template>
                         <template is="dom-if" if="{{_noSubTitle(item)}}">
-                            <h3>New Authorization</h3>
+                            <h5>New Authorization</h5>
                         </template>
+                        </a>
                     </div>
-                    <iron-collapse id="tx">
+                    <iron-collapse id="collapse">
+                        <div>Content goes here...</div>
+                    </iron-collapse>
+
                     <div class="horizontal center layout">
                         <div class="part raw vertical layout flex">
                             <div class="title">Raw transaction:</div>
@@ -80,7 +84,8 @@
                             </div>
                         </div>
                     </div>
-                    </iron-collapse>
+
+
                 </div>
 
             </template>
@@ -140,6 +145,11 @@
                 return item.subTitle !== ""
             }
 
+            open() {
+                console.log('open');
+                console.log(this.$.collapse);
+                this.$.collapse.toggle();
+            }
             async show(detail) {
 
                 const relay = new Relay(this.settingsRelay+"/rpc");
@@ -150,7 +160,6 @@
                     rawTx.nonce = rawTx.nonce || nonce;
                     rawTx.chainId = 7107171;
                     nonce = '0x' + (Number(rawTx.nonce) + 1).toString(16);
-                    rawTx.chainId= 7107171;
                     raw.raw = JSON.stringify(rawTx);
                     return raw;
                 });
