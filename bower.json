@@ -60,7 +60,6 @@
     "vaadin-text-field": "vaadin/vaadin-text-field#^1.1.0",
     "vaadin-valo-theme": "vaadin/vaadin-valo-theme#^0.3.2",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0"
-
   },
   "resolutions": {
     "async": "^2.5.0",
