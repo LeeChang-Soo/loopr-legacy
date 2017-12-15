@@ -140,4 +140,19 @@ const AppConfigMixin = (superclass) => class extends superclass {
             return result;
         }
     }
+
+    _calculatePrice(appConfig, tokenx, tokeny, amountx, amounty) {
+        if (appConfig && tokenx && tokeny && amountx && amounty) {
+            let market = appConfig.computeMarketByTokens(tokenx, tokeny);
+            if (market) {
+                if (market.tokenx === tokenx) {
+                    //console.log(tokenx+"("+Number(amountx)+")->"+tokeny+"("+Number(amounty)+") = "+(amounty / amountx));
+                    return amounty / amountx;
+                } else {
+                    //console.log(tokenx+"("+Number(amountx)+")->"+tokeny+"("+Number(amounty)+") = "+(amountx / amounty))
+                    return amountx / amounty;
+                }
+            }
+        }
+    }
 }
