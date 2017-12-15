@@ -70,7 +70,7 @@
 
         .favoriteSelector {
             height: 44px;
-            padding-left: 25px;
+            #padding-left: 25px;
         }
 
         .favorite {
@@ -152,7 +152,7 @@
             <paper-card transparent>
                 <div class="horizontal start layout">
                     <div class="favoriteSelector horizontal layout center">
-                        <a href="javascript:void(0)" on-click="_filterFavorite"><iron-icon class$="{{favoriteClass}}" icon="icons:favorite"></iron-icon></a>
+                        <vaadin-checkbox checked="{{isFilterFavorite}}">Show My Favorite Only</vaadin-checkbox>
                     </div>
                     <div class="split"></div>
                     <template is="dom-if" if="{{!isFilterFavorite}}">
