@@ -306,9 +306,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     }
                     return item;
                 }.bind(this));
-                //TODO TEST CODE
-                filteredMarkets.push({market: "REP-LRC", interval: "", amount: 0, vol: 0, open: 0, favoriteClass: "favorite"})
-                console.log(filteredMarkets);
                 return _.sortBy(filteredMarkets, [function(o) { return o.market; }]);
             }
         }
