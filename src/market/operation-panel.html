@@ -688,7 +688,7 @@
                         return;
                     }
                     data.lrcFee = this.isEnoughFee(this.lrcFee, this.lrcBalance,this.tokens) ? '0x' + (this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16) : '0x0';
-                    data.buyNoMoreThanAmountB = true;
+                    data.buyNoMoreThanAmountB = false;
                     data.marginSplitPercentage = Number(data.lrcFee) !==0 ? Number(this.settingsMarginSplit) : 100;
                     detail.order = {
                         raw: JSON.stringify(data),

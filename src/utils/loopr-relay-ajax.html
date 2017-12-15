@@ -51,7 +51,8 @@
         static get observers() {
             return [
                 '_isToReload(url, method, params)',
-                '_isNotify(error, settingsRelayName)'
+                '_isNotify(error, settingsRelayName)',
+                '_isClearNotify(lastResponse)'
             ];
         }
 
@@ -88,6 +89,12 @@
                 let message = "Failed to talk to the selected relay:["+settingsRelayName+"], you could try to switch Relay in page Settings or try again later"
                 var detail = { text: message, category: "error", duration: 30000 }
                 this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
+            }
+        }
+
+        _isClearNotify(lastResponse) {
+            if(lastResponse) {
+                this.dispatchEvent(new CustomEvent('closenotification', { bubbles: true, composed: true, detail: {} }));
             }
         }
 
