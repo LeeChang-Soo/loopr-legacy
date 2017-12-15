@@ -467,7 +467,7 @@
                     data.marginSplitPercentage = Number(data.lrcFee) !==0 ? Number(this.settingsMarginSplit) : 100;
                     detail.order = {
                         raw: JSON.stringify(data),
-                        subTitle: "Place Order"
+                        subTitle: "Place a loopring order to buy "+Number(this.buyAmount)+" "+ this.tokens.token.toUpperCase()+" with "+ Number(this.buyTotal) +" "+ this.tokenb.token.toUpperCase()
                     };
 
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
@@ -692,7 +692,8 @@
                     data.marginSplitPercentage = Number(data.lrcFee) !==0 ? Number(this.settingsMarginSplit) : 100;
                     detail.order = {
                         raw: JSON.stringify(data),
-                        subTitle: "Place Order"
+                        subTitle: "Place an Order",
+                        description:"Sell "+ Number(this.sellAmount) +" "+ this.tokens.token.toUpperCase()+"  to get "+ Number(this.sellTotal) +" "+ this.tokenb.token.toUpperCase()
                     };
 
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
@@ -725,7 +726,8 @@
                                 tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
                                 raws.push({
                                     "raw": JSON.stringify(tx),
-                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase(),
+                                    "description":"Set allowance  to " + Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             } else {
                                 tx.data = signer.generateApproveData(spender, '0x0');
@@ -733,10 +735,12 @@
                                 tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
                                 raws.push({
                                     "raw": cancelRaw,
-                                    "subTitle": "Cancel Older Authorization Of " + this.tokens.token.toUpperCase()
+                                    "subTitle": "Cancel Older Authorization Of " + this.tokens.token.toUpperCase(),
+                                    "description": "Set allowance  to 0 first in order to set Allowance to "+ Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 }, {
                                     "raw": JSON.stringify(tx),
-                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase(),
+                                    "description": "Improve allowance  to " + Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             }
                         }
@@ -763,7 +767,8 @@
                                 tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
                                 raws.push({
                                     "raw": JSON.stringify(tx),
-                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase(),
+                                    "description":"Set allowance for  to " + Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             } else {
                                 tx.data = signer.generateApproveData(spender, '0x0');
@@ -771,10 +776,12 @@
                                 tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
                                 raws.push({
                                     "raw": cancelRaw,
-                                    "subTitle": "Cancel Older Authorization Of " + this.tokens.token.toUpperCase()
+                                    "subTitle": "Cancel Older Authorization Of " + this.tokens.token.toUpperCase(),
+                                    "description":"Set allowance  to 0 first in order to set Allowance to "+ Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 }, {
                                     "raw": JSON.stringify(tx),
-                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase()
+                                    "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase(),
+                                    "description":"Improve allowance to " + Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
 
                             }
@@ -802,7 +809,9 @@
 
                             if (this.lrcAllowance === 0) {
                                 tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
-                                raws.push({"raw": JSON.stringify(tx), "subTitle": " New Authorization Of LRC "});
+                                raws.push({"raw": JSON.stringify(tx),
+                                    "subTitle": " New Authorization Of LRC ",
+                                    "description":"Improve LRC Allowance to " +Number(lrcAmount)/Number('1e'+this.lrc.digits) +" to pay the order fee"+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."});
                             } else {
                                 tx.data = signer.generateApproveData(spender, '0x0');
                                 const cancelRaw = JSON.stringify(tx);
@@ -810,8 +819,10 @@
 
                                 raws.push({
                                     "raw": cancelRaw,
-                                    "subTitle": "Cancel Older Authorization Of LRC"
-                                }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization Of LRC"});
+                                    "subTitle": "Cancel Older Authorization Of LRC",
+                                    "description":"Set LRC allowance to 0 in order to improve it to "+Number(lrcAmount)/Number('1e'+this.lrc.digits) +" to pay the order fee with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization Of LRC",
+                                    "description":"Improve LRC Allowance to " +Number(lrcAmount)/Number('1e'+this.lrc.digits) +" to pay the order fee with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."});
                             }
                         }
                     }

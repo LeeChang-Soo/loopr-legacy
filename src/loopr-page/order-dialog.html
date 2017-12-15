@@ -39,11 +39,21 @@
 
             .content {
                 padding: 0 16px;
+                margin: 0;
             }
-
             .part {
                 padding: 8px;
             }
+
+            a {
+                text-decoration:none;
+            }
+
+            div.description {
+               font-size: 12px;
+            }
+
+
         </style>
         <ethereum-signer id="signer"></ethereum-signer>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -53,68 +63,75 @@
                       entry-animation="slide-from-top-animation" exit-animation="fade-out-animation"
                       class="size-position">
             <template is="dom-repeat" items="[[detail.raws]]">
-
                 <div class="content vertical layout">
-                    <div class="horizontal start-justified layout">
-                        <a href="javascript:void(0)" on-click="open">
-                        <template is="dom-if" if="{{_hasSubTitle(item)}}">
-                            <h5>[[item.subTitle]]</h5>
-                        </template>
-                        <template is="dom-if" if="{{_noSubTitle(item)}}">
-                            <h5>New Authorization</h5>
-                        </template>
-                        </a>
-                    </div>
-                    <iron-collapse id="collapse">
-                        <div>Content goes here...</div>
+                    <a href="javascript:void(0)" on-click="toggle">
+                        <div class="horizontal start-justified layout" >
+                            <template is="dom-if" if="{{_hasSubTitle(item)}}">
+                                <h5 bind="[[getId(item.raw)]]">[[item.subTitle]]</h5>
+                            </template>
+                            <template is="dom-if" if="{{_noSubTitle(item)}}">
+                                <h5 bind="[[getId(item.raw)]]">New Authorization</h5>
+                            </template>
+                        </div>
+                        <div class="description">
+                            <br> [[item.description]]
+                        </div>
+                    </a>
+
+                    <iron-collapse id="[[getId(item.raw)]]">
+                        <div class="horizontal center layout">
+                            <div class="part raw vertical layout flex">
+                                <div class="title">Raw transaction:</div>
+                                <div class="wrapper raw">
+                                    <iron-autogrow-textarea value={{item.raw}} readonly="true"></iron-autogrow-textarea>
+                                </div>
+                            </div>
+                            <div class="part  vertical layout flex">
+                                <div class="title">Signed transaction:</div>
+                                <div class="wrapper signed">
+                                    <iron-autogrow-textarea value={{item.signed}}
+                                                            readonly="true"></iron-autogrow-textarea>
+                                </div>
+                            </div>
+                        </div>
                     </iron-collapse>
 
+                </div>
+
+            </template>
+
+            <div class="content vertical layout">
+                <a href="javascript:void(0)" on-click="toggle">
+                    <div class="horizontal start-justified layout" >
+                        <template is="dom-if" if="{{_hasSubTitle(detail.order)}}">
+                            <h5 bind="[[getId()]]">[[detail.order.subTitle]]</h5>
+                        </template>
+                        <template is="dom-if" if="{{_noSubTitle(detail.order)}}">
+                            <h5 bind="[[getId()]]">Place Order</h5>
+                        </template>
+                    </div>
+                    <div class="description">
+                        <br> [[detail.order.description]]
+                    </div>
+                </a>
+                <iron-collapse id="orderDetail" opened>
                     <div class="horizontal center layout">
                         <div class="part raw vertical layout flex">
-                            <div class="title">Raw transaction:</div>
+                            <div class="title">Raw Order:</div>
                             <div class="wrapper raw">
-                                <iron-autogrow-textarea value={{item.raw}} readonly="true"></iron-autogrow-textarea>
+                                <iron-autogrow-textarea value={{detail.order.raw}}
+                                                        readonly="true"></iron-autogrow-textarea>
                             </div>
                         </div>
                         <div class="part  vertical layout flex">
-                            <div class="title">Signed transaction:</div>
+                            <div class="title">Signed Order:</div>
                             <div class="wrapper signed">
-                                <iron-autogrow-textarea value={{item.signed}}
+                                <iron-autogrow-textarea value={{detail.order.signed}}
                                                         readonly="true"></iron-autogrow-textarea>
                             </div>
                         </div>
                     </div>
-
-
-                </div>
-
-            </template>
-
-            <template is="dom-if" if="{{_noSubTitle(detail.order)}}">
-                <h2>Place Order</h2>
-            </template>
-            <div class="content vertical layout">
-                <div class="horizontal start-justified layout">
-                    <template is="dom-if" if="{{_hasSubTitle(detail.order)}}">
-                        <h3>[[detail.order.subTitle]]</h3>
-                    </template>
-                </div>
-
-                <div class="horizontal center layout">
-                    <div class="part raw vertical layout flex">
-                        <div class="title">Raw Order:</div>
-                        <div class="wrapper raw">
-                            <iron-autogrow-textarea value={{detail.order.raw}} readonly="true"></iron-autogrow-textarea>
-                        </div>
-                    </div>
-                    <div class="part  vertical layout flex">
-                        <div class="title">Signed Order:</div>
-                        <div class="wrapper signed">
-                            <iron-autogrow-textarea value={{detail.order.signed}}
-                                                    readonly="true"></iron-autogrow-textarea>
-                        </div>
-                    </div>
-                </div>
+                </iron-collapse>
             </div>
 
             <div class="buttons">
@@ -145,14 +162,32 @@
                 return item.subTitle !== ""
             }
 
-            open() {
-                console.log('open');
-                console.log(this.$.collapse);
-                this.$.collapse.toggle();
+            toggle(e) {
+                console.log(e.target)
+                const target = e.target.bind;
+                console.log(target);
+                const ids = _.map(this.detail.raws, raw => {
+                    return this.getId(raw.raw)
+                });
+                ids.push('orderDetail');
+                _.each(ids, id => {
+                    const collapse = id === 'orderDetail' ? this.$.orderDetail : this.shadowRoot.querySelector('#' + id);
+                    if (id === target) {
+                        console.log('toggle');
+                        collapse.toggle()
+                    } else {
+                        collapse.hide()
+                    }
+                });
             }
+
+            getId(raw) {
+                return raw ? 'collapse' + Number(JSON.parse(raw).nonce) : 'orderDetail';
+            }
+
             async show(detail) {
 
-                const relay = new Relay(this.settingsRelay+"/rpc");
+                const relay = new Relay(this.settingsRelay + "/rpc");
                 let nonce = await relay.getTransactionCount(this.wallet.address);
 
                 const rawTxs = _.map(detail.raws, function (raw) {
@@ -169,7 +204,8 @@
                     return {
                         raw: JSON.stringify(tx.tx),
                         signed: tx.signedTx,
-                        subTitle: rawTx.subTitle
+                        subTitle: rawTx.subTitle,
+                        description:rawTx.description
                     };
                 }.bind(this), function (err, result) {
                     if (err) {
@@ -188,9 +224,9 @@
 
 
                 async.each(this.detail.raws, async function (raw) {
-                    const relay = new Relay(this.settingsRelay+"/rpc");
+                    const relay = new Relay(this.settingsRelay + "/rpc");
                     const result = await relay.sendSignedTx(raw.signed);
-                    if(!result.error){
+                    if (!result.error) {
                         const detail = {
                             text: "submit Tx successfully, the Tx hash is ",
                             category: "info",
@@ -203,7 +239,7 @@
                             composed: true,
                             detail: detail
                         }));
-                    }else{
+                    } else {
                         const detail = {text: result.error.message, category: "info", duration: 5000};
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
@@ -213,7 +249,7 @@
                     }
                 }.bind(this), async function (err) {
 
-                    if(err && err.message.indexOf('known transaction') > -1){
+                    if (err && err.message.indexOf('known transaction') > -1) {
                         const txHash = '0x' + err.message.slice(err.message.indexOf('known transaction') + 19);
                         const detail = {
                             text: "Submit tx successfully, the Tx hash is ",
@@ -236,24 +272,24 @@
                             detail: detail
                         }));
                     } else {
-                        const relay = new Relay(this.settingsRelay+"/rpc");
-                       const result =  await relay.submitLoopringOrder(JSON.parse(this.detail.order.signed));
-                       if(result.error){
-                           const detail = {text: result.error.message, category: "error", duration: 5000};
-                           this.dispatchEvent(new CustomEvent('notification', {
-                               bubbles: true,
-                               composed: true,
-                               detail
-                           }));
+                        const relay = new Relay(this.settingsRelay + "/rpc");
+                        const result = await relay.submitLoopringOrder(JSON.parse(this.detail.order.signed));
+                        if (result.error) {
+                            const detail = {text: result.error.message, category: "error", duration: 5000};
+                            this.dispatchEvent(new CustomEvent('notification', {
+                                bubbles: true,
+                                composed: true,
+                                detail
+                            }));
 
-                       }else{
-                           const detail = {text: 'Place order successfully', category: "info", duration: 5000};
-                           this.dispatchEvent(new CustomEvent('notification', {
-                               bubbles: true,
-                               composed: true,
-                               detail
-                           }));
-                       }
+                        } else {
+                            const detail = {text: 'Place order successfully', category: "info", duration: 5000};
+                            this.dispatchEvent(new CustomEvent('notification', {
+                                bubbles: true,
+                                composed: true,
+                                detail
+                            }));
+                        }
                     }
                 }.bind(this));
             }
