@@ -109,7 +109,7 @@
                     <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{sellPrice}}"
                                        pattern="[[_numPatten(marketPrecision)]]"
                                        error-message="number with max [[marketPrecision]] precision">
-                        <div slot="suffix">[[tokens.unit]]/[[tokenb.unit]]</div>
+                        <div slot="suffix">[[tokenb.unit]]/[[tokens.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">=</div>
                     <balance-text-field disabled label="[[tokenb.token]] Total" value="{{sellTotal}}"
@@ -173,7 +173,7 @@
                     <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{buyPrice}}"
                                        pattern="[[_numPatten(marketPrecision)]]"
                                        error-message="number with max [[marketPrecision]] precision">
-                        <div slot="suffix">[[tokens.unit]]/[[tokenb.unit]]</div>
+                        <div slot="suffix">[[tokenb.unit]]/[[tokens.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">=</div>
                     <balance-text-field disabled label="[[tokenb.token]] Total" value="{{buyTotal}}"
@@ -384,13 +384,13 @@
 
             _computeBuyTotal(amount, price, tokenb) {
                 if (amount && price && Number(price) > 0 && tokenb) {
-                    return Math.ceil((amount / price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
+                    return Math.ceil((amount * price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
                 }
             }
 
             _computeSellTotal(amount, price, tokenb) {
                 if (amount && price && Number(price) > 0 && tokenb) {
-                    return Math.floor((amount / price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
+                    return Math.floor((amount * price) * Number('1e' + tokenb.precision)) / Number('1e' + tokenb.precision);
                 }
             }
 
@@ -478,7 +478,7 @@
 
                     if (this.tokenb.token.toUpperCase() === 'LRC') {
 
-                        const require = Number(data.amounts) + data.lrcFee * Number('1e' + this.lrc.digits);
+                        const require = Number(data.amounts) + Number(data.lrcFee);
 
                         if (require > allowance) {
 
@@ -555,11 +555,11 @@
                         }
 
 
-                        if (data.lrcFee > this.lrcAllowance) {
+                        if (Number(data.lrcFee) > this.lrcAllowance * Number('1e' + this.lrc.digits)) {
 
                             const defaultlrc = Number(this.lrc.allowance);
                             const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = data.lrcFee * Number('1e' + this.lrc.digits);
+                            const lrcFee = Number(data.lrcFee) ;
 
                             let lrcAmount;
                             if (defaultlrc >= lrcBalance) {
@@ -690,7 +690,7 @@
                         return;
                     }
                     data.lrcFee = this.isEnoughFee(this.lrcFee, this.lrcBalance,this.tokens) ? '0x' + (this._showAmount(this.lrcFee) * Number('1e' + this.lrc.digits)).toString(16) : '0x0';
-                    data.buyNoMoreThanAmountB = true;
+                    data.buyNoMoreThanAmountB = false;
                     data.marginSplitPercentage = Number(data.lrcFee) !==0 ? Number(this.settingsMarginSplit) : 100;
                     detail.order = {
                         raw: JSON.stringify(data),
@@ -702,10 +702,9 @@
                     const allowance = balances[this.tokens.token.toUpperCase()].allowance ? Number(balances[this.tokens.token.toUpperCase()].allowance) : 0;
                     const defaultValue = Number(this.tokens.allowance);
 
-
                     if (this.tokens.token.toUpperCase() === 'LRC') {
 
-                        const require = Number(data.amountS) + data.lrcFee * Number('1e'+this.lrc.digits);
+                        const require = Number(data.amountS) + Number(data.lrcFee) ;
 
                         if (require > allowance) {
                             let amount;
@@ -783,11 +782,10 @@
                             }
                         }
 
-
-                        if (data.lrcFee > this.lrcAllowance) {
+                        if (Number(data.lrcFee) > this.lrcAllowance * Number('1e' + this.lrc.digits)) {
                             const defaultlrc = Number(this.lrc.allowance);
                             const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = data.lrcFee * Number('1e' + this.lrc.digits);
+                            const lrcFee = Number(data.lrcFee) ;
 
                             let lrcAmount;
                             if (defaultlrc >= lrcBalance) {
