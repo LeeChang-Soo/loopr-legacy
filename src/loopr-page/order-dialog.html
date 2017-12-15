@@ -53,13 +53,15 @@
                       entry-animation="slide-from-top-animation" exit-animation="fade-out-animation"
                       class="size-position">
             <template is="dom-repeat" items="[[detail.raws]]">
-                <template is="dom-if" if="{{_noSubTitle(item)}}">
-                    <h2>New Authorization</h2>
-                </template>
+
                 <div class="content vertical layout">
                     <div class="horizontal start-justified layout">
+                        <a href="javascript:void(0)" on-click="open"></a>
                         <template is="dom-if" if="{{_hasSubTitle(item)}}">
                             <h3>[[item.subTitle]]</h3>
+                        </template>
+                        <template is="dom-if" if="{{_noSubTitle(item)}}">
+                            <h3>New Authorization</h3>
                         </template>
                     </div>
                     <iron-collapse id="tx">
