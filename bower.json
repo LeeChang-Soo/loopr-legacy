@@ -4,7 +4,8 @@
     "Loopring Foundation"
   ],
   "license": "https://polymer.github.io/LICENSE.txt",
-  "dependencies": {
+  "dependencies":
+  {
     "app-layout": "PolymerElements/app-layout#^2.0.0",
     "app-route": "PolymerElements/app-route#^2.0.0",
     "async": "^2.6.0",
@@ -61,7 +62,8 @@
     "vaadin-valo-theme": "vaadin/vaadin-valo-theme#^0.3.2",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0"
   },
-  "resolutions": {
+  "resolutions":
+  {
     "async": "^2.5.0",
     "iron-a11y-keys-behavior": "^v2.0.0",
     "iron-flex-layout": "^2.0.0",
@@ -72,7 +74,8 @@
     "polymer": "^2.0.0",
     "webcomponentsjs": "^v1.0.2"
   },
-  "devDependencies": {
+  "devDependencies":
+  {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0"
   },
   "private": true
