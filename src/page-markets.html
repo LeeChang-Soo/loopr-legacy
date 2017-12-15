@@ -43,22 +43,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         .favoriteTitle {
-            --iron-icon-height: 16px;
-            --iron-icon-width: 16px;
+            --iron-icon-height: 15px;
+            --iron-icon-width: 15px;
+            --iron-icon-stroke-color: black;
+            --iron-icon-fill-color: black;
+        }
+
+        .favoriteTitleSelected {
+            --iron-icon-height: 15px;
+            --iron-icon-width: 15px;
             --iron-icon-stroke-color: var(--paper-blue-500);
-            --iron-icon-fill-color: var(--paper-blue-500);;
+            --iron-icon-fill-color: var(--paper-blue-500);
         }
 
         .favorite {
-            --iron-icon-height: 20px;
-            --iron-icon-width: 20px;
+            --iron-icon-height: 15px;
+            --iron-icon-width: 15px;
             --iron-icon-stroke-color: var(--paper-blue-500);
             --iron-icon-fill-color: white;
         }
 
         .favoriteSelected {
-            --iron-icon-height: 20px;
-            --iron-icon-width: 20px;
+            --iron-icon-height: 15px;
+            --iron-icon-width: 15px;
             --iron-icon-fill-color: var(--paper-amber-700);
         }
         </style>
@@ -79,7 +86,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <template is="dom-repeat" items="[[tabs]]">
                                     <paper-tab name="[[item]]">[[item]] Market</paper-tab>
                                 </template>
-                                <paper-tab name="favorite"><iron-icon class="favoriteTitle" icon="icons:favorite"></iron-icon>&nbsp;MY FAVORITE</paper-tab>
+                                <paper-tab name="favorite"><iron-icon class$="{{favoriteTitle}}" icon="icons:favorite"></iron-icon>&nbsp;MY FAVORITE</paper-tab>
                             </paper-tabs>
                         </template>
                         <div class="flex"></div>
@@ -188,6 +195,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: String,
                     value: "favorite",
                     computed: '_computeFavoriteClass(isFilterFavorite)'
+                },
+                favoriteTitle: {
+                    type: String,
+                    value: 'favoriteTitle',
+                    computed: '_computeFavoriteTitleClass(isFilterFavorite)'
                 }
             };
         }
@@ -331,6 +343,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 return "favoriteSelected";
             } else {
                 return "favorite";
+            }
+        }
+
+        _computeFavoriteTitleClass(isFilterFavorite) {
+            if (isFilterFavorite) {
+                return "favoriteTitleSelected";
+            } else {
+                return "favoriteTitle";
             }
         }
 
