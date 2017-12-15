@@ -162,6 +162,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 let amountB = this.toNumber(data.originalOrder.amountB, tokenB);
                 let dealedS = this.toNumber(data.dealtAmountS, tokenS);
                 let dealedB = this.toNumber(data.dealtAmountB, tokenB);
+                let status = "";
+                if ("ORDER_NEW" === data.status) {
+                    status = "NEW";
+                } else if ("ORDER_PARTIAL" === data.status){
+                    status = "PARTIAL";
+                } else if ("ORDER_FINISHED" === data.status){
+                    status = "FINISHED";
+                } else if ("ORDER_CUTOFF" === data.status){
+                    status = "CUTOFF";
+                }
                 let result = {
                     tokenS: tokenS.unit,
                     amountS: amountS,
@@ -171,7 +181,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     amountB: amountB,
                     precisionB: tokenB.precision,
                     totalDealedAmountB: dealedB,
-                    status: data.status
+                    status: status
                 };
                 return result;
             }
