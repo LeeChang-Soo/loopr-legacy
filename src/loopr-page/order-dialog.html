@@ -33,12 +33,12 @@
             }
 
             .title {
-                color: var(--app-text-color-light);
                 margin-bottom: 8px;
+                padding: 0 16px;
             }
 
             .content {
-                padding: 0 16px;
+                padding: 5px 16px;
                 margin: 0;
             }
             .part {
@@ -46,13 +46,21 @@
             }
 
             a {
-                text-decoration:none;
+                text-decoration: none;
             }
 
             div.description {
-               font-size: 12px;
+               font-size: 14px;
+                margin: 0;
+                padding: 3px 16px;
             }
 
+            h3{
+                margin: 12px 0 5px ;
+            }
+            iron-icon{
+               padding-top: 9px;
+            }
 
         </style>
         <ethereum-signer id="signer"></ethereum-signer>
@@ -65,18 +73,18 @@
             <template is="dom-repeat" items="[[detail.raws]]">
                 <div class="content vertical layout">
                     <a href="javascript:void(0)" on-click="toggle">
-                        <div class="horizontal start-justified layout" >
+                        <div  class="title horizontal center layout">
                             <template is="dom-if" if="{{_hasSubTitle(item)}}">
-                                <h5 bind="[[getId(item.raw)]]">[[item.subTitle]]</h5>
+                                <iron-icon icon="[[getIcon(item.raw)]]" id="[[getIconId(item.raw)]]"></iron-icon>  <h3 bind="[[getId(item.raw)]]">[[item.subTitle]]</h3>
                             </template>
                             <template is="dom-if" if="{{_noSubTitle(item)}}">
-                                <h5 bind="[[getId(item.raw)]]">New Authorization</h5>
+                                <iron-icon icon="[[getIcon(item.raw)]]" id="[[getIconId(item.raw)]]"></iron-icon>   <h3 bind="[[getId(item.raw)]]">New Authorization</h3>
                             </template>
                         </div>
-                        <div class="description">
-                            <br> [[item.description]]
-                        </div>
                     </a>
+                    <div class="description">
+                        [[item.description]]
+                    </div>
 
                     <iron-collapse id="[[getId(item.raw)]]">
                         <div class="horizontal center layout">
@@ -102,18 +110,18 @@
 
             <div class="content vertical layout">
                 <a href="javascript:void(0)" on-click="toggle">
-                    <div class="horizontal start-justified layout" >
+                    <div class="title horizontal center layout">
                         <template is="dom-if" if="{{_hasSubTitle(detail.order)}}">
-                            <h5 bind="[[getId()]]">[[detail.order.subTitle]]</h5>
+                            <iron-icon icon="[[getIcon()]]" id="[[getIconId()]]"></iron-icon>    <h3 bind="[[getId()]]">[[detail.order.subTitle]]</h3>
                         </template>
                         <template is="dom-if" if="{{_noSubTitle(detail.order)}}">
-                            <h5 bind="[[getId()]]">Place Order</h5>
+                            <iron-icon icon="[[getIcon()]]" id="[[getIconId()]]"></iron-icon>    <h3 bind="[[getId()]]">Place Order</h3>
                         </template>
                     </div>
-                    <div class="description">
-                        <br> [[detail.order.description]]
-                    </div>
                 </a>
+                <div class="description">
+                     [[detail.order.description]]
+                </div>
                 <iron-collapse id="orderDetail" opened>
                     <div class="horizontal center layout">
                         <div class="part raw vertical layout flex">
@@ -162,23 +170,38 @@
                 return item.subTitle !== ""
             }
 
+            getIcon(raw){
+                const targetId = this.getId(raw);
+                const collapse = targetId === 'orderDetail' ? this.$.orderDetail : this.shadowRoot.querySelector('#' + targetId);
+                return collapse.opened ? "icons:expand-less":"icons:expand-more";
+            };
+
+            getIconId(raw)
+            {
+                return raw ? 'icon' + Number(JSON.parse(raw).nonce) : 'orderIcon';
+            }
             toggle(e) {
-                console.log(e.target)
                 const target = e.target.bind;
-                console.log(target);
                 const ids = _.map(this.detail.raws, raw => {
-                    return this.getId(raw.raw)
-                });
-                ids.push('orderDetail');
-                _.each(ids, id => {
-                    const collapse = id === 'orderDetail' ? this.$.orderDetail : this.shadowRoot.querySelector('#' + id);
-                    if (id === target) {
-                        console.log('toggle');
-                        collapse.toggle()
-                    } else {
-                        collapse.hide()
+                    return {
+                        collapse:this.getId(raw.raw),
+                        icon:this.getIconId(raw.raw)
                     }
                 });
+                ids.push({collapse:'orderDetail',icon:'orderIcon'});
+                console.log(ids)
+                _.each(ids, id => {
+                    const collapse = id.collapse === 'orderDetail' ? this.$.orderDetail : this.shadowRoot.querySelector('#' + id.collapse);
+                    const icon =  this.shadowRoot.querySelector('#' + id.icon);
+                    if (id.collapse === target) {
+                        collapse.toggle();
+                    } else {
+                        collapse.hide();
+                    }
+                    console.log(icon)
+                    icon.icon =  collapse.opened ? "icons:expand-less":"icons:expand-more";
+                });
+
             }
 
             getId(raw) {
