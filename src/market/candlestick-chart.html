@@ -96,8 +96,7 @@
         _chart(resp, market) {
             let datas = resp.result;
             resp.xData = Highcharts.map(datas, function(val, j) {
-                //return (new Date(val[0])).toUTCString()
-                return val.Start;
+                return Number(val.Start) * 1000;
             });
             resp.price = Highcharts.map(datas, function(val, j) {
                 return val.Open;
@@ -118,7 +117,7 @@
                     labels: {
                         formatter: function() {
                             //console.log(Highcharts.dateFormat('%A, %b %e, %Y', this.value));
-                            return Highcharts.dateFormat('%b %e, %Y', this.value);
+                            return Highcharts.dateFormat('%m/%d/%Y %H:%M:%S', this.value);
                         }
                     },
                     categories: resp.xData,
