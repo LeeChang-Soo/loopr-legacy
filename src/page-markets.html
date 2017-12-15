@@ -164,9 +164,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     computed: '_process(appConfig, resp.result, cookieValues)'
                 },
-                marketSelector: {
-                    type: String
-                },
                 params: {
                     type: Object,
                     computed:'_computeParams(page, settingsVersion)'
@@ -384,7 +381,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         go() {
-            this.marketSelector = '';
             //this.$.ajax.generateRequest();
         }
     }
