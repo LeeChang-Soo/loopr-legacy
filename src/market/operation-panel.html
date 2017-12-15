@@ -440,8 +440,7 @@
                     const gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     let currentVersion = this.settingsVersion;
                     const spender = this.appConfig.delegateAddress;
-                    const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
-                    data.protocol = contractAddress;
+                    data.protocol = this.appConfig.contractVersionMap[currentVersion].address;
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokenb.address;
                     data.tokenB = this.tokens.address;
@@ -669,8 +668,7 @@
                     const gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     let currentVersion = this.settingsVersion;
                     const spender = this.appConfig.delegateAddress;
-                    const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
-                    data.protocol = contractAddress;
+                    data.protocol = this.appConfig.contractVersionMap[currentVersion].address;;
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;

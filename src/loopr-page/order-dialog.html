@@ -30,7 +30,6 @@
 
             .signed.wrapper {
                 background-color: var(--app-primary-color-dark);
-                background-color: var(--app-primary-color-dark);
             }
 
             .title {
@@ -39,7 +38,7 @@
             }
 
             .content {
-                padding: 16px;
+                padding: 0 16px;
             }
 
             .part {
@@ -63,6 +62,7 @@
                             <h3>[[item.subTitle]]</h3>
                         </template>
                     </div>
+                    <iron-collapse id="tx">
                     <div class="horizontal center layout">
                         <div class="part raw vertical layout flex">
                             <div class="title">Raw transaction:</div>
@@ -78,7 +78,9 @@
                             </div>
                         </div>
                     </div>
+                    </iron-collapse>
                 </div>
+
             </template>
 
             <template is="dom-if" if="{{_noSubTitle(detail.order)}}">
