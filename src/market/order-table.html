@@ -97,7 +97,7 @@
             <vaadin-grid-column width="50px">
                 <template class="header">Amount</template>
                 <template>
-                    <pretty-number v="[[item.amountS]]" d=[[item.volumnPrecisionS]] postfix="[[item.tokenS]]"></pretty-number>
+                    <pretty-number v="[[item.amount]]" d=[[item.amountVolumnPrecision]] postfix="[[item.amountToken]]"></pretty-number>
                 </template>
                 <template class="footer"></template>
             </vaadin-grid-column>
@@ -111,7 +111,7 @@
             <vaadin-grid-column width="50px">
                 <template class="header">Size</template>
                 <template>
-                    <pretty-number v="[[item.amountB]]" d=[[item.volumnPrecisionB]] postfix="[[item.tokenB]]"></pretty-number>
+                    <pretty-number v="[[item.size]]" d=[[item.sizeVolumnPrecision]] postfix="[[item.sizeToken]]"></pretty-number>
                 </template>
                 <template class="footer"></template>
             </vaadin-grid-column>
@@ -443,25 +443,12 @@
                 order.totalCanceled = 0;
             }
             order.dealedAndCanceled = order.totalDealed + order.totalCanceled;
+            let marketConfig = null;
             if (this.market) {
-                let marketConfig = this.getMarket(this.market);
+                marketConfig = this.getMarket(this.market);
                 if (marketConfig) {
                     order.typeClass = upperTokenB === marketConfig.tokenx ? 'green' : 'red';
                     order.typeTitle = upperTokenB === marketConfig.tokenx ? 'Buy' : 'Sell';
-                    if (upperTokenB === marketConfig.tokenx) {
-                        let tempS = upperTokenS,
-                            tempB = upperTokenB,
-                            tempAmountS = order.originalOrder.amountB,
-                            tempAmountB = order.originalOrder.amountS,
-                            tempDealedAmountS = order.dealtAmountS,
-                            tempDealedAmountB = order.dealtAmountB;
-                        order.originalOrder.tokenS = tempB;
-                        order.originalOrder.amountS = tempAmountB;
-                        order.dealtAmountS = tempDealedAmountB;
-                        order.originalOrder.tokenB = tempS;
-                        order.dealtAmountB = tempDealedAmountS;
-                        order.originalOrder.amountB = tempAmountS;
-                    }
                 } else {
                     var detail = { text: "Market is not supported: " + this.market, category: "error", duration: 8000 };
                     this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
@@ -475,14 +462,29 @@
                 order.typeTitle = upperTokenS + "⇢" + order.originalOrder.tokenB.toUpperCase();
             }
             order.tokenB = upperTokenB;
-            order.amountB = this.numberFormat(order.originalOrder.amountB, tokenb);
-            order.price = this.getPrice(order.originalOrder.amountB, order.originalOrder.amountS);
+            order.amountB = this.toNumber(order.originalOrder.amountB, tokenb);
             order.pricePrecision = tokenb.pricePrecision;
             order.volumnPrecisionB = tokenb.volumnPrecision;
             order.tokenS = upperTokenS;
-            order.amountS = this.numberFormat(order.originalOrder.amountS, tokens);
+            order.amountS = this.toNumber(order.originalOrder.amountS, tokens);
+            if (!marketConfig || upperTokenS === marketConfig.tokenx) {
+                order.amount = order.amountS;
+                order.amountVolumnPrecision = tokens.volumnPrecision;
+                order.amountToken = upperTokenS;
+                order.size = order.amountB;
+                order.sizeVolumnPrecision = tokenb.volumnPrecision;
+                order.sizeToken = upperTokenB;
+            } else {
+                order.amount = order.amountB;
+                order.amountVolumnPrecision = tokenb.volumnPrecision;
+                order.amountToken = upperTokenB;
+                order.size = order.amountS;
+                order.sizeVolumnPrecision = tokens.volumnPrecision;
+                order.sizeToken = upperTokenS;
+            }
+            order.price = this._calculatePrice(appConfig, upperTokenB, upperTokenS, order.amountB, order.amountS);
             order.volumnPrecisionS = tokens.volumnPrecision;
-            order.dealtAmountB = this.numberFormat(order.dealtAmountB, tokens);
+            order.dealtAmountB = this.numberFormat(order.dealtAmountB, tokenb);
             order.dealtAmountS = this.numberFormat(order.dealtAmountS, tokens);
             order.cancelledAmountB = this.numberFormat(order.cancelledAmountB, tokenb);
             order.cancelledAmountS = this.numberFormat(order.cancelledAmountS, tokens);

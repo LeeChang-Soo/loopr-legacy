@@ -527,6 +527,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 appConfig.marketIds = _.map(appConfigRaw.markets, o => appConfig.computeMarketId(o.tokenx, o.tokeny));
                 appConfig.marketConfig = { defaultPricePrecision: 3, defaultVolumePrecision: 5 }
                 appConfig.contractVersionMap = _.keyBy(appConfigRaw.contracts, o => o.version);
+                appConfig.computeMarketByTokens = function(tokenx, tokeny) {
+                    if (!tokenx || !tokeny) {
+                        return null;
+                    }
+                    let tempTokenx = tokenx.toUpperCase();
+                    let tempTokeny = tokeny.toUpperCase();
+                    if (appConfig.tokenMap[tempTokenx] && appConfig.tokenMap[tempTokeny]) {
+                        let markety = appConfig.computeMarketId(tempTokenx, tempTokeny);
+                        let marketx = appConfig.computeMarketId(tempTokeny, tempTokenx);
+                        if (appConfig.marketMap[markety]) {
+                            return appConfig.marketMap[markety];
+                        } else if(appConfig.marketMap[marketx]) {
+                            return appConfig.marketMap[marketx];
+                        }
+                    }
+                    return null;
+                }
+                appConfig.computeMarket = function(market) {
+                    if (!market) {
+                        return null;
+                    }
+                    let tempMarket = market.toUpperCase();
+                    if (appConfig.marketMap[tempMarket]) {
+                        return appConfig.marketMap[tempMarket];
+                    } else {
+                        return null;
+                    }
+                }
 
                 this.$.loading.style.display = "none";
                 this.$.pages.style.display = "inherit";
