@@ -80,7 +80,7 @@
 
         signToSend() {
             this.tx.value = '0x' + new BigNumber(this.maxSend, 10).times(Number('1e' + this.token.digits)).toString(16);
-            const detail = {raws: [{ 'raw': JSON.stringify(this.tx), 'subTitle': this.title, 'description': 'transfer '+ this.maxSend + ' ETH  to ' + this.tx.to +
+            const detail = {raws: [{ 'raw': JSON.stringify(this.tx), 'subTitle': this.title, 'description': 'Transfer '+ this.maxSend + ' ETH  to ' + this.tx.to +
             ' with gas is '+ this.gasLimit + ' and gasPrice is ' + this.gasPrice+' Gwei'}]};
             this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
             this.$.dialog.close();

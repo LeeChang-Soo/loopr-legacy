@@ -456,7 +456,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
                 const detail = { raws: [{ "raw": JSON.stringify(tx),
                     "subTitle": "Transfer " + this.selectedTokenBalance.token.toUpperCase(),
-                    "description":"transfer " + this.$.amount.value + " " + this.selectedTokenBalance.token.toUpperCase() + " to " + this.address +" with gas is "
+                    "description":"Transfer " + this.$.amount.value + " " + this.selectedTokenBalance.token.toUpperCase() + " to " + this.address +" with gas is "
                     + Number(tx.gasLimit)+" and gasPrice is " + Number(tx.gasPrice)/1e9+" Gwei"
                 }] };
                 this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));

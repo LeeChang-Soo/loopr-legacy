@@ -415,7 +415,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
                         tx.data = '0xd0e30db0';
                         subTitle = 'Convert ETH to  WETH';
-                        description = 'convert ' + this.$.amount.value + ' ETH to WETH with gas is ' + Number(tx.gasLimit) + ' and gasPrice  is '+ Number(tx.gasPrice)/1e9 + 'Gwei'
+                        description = 'Convert ' + this.$.amount.value + ' ETH to WETH with gas is ' + Number(tx.gasLimit) + ' and gasPrice  is '+ Number(tx.gasPrice)/1e9 + 'Gwei'
                         if (this.fromTokenBalance.balance < (Number(tx.value) + Number(tx.gasLimit) * Number(tx.gasPrice))) {
                             const detail = {
                                 tx: tx,
@@ -437,7 +437,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         tx.value = '0x0';
                         tx.data = signer.generateWithdrawData('0x' + (Number(this.$.amount.value) * Number('1e' + WETHConfig.digits)).toString(16));
                         subTitle = 'Convert WETH to  ETH';
-                        description = 'convert ' + this.$.amount.value + ' WETH to ETH with gas is ' + Number(tx.gasLimit) + ' and gasPrice  is '+ Number(tx.gasPrice)/1e9 + 'Gwei'
+                        description = 'Convert ' + this.$.amount.value + ' WETH to ETH with gas is ' + Number(tx.gasLimit) + ' and gasPrice  is '+ Number(tx.gasPrice)/1e9 + 'Gwei'
                         const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
                         if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
                             const detail = {
