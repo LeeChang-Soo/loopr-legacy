@@ -401,7 +401,7 @@
                     return;
                 }
 
-                var detail = { raws: [{ "raw": JSON.stringify(rawTx), "subTitle": "Cancel Order","description":"cancle order with gas is " + Number(rawTx.gasLimit) + 'and gasPrice is ' + Number(rawTx.gasPrice)+' Gwei' }] };
+                var detail = { raws: [{ "raw": JSON.stringify(rawTx), "subTitle": "Cancel Order","description":"cancle order with gas is " + Number(rawTx.gasLimit) + ' and gasPrice is ' + Number(rawTx.gasPrice)/1e9+' Gwei' }] };
                 this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
 
             } catch (e) {
