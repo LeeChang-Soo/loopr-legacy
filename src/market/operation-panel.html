@@ -330,7 +330,7 @@
 
             _computeFee(token, tradeAmount, priceQuote, settingsLrcFe){
 
-                if(token && tradeAmount >= 0 && priceQuote && settingsLrcFe){
+                if(token && tradeAmount >= 0 && priceQuote && settingsLrcFe>=0){
                     let selectTokenPrice = priceQuote.getPrice(token.token);
                     let amount = tradeAmount * selectTokenPrice;
                     let fee = amount * settingsLrcFe / 1000;
@@ -998,7 +998,7 @@
             }
 
             _showAmountInfo(selectToken, sellAmount, priceQuote, settingsLrcFee) {
-                if (selectToken && sellAmount && priceQuote && Number(sellAmount)>=0 && settingsLrcFee) {
+                if (selectToken && sellAmount && priceQuote && Number(sellAmount)>=0 && settingsLrcFee >= 0 ) {
                     let selectTokenPrice = priceQuote.getPrice(selectToken.token);
                     let amount = sellAmount * selectTokenPrice;
                     let fee = amount * settingsLrcFee / 1000;
