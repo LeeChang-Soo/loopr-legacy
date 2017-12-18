@@ -147,14 +147,14 @@
                                 <a href="/#/approve/[[tokens.token]]" tabindex="-1"> Set allowance to
                                     [[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]] </a>
                             </template>
-                            <br> [[_showAmountInfo(tokens, sellAmount, priceQuote,settingsLrcFee)]]
+                            <br> [[_showAmountInfo(tokenb, sellTotal, priceQuote,settingsLrcFee)]]
                         </template>
                         <template is="dom-if"
                                   if="[[!bothNonEnough(sellAmount,tokensBalance,tokensAllowance,tokens,sellFee)]]">
                             <template is="dom-if" if="[[!isBalanceEnough(sellAmount,tokensAllowance,tokens,sellFee)]]">
                                 You have insufficient allowance([[tokensAllowance]]). <a
                                     href="/#/approve/[[tokenb.token]]" tabindex="-1"> Improve allowance </a>
-                                <br> [[_showAmountInfo(tokens, sellAmount, priceQuote,settingsLrcFee)]]
+                                <br> [[_showAmountInfo(tokenb, sellTotal, priceQuote,settingsLrcFee)]]
                             </template>
                         </template>
                     </div>
@@ -209,14 +209,14 @@
                                 <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Set allowance to
                                     [[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]] </a>
                             </template>
-                            <br> [[_showAmountInfo(tokens, buyAmount, priceQuote,settingsLrcFee)]]
+                            <br> [[_showAmountInfo(tokenb, buyTotal, priceQuote, settingsLrcFee)]]
                         </template>
                         <template is="dom-if"
                                   if="[[!bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance,tokenb,buyFee)]]">
                             <template is="dom-if" if="[[!isBalanceEnough(buyTotal,tokenbAllowance,tokenb,buyFee)]]">
                                 You have insufficient allowance([[tokenbAllowance]]).
                                 <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Improve allowance </a>
-                                <br> [[_showAmountInfo(tokens, buyAmount, priceQuote,settingsLrcFee)]]
+                                <br> [[_showAmountInfo(tokenb, buyTotal, priceQuote, settingsLrcFee)]]
                             </template>
                         </template>
                     </div>
@@ -295,11 +295,11 @@
                     lrcAllowance: Number,
                     sellFee:{
                         type:Number,
-                        computed:'_computeFee(tokens, sellAmount, priceQuote, settingsLrcFee)'
+                        computed:'_computeFee(tokenb, sellTotal, priceQuote, settingsLrcFee)'
                     } ,
                     buyFee:{
                         type:Number,
-                        computed:'_computeFee(tokens, buyAmount, priceQuote, settingsLrcFee)'
+                        computed:'_computeFee(tokenb, buyTotal, priceQuote, settingsLrcFee)'
                     }
                 };
             }
