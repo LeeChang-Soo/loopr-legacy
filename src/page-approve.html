@@ -486,7 +486,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     if (currentAllowance === 0 || Number(this.$.amount.value) === 0 ) {
                         tx.data = signer.generateApproveData(spender, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16));
                         detail = {
-                            raws: [{"raw": JSON.stringify(tx), "subTitle": "New Authorization","description":"Set allowance  to " + this.$.amount.value+" with gas is "+Number(tx.gasLimit)+ " and gasPrice is " + Number(tx.gasPrice)/1e9 + "Gwei."
+                            raws: [{"raw": JSON.stringify(tx), "subTitle": "New Authorization Of " + this.selectedTokenBalance.token.toUpperCase(),"description":"Set allowance  to " + this.$.amount.value+" with gas is "+Number(tx.gasLimit)+ " and gasPrice is " + Number(tx.gasPrice)/1e9 + "Gwei."
                             }]
                         };
 
@@ -497,9 +497,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         detail = {
                             raws: [{
                                 "raw": cancelRaw,
-                                "subTitle": "Cancel Older Authorization",
+                                "subTitle": "Cancel Older Authorization Of " + this.selectedTokenBalance.token.toUpperCase(),
                                 "description": "Set allowance  to 0 first in order to set Allowance to 0 with gas is "+Number(tx.gasLimit)+ " and gasPrice is " + Number(tx.gasPrice)/1e9 + "Gwei."
-                            }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization","description":"Set allowance  to " + this.$.amount.value+" with gas is "+Number(tx.gasLimit)+ " and gasPrice is " + Number(tx.gasPrice)/1e9 + "Gwei."
+                            }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization Of " + this.selectedTokenBalance.token.toUpperCase(),"description":"Set allowance  to " + this.$.amount.value+" with gas is "+Number(tx.gasLimit)+ " and gasPrice is " + Number(tx.gasPrice)/1e9 + "Gwei."
                         }]
                         };
                     }
