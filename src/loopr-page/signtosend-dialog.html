@@ -9,6 +9,8 @@
             }
 
             paper-dialog {
+
+                width: 785px;
             }
 
             iron-autogrow-textarea {
@@ -41,6 +43,26 @@
             .part {
                 padding: 8px;
             }
+
+
+            h3{
+                margin: 12px 0 5px ;
+            }
+
+            iron-icon{
+                padding-top: 15px;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            div.description {
+                font-size: 14px;
+                margin: 5px 0 20px ;
+                padding: 3px 10px;
+            }
+
         </style>
         <ethereum-signer id="signer"></ethereum-signer>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -60,6 +82,10 @@
                         </template>
                     </div>
                     </a>
+                    <div class="description">
+                        [[item.description]]
+                    </div>
+                    <iron-collapse id="[[getId(item.raw)]]">
                     <div class="horizontal center layout">
                         <div class="part raw vertical layout flex">
                             <div class="title">Raw transaction:</div>
@@ -75,6 +101,7 @@
                             </div>
                         </div>
                     </div>
+                    </iron-collapse>
                 </div>
             </template>
             <div class="buttons">
@@ -185,7 +212,12 @@
                 }.bind(this), function (err, result) {
 
                     if (err) {
-                        console.log(err.message)
+                        const detail = {text: err.message, category: "error", duration: 8000};
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
                     } else {
                         detail.raws = result;
                         this.detail = detail;
