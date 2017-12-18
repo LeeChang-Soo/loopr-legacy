@@ -998,7 +998,7 @@
             }
 
             _showAmountInfo(selectToken, sellAmount, priceQuote, settingsLrcFee) {
-                if (selectToken && sellAmount && priceQuote && Number(sellAmount)) {
+                if (selectToken && sellAmount && priceQuote && Number(sellAmount)>=0 && settingsLrcFee) {
                     let selectTokenPrice = priceQuote.getPrice(selectToken.token);
                     let amount = sellAmount * selectTokenPrice;
                     let fee = amount * settingsLrcFee / 1000;
