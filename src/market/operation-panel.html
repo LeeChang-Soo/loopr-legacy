@@ -141,8 +141,8 @@
                     <div class="common">
                         <template is="dom-if"
                                   if="[[!nonEnough(sellAmount, tokensBalance,tokensAllowance,tokens,sellFee)]]">
-                            Your [[tokens.token.toUpperCase()]] balance is [[tokensBalance]].
-                            Your [[tokens.token.toUpperCase()]] allowance is [[tokensAllowance]].
+                            Your [[tokens.token]] balance is [[tokensBalance]].
+                            Your [[tokens.token]] allowance is [[tokensAllowance]].
                             <template is="dom-if" if="[[isAllowanceWarn(tokensAllowance,tokens)]]">
                                 <a href="/#/approve/[[tokens.token]]" tabindex="-1"> Set allowance to
                                     [[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]] </a>
@@ -203,8 +203,8 @@
                     </div>
                     <div class="common">
                         <template is="dom-if" if="[[!nonEnough(buyTotal,tokenbBalance,tokenbAllowance,tokenb,buyFee)]]">
-                            Your [[tokenb.token.toUpperCase()]] balance is [[tokenbBalance]].
-                            Your [[tokenb.token.toUpperCase()]] allowance is [[tokenbAllowance]].
+                            Your [[tokenb.token]] balance is [[tokenbBalance]].
+                            Your [[tokenb.token]] allowance is [[tokenbAllowance]].
                             <template is="dom-if" if="[[isAllowanceWarn(tokenbAllowance,tokenb)]]">
                                 <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Set allowance to
                                     [[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]] </a>
@@ -382,7 +382,9 @@
                 if (market && appConfig) {
                     const tokenPair = market.split('-');
                     const tokenx = tokenPair[0];
-                    return _.find(appConfig.tokens, {token: tokenx});
+                    const token =  _.find(appConfig.tokens, {token: tokenx});
+                    token.token = token.token.toUpperCase();
+                    return token;
                 }
             }
 
@@ -391,7 +393,9 @@
                 if (market && appConfig) {
                     const tokenPair = market.split('-');
                     const tokenx = tokenPair[1];
-                    return _.find(appConfig.tokens, {token: tokenx});
+                    const token =  _.find(appConfig.tokens, {token: tokenx});
+                    token.token = token.token.toUpperCase();
+                    return token;
                 }
             }
 
