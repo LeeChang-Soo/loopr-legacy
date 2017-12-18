@@ -1,5 +1,4 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<script type="text/javascript" src="../../bower_components/async/dist/async.js"></script>
 
 <dom-module id="signtosend-dialog">
     <template>
@@ -10,6 +9,8 @@
             }
 
             paper-dialog {
+
+                width: 785px;
             }
 
             iron-autogrow-textarea {
@@ -28,7 +29,6 @@
 
             .signed.wrapper {
                 background-color: var(--app-primary-color-dark);
-                background-color: var(--app-primary-color-dark);
             }
 
             .title {
@@ -37,12 +37,33 @@
             }
 
             .content {
-                padding: 16px;
+                padding: 0 16px;
+                margin: 0;
             }
 
             .part {
                 padding: 8px;
             }
+
+
+            h3{
+                margin: 12px 0 5px ;
+            }
+
+            iron-icon{
+                padding-top: 15px;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            div.description {
+                font-size: 14px;
+                margin: 5px 0 20px ;
+                padding: 3px 10px;
+            }
+
         </style>
         <ethereum-signer id="signer"></ethereum-signer>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -51,15 +72,21 @@
         <paper-dialog always-on-top no-cancel-on-outside-click with-backdrop id="dialog"
                       entry-animation="slide-from-top-animation" exit-animation="fade-out-animation">
             <template is="dom-repeat" items="[[detail.raws]]">
-                <template is="dom-if" if="{{_noSubTitle(item)}}">
-                    <h2>Sign Transaction</h2>
-                </template>
                 <div class="content vertical layout">
+                    <a href="javascript:void(0)" on-click="toggle">
                     <div class="horizontal start-justified layout">
                         <template is="dom-if" if="{{_hasSubTitle(item)}}">
-                            <h3>[[item.subTitle]]</h3>
+                            <iron-icon icon="[[getIcon(item.raw)]]" id="[[getIconId(item.raw)]]"></iron-icon>  <h3 bind="[[getId(item.raw)]]">[[item.subTitle]]</h3>
+                        </template>
+                        <template is="dom-if" if="{{_noSubTitle(item)}}">
+                            <iron-icon icon="[[getIcon(item.raw)]]" id="[[getIconId(item.raw)]]"></iron-icon>  <h3 bind="[[getId(item.raw)]]">Sign Transaction</h3>
                         </template>
                     </div>
+                    </a>
+                    <div class="description">
+                        [[item.description]]
+                    </div>
+                    <iron-collapse id="[[getId(item.raw)]]">
                     <div class="horizontal center layout">
                         <div class="part raw vertical layout flex">
                             <div class="title">Raw transaction:</div>
@@ -75,6 +102,7 @@
                             </div>
                         </div>
                     </div>
+                    </iron-collapse>
                 </div>
             </template>
             <div class="buttons">
@@ -100,7 +128,8 @@
             static get properties() {
                 return {
                     detail: Object,
-                    signed: String
+                    signed: String,
+                    max: Number
                 };
             }
 
@@ -111,6 +140,52 @@
             _hasSubTitle(item) {
                 return item.subTitle != ""
             }
+
+            getId(raw) {
+                if(raw){
+                    return  'collapse' + Number(JSON.parse(raw).nonce);
+                }
+
+            }
+
+            getIconId(raw)
+            {
+                if(raw){
+                    return 'icon' + Number(JSON.parse(raw).nonce) ;
+                }
+
+            }
+
+            getIcon(raw){
+                const targetId = this.getId(raw);
+                const nonce  = Number(JSON.parse(raw).nonce);
+                const collapse = this.shadowRoot.querySelector('#' + targetId);
+                collapse.opened = nonce === this.max ;
+                return collapse.opened ? "icons:expand-less":"icons:expand-more";
+            };
+
+            toggle(e) {
+                const target = e.target.bind;
+                const ids = _.map(this.detail.raws, raw => {
+                    return {
+                        collapse:this.getId(raw.raw),
+                        icon:this.getIconId(raw.raw)
+                    }
+                });
+
+                _.each(ids, id => {
+                    const collapse =  this.shadowRoot.querySelector('#' + id.collapse);
+                    const icon =  this.shadowRoot.querySelector('#' + id.icon);
+                    if (id.collapse === target) {
+                        collapse.toggle();
+                    } else {
+                        collapse.hide();
+                    }
+                    icon.icon =  collapse.opened ? "icons:expand-less":"icons:expand-more";
+                });
+
+            }
+
 
             async show(detail) {
 
@@ -132,15 +207,22 @@
                     return {
                         raw: JSON.stringify(tx.tx),
                         signed: tx.signedTx,
-                        subTitle: rawTx.subTitle
+                        subTitle: rawTx.subTitle,
+                        description:rawTx.description
                     };
                 }.bind(this), function (err, result) {
 
                     if (err) {
-                        console.log(err.message)
+                        const detail = {text: err.message, category: "error", duration: 8000};
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
                     } else {
                         detail.raws = result;
                         this.detail = detail;
+                        this.max = Number(nonce) -1;
                         this.$.dialog.toggle()
                     }
                 }.bind(this));

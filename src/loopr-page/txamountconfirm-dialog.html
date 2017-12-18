@@ -14,7 +14,7 @@
         <paper-dialog always-on-top no-cancel-on-outside-click with-backdrop id="dialog" entry-animation="slide-from-top-animation" exit-animation="fade-out-animation">
             <h2>Confirm Tx Amount </h2>
             <div class="vertical layout">
-                Your have insufficient balance to transfer [[value]] ETH with tx fee of (gasPrice * gasLimit = [[gasPrice]] * [[gasLimit]] wei), you can send [[maxSend]] ETH at most.
+                Your have insufficient balance to transfer [[value]] ETH with tx fee of (gasPrice * gasLimit = [[gasPrice]] * [[gasLimit]] Gwei), you can send [[maxSend]] ETH at most.
             </div>
             </div>
             <div class="buttons">
@@ -68,19 +68,20 @@
 
         _computeGasPrice(rawTx) {
             if (rawTx) {
-                return Number(rawTx.gasPrice);
+                return Number(rawTx.gasPrice)/1e9;
             }
         }
 
         _computeMaxSend(token, gasLimit, gasPrice) {
             if (token && gasPrice && gasLimit) {
-                return Math.floor((Number(token.balance) - gasLimit * gasPrice) / Number('1e' + token.digits) * Number('1e' + token.precision)) / Number('1e' + token.precision);
+                return new BigNumber(token.balance, 10).minus(gasLimit * gasPrice * 1e9).dividedBy(Number('1e' + token.digits)).times(Number('1e' + token.precision)).floor().dividedBy(Number('1e' + token.precision));
             }
         }
 
         signToSend() {
-            this.tx.value = '0x' + (Number(this.maxSend) * Number('1e' + this.token.digits)).toString(16);
-            var detail = { raws: [{ "raw": JSON.stringify(this.tx), "subTitle": this.title }] };
+            this.tx.value = '0x' + new BigNumber(this.maxSend, 10).times(Number('1e' + this.token.digits)).toString(16);
+            const detail = {raws: [{ 'raw': JSON.stringify(this.tx), 'subTitle': this.title, 'description': 'transfer '+ this.maxSend + ' ETH  to ' + this.tx.to +
+            ' with gas is '+ this.gasLimit + ' and gasPrice is ' + this.gasPrice+' Gwei'}]};
             this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
             this.$.dialog.close();
         }
