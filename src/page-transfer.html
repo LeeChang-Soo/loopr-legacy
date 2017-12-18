@@ -423,7 +423,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 digits: this.selectedTokenBalance.digits,
                                 precision: this.selectedTokenBalance.precision
                             },
-                            title: "transfer ETH"
+                            title: "Transfer ETH"
                         };
 
                         this.dispatchEvent(new CustomEvent('txamountconfirm', {
@@ -441,11 +441,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
 
                     if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
-                        var detail = {
+                        const detail = {
                             text: 'You has insufficient ETH balance for gasLimit * gasPrice',
                             category: "warning",
                             duration: 8000
-                        }
+                        };
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
                             composed: true,
@@ -454,10 +454,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         return;
                     }
                 }
-                var detail = { raws: [{ "raw": JSON.stringify(tx), "subTitle": "transfer ETH" }] };
+                const detail = { raws: [{ "raw": JSON.stringify(tx),
+                    "subTitle": "Transfer " + this.selectedTokenBalance.token.toUpperCase(),
+                    "description":"transfer " + this.$.amount.value + " " + this.selectedTokenBalance.token.toUpperCase() + " to " + this.address +" with gas is "
+                    + Number(tx.gasLimit)+" and gasPrice is " + Number(tx.gasPrice)/1e9+" Gwei"
+                }] };
                 this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
             } catch (e) {
-                var detail = { text: e.message, category: "error", duration: 8000 }
+                const detail = { text: e.message, category: "error", duration: 8000 }
                 this.dispatchEvent(new CustomEvent('notification', {
                     bubbles: true,
                     composed: true,

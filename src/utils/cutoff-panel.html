@@ -147,7 +147,7 @@
                 if (ETHBalance < (Number(rawTx.gasLimit) * Number(rawTx.gasPrice))) {
                     const detail = {
                         text: 'You has insufficient ETH balance for gasLimit * gasPrice',
-                        category: "warning",
+                        category: 'warning',
                         duration: 8000
                     };
                     this.dispatchEvent(new CustomEvent('notification', {
@@ -160,14 +160,15 @@
 
                 const detail = {
                     raws: [{
-                        "raw": JSON.stringify(rawTx),
-                        "subTitle": "Set Expiration Cutoff Timestamp"
-                    }]
+                        'raw': JSON.stringify(rawTx),
+                        'subTitle': 'Set Expiration Cutoff Timestamp',
+                        'description': 'set cut off to cancel all orders before the cut off with gas is ' +Number(rawTx.gasLimit)+ ' and gasPrice is ' + Number(rawTx.gasPrice)/1e9 + ' Gwei'
+                     }]
                 };
                 this.dispatchEvent(new CustomEvent('signtosend', { bubbles: true, composed: true, detail: detail }));
                 this.hasSet = false;
             } catch (e) {
-                var detail = { text: e.message, category: "error", duration: 8000 }
+                var detail = { text: e.message, category: 'error', duration: 8000 }
                 this.dispatchEvent(new CustomEvent('notification', {
                     bubbles: true,
                     composed: true,
