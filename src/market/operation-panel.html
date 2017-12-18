@@ -102,13 +102,13 @@
                 <div class="sell container">
                     <balance-text-field id="sellAmount" label="[[tokens.token]] Quantity" value="{{sellAmount}}"
                                        pattern="[[_numPatten(tokens.precision)]]"
-                                       error-message="sellAmountError"  max="[[tokensBalance]]" min="[[tokens.minTradeValue]]">
+                                       error-message="non-zero number with [[tokens.precision]] precision "  max="[[tokensBalance]]" min="[[tokens.minTradeValue]]">
                         <div slot="suffix">[[tokens.unit]]</div>
                     </balance-text-field>
                     <div class="seperator">&times;</div>
                     <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{sellPrice}}"
                                        pattern="[[_numPatten(marketPrecision)]]"
-                                       error-message="number with max [[marketPrecision]] precision">
+                                       error-message="non-zero number with [[marketPrecision]] precision">
                         <div slot="suffix">[[tokenb.unit]]/[[tokens.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">=</div>
@@ -141,8 +141,8 @@
                     <div class="common">
                         <template is="dom-if"
                                   if="[[!nonEnough(sellAmount, tokensBalance,tokensAllowance,tokens,sellFee)]]">
-                            Your balance is [[tokensBalance]].
-                            Your allowance is [[tokensAllowance]].
+                            Your [[tokens.token.toUpperCase()]] balance is [[tokensBalance]].
+                            Your [[tokens.token.toUpperCase()]] allowance is [[tokensAllowance]].
                             <template is="dom-if" if="[[isAllowanceWarn(tokensAllowance,tokens)]]">
                                 <a href="/#/approve/[[tokens.token]]" tabindex="-1"> Set allowance to
                                     [[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]] </a>
@@ -166,13 +166,13 @@
                 <div class="buy container">
                     <balance-text-field id="buyAmount" label="[[tokens.token]] Quantity" value="{{buyAmount}}"
                                        pattern="[[_numPatten(tokens.precision)]]"
-                                       error-message="buyAmountError"  min="[[tokens.minTradeValue]]">
+                                       error-message="non-zero number with [[tokens.precision]] precision "  min="[[tokens.minTradeValue]]">
                         <div slot="suffix">[[tokens.unit]]</div>
                     </balance-text-field>
                     <div class="seperator">&times;</div>
                     <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{buyPrice}}"
                                        pattern="[[_numPatten(marketPrecision)]]"
-                                       error-message="number with max [[marketPrecision]] precision">
+                                       error-message="non-zero number with [[marketPrecision]] precision">
                         <div slot="suffix">[[tokenb.unit]]/[[tokens.unit]]</div>
                     </vaadin-text-field>
                     <div class="seperator">=</div>
@@ -203,8 +203,8 @@
                     </div>
                     <div class="common">
                         <template is="dom-if" if="[[!nonEnough(buyTotal,tokenbBalance,tokenbAllowance,tokenb,buyFee)]]">
-                            Your balance is [[tokenbBalance]].
-                            Your allowance is [[tokenbAllowance]].
+                            Your [[tokenb.token.toUpperCase()]] balance is [[tokenbBalance]].
+                            Your [[tokenb.token.toUpperCase()]] allowance is [[tokenbAllowance]].
                             <template is="dom-if" if="[[isAllowanceWarn(tokenbAllowance,tokenb)]]">
                                 <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Set allowance to
                                     [[_numFormat(tokenb.allowance,tokenb.digits,tokenb.precision)]] </a>
