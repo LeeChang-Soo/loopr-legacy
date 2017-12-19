@@ -585,7 +585,7 @@
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
-                            tx.to = this.tokenb.address;
+                            tx.to = this.lrc.address;
                             tx.value = '0x0';
 
                             if (this.lrcAllowance === 0) {
@@ -765,8 +765,6 @@
                             tx.to = this.tokens.address;
                             tx.value = '0x0';
 
-
-
                             if (allowance.equals(0)) {
                                 tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
                                 raws.push({
@@ -801,7 +799,7 @@
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
-                            tx.to = this.tokenb.address;
+                            tx.to = this.lrc.address;
                             tx.value = '0x0';
 
                             if (this.lrcAllowance === 0) {
