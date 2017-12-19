@@ -66,6 +66,7 @@
         <ethereum-signer id="signer"></ethereum-signer>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
+        <global-variable key="app-config" value="{{appConfig}}"></global-variable>
 
         <paper-dialog always-on-top no-cancel-on-outside-click with-backdrop id="dialog"
                       entry-animation="slide-from-top-animation" exit-animation="fade-out-animation"
@@ -214,11 +215,11 @@
                 const rawTxs = _.map(detail.raws, function (raw) {
                     const rawTx = JSON.parse(raw.raw);
                     rawTx.nonce = rawTx.nonce || nonce;
-                    rawTx.chainId = 7107171;
+                    rawTx.chainId = rawTx.chainId || this.appConfig.chainId || 1;
                     nonce = '0x' + (Number(rawTx.nonce) + 1).toString(16);
                     raw.raw = JSON.stringify(rawTx);
                     return raw;
-                });
+                }.bind(this));
 
                 async.map(rawTxs, async function (rawTx) {
                     const tx = await this.$.signer.sign(JSON.parse(rawTx.raw));
