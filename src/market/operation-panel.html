@@ -499,118 +499,89 @@
                     detail.order = {
                         raw: JSON.stringify(data),
                         subTitle: "Place an order",
-                        description:"Buy "+Number(this.buyAmount)+" "+ this.tokens.token.toUpperCase()+" with "+ Number(this.buyTotal) +" "+ this.tokenb.token.toUpperCase()
+                        description:"Buy "+ Number(this.buyAmount)+" "+ this.tokens.token.toUpperCase()+" with "+ Number(this.buyTotal) +" "+ this.tokenb.token.toUpperCase()
                     };
 
+                    const relay = new Relay(this.settingsRelay);
+                    const response =  await relay.getEstimatedAllocatedAllowance(this.wallet.address, this.tokenb.token.toUpperCase());
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
-                    const balance = balances[this.tokenb.token.toUpperCase()] ? Number(balances[this.tokenb.token.toUpperCase()].balance) : 0;
-                    const allowance = balances[this.tokenb.token.toUpperCase()].allowance ? Number(balances[this.tokenb.token.toUpperCase()].allowance) : 0;
-                    const defaultValue = Number(this.tokenb.allowance);
+                    const allowance = balances[this.tokenb.token.toUpperCase()].allowance ? new BigNumber(balances[this.tokenb.token.toUpperCase()].allowance) : new BigNumber(0);
+                    const defaultValue = new BigNumber(this.tokenb.allowance);
 
                     if (this.tokenb.token.toUpperCase() === 'LRC') {
-
-                        const require = Number(data.amounts) + Number(data.buyFee);
-
-                        if (require > allowance) {
-
-                            let amount;
-
-                            if (balance < defaultValue) {
-                                amount = balance;
-                            }
-
-                            if (balance > defaultValue) {
-                                amount = defaultValue > require ? defaultValue : require
-                            }
-
+                        const require = new BigNumber(data.amountS).plus(data.buyFee).plus(response.result) ;
+                        if (require.gt(allowance)) {
+                            const amount = defaultValue.gt(require)  ? defaultValue : require;
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
                             tx.to = this.tokenb.address;
                             tx.value = '0x0';
 
-                            if (allowance === 0) {
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                            if (allowance.equals(0)) {
+                                tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
                                 raws.push({"raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of "+this.tokenb.token.toUpperCase(),
-                                    "description":"Set allowance  to " + Number(amount)/Number('1e'+this.tokenb.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set allowance  to " + amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             } else {
                                 tx.data = signer.generateApproveData(spender, '0x0');
                                 const cancelRaw = JSON.stringify(tx);
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
 
                                 raws.push({
                                     "raw": cancelRaw,
                                     "subTitle": "Cancel Older Authorization Of " + this.tokenb.token.toUpperCase(),
-                                    "description": "Set allowance  to 0 first in order to set Allowance to "+ Number(amount)/Number('1e'+this.tokenb.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description": "Set allowance  to 0 first in order to set Allowance to "+ amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 }, {"raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of "+this.tokenb.token.toUpperCase(),
-                                    "description":"Set allowance  to " + Number(amount)/Number('1e'+this.tokenb.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set allowance  to " + amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             }
                         }
 
                     } else {
 
-                        if (Number(data.amountS) > allowance) {
+                        const require = new BigNumber(data.amountS).plus(response.result) ;
 
-                            let amount;
+                        if (require.gt(allowance)) {
 
-                            if (balance < defaultValue) {
-                                amount = balance;
-                            }
-
-                            if (balance > defaultValue) {
-                                amount = defaultValue > Number(data.amountS) ? defaultValue : Number(data.amountS)
-                            }
-
+                            const amount = defaultValue .gt(require) ? defaultValue : require;
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
                             tx.to = this.tokenb.address;
                             tx.value = '0x0';
 
-                            if (allowance === 0) {
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                            if (allowance.equals(0) ) {
+                                tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
                                 raws.push({
                                     "raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of " + this.tokenb.token.toUpperCase(),
-                                    "description":"Set allowance  to " + Number(amount)/Number('1e'+this.tokenb.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set allowance  to " + amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             } else {
                                 tx.data = signer.generateApproveData(spender, '0x0');
                                 const cancelRaw = JSON.stringify(tx);
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
 
                                 raws.push({
                                     "raw": cancelRaw,
                                     "subTitle": "Cancel Older Authorization Of " + this.tokenb.token.toUpperCase(),
-                                    "description": "Set allowance  to 0 first in order to set Allowance to "+ Number(amount)/Number('1e'+this.tokenb.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description": "Set allowance  to 0 first in order to set Allowance to "+ amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 }, {
                                     "raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of " + this.tokenb.token.toUpperCase(),
-                                    "description":"Set allowance  to " + Number(amount)/Number('1e'+this.tokenb.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set allowance  to " + amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             }
                         }
 
-
-                        if (Number(data.lrcFee) > this.lrcAllowance * Number('1e' + this.lrc.digits)) {
-
-                            const defaultlrc = Number(this.lrc.allowance);
-                            const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = Number(data.lrcFee) ;
-
-                            let lrcAmount;
-                            if (defaultlrc >= lrcBalance) {
-                                lrcAmount = lrcBalance;
-                            }
-
-                            if (defaultlrc < lrcBalance) {
-                                lrcAmount = defaultlrc > lrcFee ? defaultlrc : lrcFee;
-                            }
-
+                        const lrcResponse =  await relay.getEstimatedAllocatedAllowance(this.wallet.address, 'LRC');
+                        const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
+                        if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times(Number('1e' + this.lrc.digits))) ) {
+                            const defaultlrc = new BigNumber(this.lrc.allowance);
+                            const lrcAmount = defaultlrc.gt(lrcRequest) ? defaultlrc : lrcRequest;
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -618,20 +589,20 @@
                             tx.value = '0x0';
 
                             if (this.lrcAllowance === 0) {
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+                                tx.data = signer.generateApproveData(spender, '0x' + lrcAmount.toString(16));
                                 raws.push({"raw": JSON.stringify(tx), "subTitle": " New Authorization Of LRC ",
-                                    "description":"Improve LRC Allowance to " +Number(lrcAmount)/Number('1e'+this.lrc.digits) +" to pay the order fee"+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."});
+                                    "description":"Improve LRC Allowance to " + lrcAmount.div(Number('1e'+this.lrc.digits)) +" to pay the order fee"+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."});
                             } else {
                                 tx.data = signer.generateApproveData(spender, '0x0');
                                 const cancelRaw = JSON.stringify(tx);
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+                                tx.data = signer.generateApproveData(spender, '0x' + lrcAmount.toString(16));
 
                                 raws.push({
                                     "raw": cancelRaw,
                                     "subTitle": "Cancel Older Authorization Of LRC",
-                                    "description":"Set LRC allowance to 0 in order to improve it to "+Number(lrcAmount)/Number('1e'+this.lrc.digits) +" to pay the order fee with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set LRC allowance to 0 in order to improve it to "+lrcAmount.div(Number('1e'+this.lrc.digits)) +" to pay the order fee with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization Of LRC",
-                                    "description":"Improve LRC Allowance to " +Number(lrcAmount)/Number('1e'+this.lrc.digits) +" to pay the order fee"+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Improve LRC Allowance to " +lrcAmount.div(Number('1e'+this.lrc.digits)) +" to pay the order fee"+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             }
 
@@ -714,7 +685,7 @@
                     const gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     let currentVersion = this.settingsVersion;
                     const spender = this.appConfig.delegateAddress;
-                    data.protocol = this.appConfig.contractVersionMap[currentVersion].address;;
+                    data.protocol = this.appConfig.contractVersionMap[currentVersion].address;
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
@@ -743,25 +714,17 @@
                     };
 
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
-                    const balance = balances[this.tokens.token.toUpperCase()] ? Number(balances[this.tokens.token.toUpperCase()].balance) : 0;
-                    const allowance = balances[this.tokens.token.toUpperCase()].allowance ? Number(balances[this.tokens.token.toUpperCase()].allowance) : 0;
-                    const defaultValue = Number(this.tokens.allowance);
+                    const allowance = balances[this.tokens.token.toUpperCase()].allowance ? new BigNumber(balances[this.tokens.token.toUpperCase()].allowance) : new BigNumber(0);
+                    const defaultValue = new BigNumber(this.tokens.allowance);
+                    const relay = new Relay(this.settingsRelay);
+                    const response = await relay.getEstimatedAllocatedAllowance(this.wallet.address, this.tokens.token.toUpperCase());
 
                     if (this.tokens.token.toUpperCase() === 'LRC') {
 
-                        const require = Number(data.amountS) + Number(data.lrcFee) ;
+                        const require = new BigNumber(data.amountS).plus(data.lrcFee).plus(response.result) ;
 
-                        if (require > allowance) {
-                            let amount;
-
-                            if (balance < defaultValue) {
-                                amount = balance;
-                            }
-
-                            if (balance > defaultValue) {
-                                amount = defaultValue > require ? defaultValue :require
-                            }
-
+                        if (require .gt(allowance) ) {
+                            const amount = defaultValue > require ? defaultValue :require;
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -769,40 +732,33 @@
                             tx.value = '0x0';
 
                             if (allowance === 0) {
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
                                 raws.push({
                                     "raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase(),
-                                    "description":"Set allowance  to " + Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set allowance  to " +amount.div(Number('1e'+this.tokens.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             } else {
                                 tx.data = signer.generateApproveData(spender, '0x0');
                                 const cancelRaw = JSON.stringify(tx);
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
                                 raws.push({
                                     "raw": cancelRaw,
                                     "subTitle": "Cancel Older Authorization Of " + this.tokens.token.toUpperCase(),
-                                    "description": "Set allowance  to 0 first in order to set Allowance to "+ Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description": "Set allowance  to 0 first in order to set Allowance to "+ amount.div(Number('1e'+this.tokens.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 }, {
                                     "raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase(),
-                                    "description": "Improve allowance  to " + Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description": "Improve allowance  to " + amount.div(Number('1e'+this.tokens.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             }
                         }
 
                     } else {
-                        if (Number(data.amountS) > allowance) {
-                            let amount;
+                        const require = new BigNumber(data.amountS).plus(response.result) ;
 
-                            if (balance < defaultValue) {
-                                amount = balance;
-                            }
-
-                            if (balance > defaultValue) {
-                                amount = defaultValue > Number(data.amountS) ? defaultValue : Number(data.amountS)
-                            }
-
+                        if (require.gt(allowance) ) {
+                            const  amount = defaultValue.gt(require) ? defaultValue : require;
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -810,42 +766,35 @@
                             tx.value = '0x0';
 
                             if (allowance === 0) {
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
                                 raws.push({
                                     "raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase(),
-                                    "description":"Set allowance for  to " + Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set allowance for  to " + amount.div(Number('1e'+this.tokens.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             } else {
                                 tx.data = signer.generateApproveData(spender, '0x0');
                                 const cancelRaw = JSON.stringify(tx);
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(amount).toString(16));
+                                tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
                                 raws.push({
                                     "raw": cancelRaw,
                                     "subTitle": "Cancel Older Authorization Of " + this.tokens.token.toUpperCase(),
-                                    "description":"Set allowance  to 0 first in order to set Allowance to "+ Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set allowance  to 0 first in order to set Allowance to "+ amount.div(Number('1e'+this.tokens.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 }, {
                                     "raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of " + this.tokens.token.toUpperCase(),
-                                    "description":"Improve allowance to " + Number(amount)/Number('1e'+this.tokens.digits)+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Improve allowance to " + amount.div(Number('1e'+this.tokens.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
 
                             }
                         }
 
-                        if (Number(data.lrcFee) > this.lrcAllowance * Number('1e' + this.lrc.digits)) {
-                            const defaultlrc = Number(this.lrc.allowance);
-                            const lrcBalance = this.lrcBalance * Number('1e' + this.lrc.digits);
-                            const lrcFee = Number(data.lrcFee) ;
+                        const lrcResponse = await relay.getEstimatedAllocatedAllowance(this.wallet.address, 'LRC');
+                        const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
 
-                            let lrcAmount;
-                            if (defaultlrc >= lrcBalance) {
-                                lrcAmount = lrcBalance;
-                            }
-
-                            if (defaultlrc < lrcBalance) {
-                                lrcAmount = defaultlrc > lrcFee ? defaultlrc : lrcFee;
-                            }
+                        if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times(Number('1e' + this.lrc.digits))) ) {
+                            const defaultlrc = new BigNumber(this.lrc.allowance);
+                            const lrcAmount = defaultlrc.gt(lrcRequest) ? defaultlrc : lrcRequest;
 
                             const tx = {};
                             tx.gasPrice = gasPrice;
@@ -854,21 +803,21 @@
                             tx.value = '0x0';
 
                             if (this.lrcAllowance === 0) {
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+                                tx.data = signer.generateApproveData(spender, '0x' + lrcAmount.toString(16));
                                 raws.push({"raw": JSON.stringify(tx),
                                     "subTitle": " New Authorization Of LRC ",
-                                    "description":"Improve LRC Allowance to " +Number(lrcAmount)/Number('1e'+this.lrc.digits) +" to pay the order fee"+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."});
+                                    "description":"Improve LRC Allowance to " +lrcAmount.div(Number('1e'+this.lrc.digits)) +" to pay the order fee"+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."});
                             } else {
                                 tx.data = signer.generateApproveData(spender, '0x0');
                                 const cancelRaw = JSON.stringify(tx);
-                                tx.data = signer.generateApproveData(spender, '0x' + Number(lrcAmount).toString(16));
+                                tx.data = signer.generateApproveData(spender, '0x' + lrcAmount.toString(16));
 
                                 raws.push({
                                     "raw": cancelRaw,
                                     "subTitle": "Cancel Older Authorization Of LRC",
-                                    "description":"Set LRC allowance to 0 in order to improve it to "+Number(lrcAmount)/Number('1e'+this.lrc.digits) +" to pay the order fee with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set LRC allowance to 0 in order to improve it to "+lrcAmount.div(Number('1e'+this.lrc.digits)) +" to pay the order fee with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 }, {"raw": JSON.stringify(tx), "subTitle": "New Authorization Of LRC",
-                                    "description":"Improve LRC Allowance to " +Number(lrcAmount)/Number('1e'+this.lrc.digits) +" to pay the order fee with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."});
+                                    "description":"Improve LRC Allowance to " +lrcAmount.div(Number('1e'+this.lrc.digits)) +" to pay the order fee with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."});
                             }
                         }
                     }
