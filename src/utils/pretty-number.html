@@ -49,18 +49,20 @@
         }
 
         _update() {
-            if (this.v) {
+            let numV = Number(this.v);
+            let numd = Number(this.d);
+            if (numV) {
                 var sign = "";
-                if (this.sign && this.v > 0) {
+                if (this.sign && numV > 0) {
                     sign = "+";
                 }
-                var s = sign + this.v.toFixed(this.d);
+                var s = sign + numV.toFixed(numd);
                 this.head = s.replace(/0+$/, "");
                 var zeros = s.length - this.head.length;
                 this.tail = "0".repeat(zeros);
-            } else if (this.d) {
+            } else if (numd) {
                 this.head = "0.";
-                this.tail = "0".repeat(this.d);
+                this.tail = "0".repeat(numd);
             } else {
                 this.head = "0";
             }
