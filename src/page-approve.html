@@ -127,8 +127,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                                         label="Amount"
                                                         pattern="[[_numPatten(selectedTokenBalance.precision)]]"
                                                         error-message="[[_numError(amount, selectedTokenBalance.precision)]]"
-                                                        tabindex="2"
-                                                        max="[[amountShow]]">
+                                                        tabindex="2">
                                         <div slot="suffix">[[selectedTokenBalance.unit]]</div>
                                     </balance-text-field>
                                     <div class$="horizontal layout start-justified warn [[showAmountWarn]]">
@@ -412,7 +411,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _showOrHidden(amount, gasLimit, additionalData, amountShow, selectedTokenBalance) {
                 let validator = new Validator();
-                if (!amount ||!selectedTokenBalance || !(new RegExp(this._numPatten(selectedTokenBalance.precision)).test(amount)) || !gasLimit || !amountShow || amountShow < Number(amount) || !selectedTokenBalance) {
+                if (!amount ||!selectedTokenBalance || !(new RegExp(this._numPatten(selectedTokenBalance.precision)).test(amount)) || !gasLimit || !amountShow  || !selectedTokenBalance) {
                     this._buttonDisable();
                     return false;
                 }
