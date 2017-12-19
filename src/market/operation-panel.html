@@ -731,7 +731,7 @@
                             tx.to = this.tokens.address;
                             tx.value = '0x0';
 
-                            if (allowance === 0) {
+                            if (allowance.equals(0)) {
                                 tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
                                 raws.push({
                                     "raw": JSON.stringify(tx),
@@ -765,7 +765,9 @@
                             tx.to = this.tokens.address;
                             tx.value = '0x0';
 
-                            if (allowance === 0) {
+
+
+                            if (allowance.equals(0)) {
                                 tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
                                 raws.push({
                                     "raw": JSON.stringify(tx),
