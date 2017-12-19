@@ -95,13 +95,14 @@
 
         _chart(resp, market) {
             let datas = resp.result;
-            resp.xData = Highcharts.map(datas, function(val, j) {
+            let array = _.sortBy(datas, [function(o) { return o.Start; }]);
+            resp.xData = Highcharts.map(array, function(val, j) {
                 return Number(val.Start) * 1000;
             });
-            resp.price = Highcharts.map(datas, function(val, j) {
+            resp.price = Highcharts.map(array, function(val, j) {
                 return val.Open;
             });
-            resp.volume = Highcharts.map(datas, function(val, j) {
+            resp.volume = Highcharts.map(array, function(val, j) {
                 return val.Amount;
             });
             let title = market.toUpperCase();
