@@ -450,7 +450,7 @@
                     if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
                         return;
                     }
-                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
+                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address.toLocaleLowerCase()) < 0) {
                         const detail = {
                             text: 'Your address is not in white list, could not submit order',
                             category: "warning",
@@ -502,7 +502,7 @@
                         description:"Buy "+ Number(this.buyAmount)+" "+ this.tokens.token.toUpperCase()+" with "+ Number(this.buyTotal) +" "+ this.tokenb.token.toUpperCase()
                     };
 
-                    const relay = new Relay(this.settingsRelay);
+                    const relay = new Relay(this.settingsRelay+"/rpc");
                     const response =  await relay.getEstimatedAllocatedAllowance(this.wallet.address, this.tokenb.token.toUpperCase());
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
                     const allowance = balances[this.tokenb.token.toUpperCase()].allowance ? new BigNumber(balances[this.tokenb.token.toUpperCase()].allowance) : new BigNumber(0);
@@ -665,7 +665,7 @@
                     if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
                         return;
                     }
-                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address) < 0) {
+                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address.toLowerCase()) < 0) {
                         const detail = {
                             text: 'Your address is not in white list, could not submit order',
                             category: "warning",
@@ -716,7 +716,7 @@
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
                     const allowance = balances[this.tokens.token.toUpperCase()].allowance ? new BigNumber(balances[this.tokens.token.toUpperCase()].allowance) : new BigNumber(0);
                     const defaultValue = new BigNumber(this.tokens.allowance);
-                    const relay = new Relay(this.settingsRelay);
+                    const relay = new Relay(this.settingsRelay+"/rpc");
                     const response = await relay.getEstimatedAllocatedAllowance(this.wallet.address, this.tokens.token.toUpperCase());
 
                     if (this.tokens.token.toUpperCase() === 'LRC') {

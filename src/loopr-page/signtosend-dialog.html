@@ -201,7 +201,7 @@
 
                     raw.raw = JSON.stringify(rawTx);
                     return raw;
-                });
+                }.bind(this));
 
                 async.map(rawTxs, async function (rawTx) {
                     const tx = await this.$.signer.sign(JSON.parse(rawTx.raw));
