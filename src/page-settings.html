@@ -250,7 +250,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         static get observers() {
-            return ['_computeCookie(appConfig, cookieValues)'];
+            return [
+                '_computeCookie(appConfig, cookieValues)',
+                '_setRelay(appConfig, cookieValues, relays)'
+            ];
         }
 
         setCustomRelay() {
@@ -271,22 +274,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.settingsMarginSplit = appConfig.defaultMarginSplitPercentage;
                     this.$.settingsMarginSplit.value = appConfig.defaultMarginSplitPercentage;
                 }
-                let relays = appConfig.relays;
-                if (cookieValues["settingsRelayConfig"]) {
-                    let cookieRelay = JSON.parse(cookieValues["settingsRelayConfig"]);
-                    relays = relays.concat(cookieRelay);
-                }
-                this.$.relay.addEventListener('value-changed', function(e) {
-                    let currentValue = this.$.relay.value;
-                    if (currentValue) {
-                        let filtered = _.filter(relays, function(o) { return o.value.indexOf(currentValue) >-1; });
-                        if (filtered) {
-                            this.settingsRelayName = filtered[0].label;
-                        }
-                        this.settingsRelay = currentValue || "//relay1.loopring.io";
-                    }
-                    console.log("relay change to:["+this.settingsRelayName + "] url:[" + this.settingsRelay+"]");
-                }.bind(this));
+
             }
             return null;
         }
@@ -335,12 +323,54 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          */
         _computedSettingsRelay(appConfig, cookieValues) {
             if (appConfig && cookieValues) {
-                let configs = appConfig.relays;
+                let relays = appConfig.relays;
                 if (cookieValues["settingsRelayConfig"]) {
                     let cookieRelay = JSON.parse(cookieValues["settingsRelayConfig"]);
-                    configs = configs.concat(cookieRelay);
+                    relays = relays.concat(cookieRelay);
                 }
-                return configs;
+                return relays;
+            }
+        }
+
+        _setRelay(appConfig, cookieValues, relays) {
+            if (appConfig && cookieValues && relays) {
+                let selectedRelay = cookieValues["settingsRelay"];
+                let currentLable = "";
+                if (selectedRelay) {
+                    let filtered = _.filter(relays, function(o) { return o.value.indexOf(selectedRelay) >-1; });
+                    if (!filtered || filtered.length == 0) {
+                        console.log("The selected relay saved in cookie:"+selectedRelay+" has been obsoleted, change to default:"+relays[0].value)
+                        selectedRelay = relays[0].value;
+                        currentLable = relays[0].label;
+                    }
+                } else {
+                    selectedRelay = relays[0].value;
+                    currentLable = relays[0].label;
+                }
+                this.settingsRelayName = currentLable;
+                this.$.relay.value = selectedRelay;
+                this.settingsRelay = selectedRelay;
+
+                this.$.relay.addEventListener('value-changed', function(e) {
+                    let currentValue = this.$.relay.value;
+                    let currentLable = "";
+                    if (currentValue) {
+                        let filtered = _.filter(relays, function(o) { return o.value.indexOf(currentValue) >-1; });
+                        if (filtered && filtered.length >0) {
+                            currentLable = filtered[0].label;
+                        } else {
+                            console.log("The selected relay saved in cookie:"+currentValue+" has been obsoleted, change to default:"+relays[0].value)
+                            currentValue = relays[0].value;
+                            currentLable = relays[0].label;
+                        }
+                    } else {
+                       currentValue = relays[0].value;
+                       currentLable = relays[0].label;
+                    }
+                    this.settingsRelayName = currentLable;
+                    this.settingsRelay = currentValue || "//relay1.loopring.io";
+                    console.log("Relay change to:["+currentLable + "] url:[" + currentValue+"]");
+                }.bind(this));
             }
         }
 
@@ -355,7 +385,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (appConfig && cookieValues) {
                 this.$.lang.value = cookieValues["settingsLang"] || appConfig.langs[0].value;
                 this.$.currency.value = cookieValues["settingsCurrency"] || appConfig.fiat[0].value;
-                this.$.relay.value = cookieValues["settingsRelay"] || appConfig.relays[0].value;
+
                 this.$.version.value = cookieValues["settingsVersion"] || appConfig.contracts[appConfig.contracts.length - 1].version;
                 this.$.gasPrice.value = cookieValues["settingsGasPrice"] || appConfig.defaultGasPrice;
                 this.$.marginSplit.value = cookieValues["settingsMarginSplit"] || appConfig.defaultMarginSplitPercentage;
