@@ -339,9 +339,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (selectedRelay) {
                     let filtered = _.filter(relays, function(o) { return o.value.indexOf(selectedRelay) >-1; });
                     if (!filtered || filtered.length == 0) {
-                        console.log("The selected relay saved in cookie:"+selectedRelay+" has been obsoleted, change to default:"+relays[0].value)
+                        console.error("The selected relay:"+selectedRelay+" has been obsoleted, change to default:"+relays[0].value)
                         selectedRelay = relays[0].value;
                         currentLable = relays[0].label;
+                    } else {
+                        selectedRelay = filtered[0].value;
+                        currentLable = filtered[0].label;
                     }
                 } else {
                     selectedRelay = relays[0].value;
@@ -358,7 +361,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         if (filtered && filtered.length >0) {
                             currentLable = filtered[0].label;
                         } else {
-                            console.log("The selected relay saved in cookie:"+currentValue+" has been obsoleted, change to default:"+relays[0].value)
+                            console.error("The selected relay:"+currentValue+" has been obsoleted, change to default:"+relays[0].value)
                             currentValue = relays[0].value;
                             currentLable = relays[0].label;
                         }

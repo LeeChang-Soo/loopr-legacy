@@ -100,7 +100,7 @@
                 return Number(val.Start) * 1000;
             });
             resp.price = Highcharts.map(array, function(val, j) {
-                return val.Open;
+                return val.Close;
             });
             resp.volume = Highcharts.map(array, function(val, j) {
                 return val.Amount;
