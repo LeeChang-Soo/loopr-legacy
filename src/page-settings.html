@@ -350,7 +350,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.settingsRelayName = currentLable;
                 this.$.relay.value = selectedRelay;
                 this.settingsRelay = selectedRelay;
-
                 this.$.relay.addEventListener('value-changed', function(e) {
                     let currentValue = this.$.relay.value;
                     let currentLable = "";
@@ -385,7 +384,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (appConfig && cookieValues) {
                 this.$.lang.value = cookieValues["settingsLang"] || appConfig.langs[0].value;
                 this.$.currency.value = cookieValues["settingsCurrency"] || appConfig.fiat[0].value;
-
                 this.$.version.value = cookieValues["settingsVersion"] || appConfig.contracts[appConfig.contracts.length - 1].version;
                 this.$.gasPrice.value = cookieValues["settingsGasPrice"] || appConfig.defaultGasPrice;
                 this.$.marginSplit.value = cookieValues["settingsMarginSplit"] || appConfig.defaultMarginSplitPercentage;
