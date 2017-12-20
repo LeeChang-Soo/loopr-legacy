@@ -454,24 +454,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 } else {
                     this.settingsCurrency = appConfig.fiat[0].value;
                 }
-                let relay = "";
-                if (cookieValues["settingsRelay"]) {
-                    relay = cookieValues["settingsRelay"];
-                } else {
-                    relay = appConfig.relays[0].value;
-                }
-                this.settingsRelay = relay;
                 let relays = appConfig.relays;
                 if (cookieValues["settingsRelayConfig"]) {
                     let cookieRelay = JSON.parse(cookieValues["settingsRelayConfig"]);
                     relays = relays.concat(cookieRelay);
                 }
-                let filteredRelays = _.filter(relays, function(o) { return o.value.indexOf(relay) >-1 });
-                if (filteredRelays && filteredRelays.length >0){
-                    this.settingsRelayName = filteredRelays[0].label;
+                let selectedRelay = cookieValues["settingsRelay"];
+                let currentLable = "";
+                if (selectedRelay) {
+                    let filtered = _.filter(relays, function(o) { return o.value.indexOf(selectedRelay) >-1; });
+                    if (!filtered || filtered.length == 0) {
+                        console.error("The selected relay:"+selectedRelay+" has been obsoleted, change to default:"+relays[0].value)
+                        selectedRelay = relays[0].value;
+                        currentLable = relays[0].label;
+                    } else {
+                        selectedRelay = filtered[0].value;
+                        currentLable = filtered[0].label;
+                    }
                 } else {
-                    this.settingsRelayName = "";
+                    selectedRelay = relays[0].value;
+                    currentLable = relays[0].label;
                 }
+                this.settingsRelay = selectedRelay;
+                this.settingsRelayName = currentLable;
                 if (cookieValues["settingsLrcFee"]) {
                     this.settingsLrcFee = cookieValues["settingsLrcFee"];
                 } else {
