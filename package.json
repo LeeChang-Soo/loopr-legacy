@@ -25,6 +25,6 @@
   },
   "dependencies": {
     "bn.js": "^4.11.8",
-    "loopringjs": "^0.0.1"
+    "loopring.js": "^0.0.11"
   }
 }
