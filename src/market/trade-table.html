@@ -420,16 +420,6 @@
 
         _computePrecisionInMarket(item, marketConfig, appConfig) {
             const defaultVolumePrecision = appConfig.marketConfig.defaultVolumePrecision;
-            if (item.tokenB === marketConfig.tokenx) {
-                let tempS = item.tokenS,
-                    tempB = item.tokenB,
-                    tempAmountS = item.amountS,
-                    tempAmountB = item.amountB;
-                item.tokenS = tempB;
-                item.fillAmountS = tempAmountB;
-                item.tokenB = tempS;
-                item.fillAmountB = tempAmountS;
-            }
             item.pricePrecision = marketConfig.pricePrecision;
             const tokenxConfigS = appConfig.tokenMap[item.tokenS];
             if (tokenxConfigS) {
