@@ -463,7 +463,6 @@
             }
             order.tokenB = upperTokenB;
             order.amountB = this.toNumber(order.originalOrder.amountB, tokenb);
-            order.pricePrecision = tokenb.pricePrecision;
             order.volumnPrecisionB = tokenb.volumnPrecision;
             order.tokenS = upperTokenS;
             order.amountS = this.toNumber(order.originalOrder.amountS, tokens);
@@ -483,6 +482,7 @@
                 order.sizeToken = upperTokenS;
             }
             order.price = this._calculatePrice(appConfig, upperTokenB, upperTokenS, order.amountB, order.amountS);
+            order.pricePrecision = this._calculatePricePrecision(appConfig, upperTokenB, upperTokenS);
             order.volumnPrecisionS = tokens.volumnPrecision;
             order.dealtAmountB = this.numberFormat(order.dealtAmountB, tokenb);
             order.dealtAmountS = this.numberFormat(order.dealtAmountS, tokens);
