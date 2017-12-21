@@ -143,14 +143,48 @@ const AppConfigMixin = (superclass) => class extends superclass {
 
     _calculatePrice(appConfig, tokenx, tokeny, amountx, amounty) {
         if (appConfig && tokenx && tokeny && amountx && amounty) {
-            let market = appConfig.computeMarketByTokens(tokenx, tokeny);
+            let tempx = tokenx.toUpperCase();
+            let tempy = tokeny.toUpperCase();
+            let market = appConfig.computeMarketByTokens(tempx, tempy);
             if (market) {
-                if (market.tokenx === tokenx) {
+                if (market.tokenx === tempx) {
                     //console.log(tokenx+"("+Number(amountx)+")->"+tokeny+"("+Number(amounty)+") = "+(amounty / amountx));
                     return amounty / amountx;
                 } else {
                     //console.log(tokenx+"("+Number(amountx)+")->"+tokeny+"("+Number(amounty)+") = "+(amountx / amounty))
                     return amountx / amounty;
+                }
+            } else {
+                let tempArr = new Array();
+                tempArr.push(tempx);
+                tempArr.push(tempy);
+                let sortedArr = _.sortBy(tempArr, [function(o) { return o; }]);
+                if (sortedArr[0] === tempx) {
+                    return amountx / amounty;
+                } else {
+                    return amounty / amountx;
+                }
+            }
+        }
+    }
+
+    _calculatePricePrecision(appConfig, tokenx, tokeny) {
+        if (appConfig && tokenx && tokeny) {
+            let tempx = tokenx.toUpperCase();
+            let tempy = tokeny.toUpperCase();
+            let market = appConfig.computeMarketByTokens(tempx, tempy);
+            if (market) {
+                return market.pricePrecision;
+            } else {// if not configured in market, sort the tokens and use the first token's precision
+                let tempArr = new Array();
+                tempArr.push(tempx);
+                tempArr.push(tempy);
+                let sortedArr = _.sortBy(tempArr, [function(o) { return o; }]);
+                let priceToken = appConfig.tokenMap[sortedArr[0]];
+                if (priceToken) {
+                    return priceToken.precision;
+                } else {
+                    return 1;
                 }
             }
         }
