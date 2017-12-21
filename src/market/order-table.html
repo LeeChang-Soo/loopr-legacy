@@ -492,8 +492,8 @@
         }
 
         _getToken(tokenName, appConfig) {
-            let pricePrecision = appConfig.marketConfig.defaultPricePrecision,
-                volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
+            let pricePrecision = appConfig.defaultPricePrecision,
+                volumnPrecision = appConfig.defaultVolumePrecision;
             let marketConfig = this.getMarket(tokenName + "-WETH");
             if (marketConfig) {
                 pricePrecision = marketConfig.pricePrecision;

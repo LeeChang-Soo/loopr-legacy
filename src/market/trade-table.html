@@ -371,9 +371,8 @@
 
         _computeOrderItem(appConfig, item) {
             if (item && appConfig) {
-                item.pricePrecision = appConfig.marketConfig.defaultPricePrecision;
-                item.volumnPrecisionS = appConfig.marketConfig.defaultVolumePrecision;
-                item.volumnPrecisionB = appConfig.marketConfig.defaultVolumePrecision;
+                item.volumnPrecisionS = appConfig.defaultVolumePrecision;
+                item.volumnPrecisionB = appConfig.defaultVolumePrecision;
                 item.ringLink = "#/ring/" + item.ringHash;
                 item.orderLink = "#/order/" + item.orderHash;
                 item.txLink = "https://etherscan.io/tx/" + item.txHash;
@@ -402,6 +401,7 @@
                 item.fillAmountB = this.toNumber(item.amountB, tokenB);
                 item.fee = Number(item.fee);
                 item.price = this._calculatePrice(appConfig, item.tokenS, item.tokenB, item.fillAmountS, item.fillAmountB);
+                item.pricePrecision = this._calculatePricePrecision(appConfig, item.tokenS, item.tokenB);
                 item.feeLrc = Number(item.lrcFee) / 1e18;
                 item.marginSplitToken = (item.splitS && Number(item.splitS)) ? item.tokenS : item.tokenB;
                 let marginSplitToken = appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
@@ -411,7 +411,7 @@
                 } else {
                     console.error("Data error, no token:" + item.marginSplitToken + " config")
                     item.marginSplitUnit = item.marginSplitToken.toUpperCase();
-                    item.marginSplitPrecision = appConfig.marketConfig.defaultVolumePrecision;
+                    item.marginSplitPrecision = appConfig.defaultVolumePrecision;
                 }
                 item.marginSplit = Number(item.splitS || item.splitB) / Number('1e' + (marginSplitToken.digits ||'18'));
                 return item;
@@ -419,8 +419,7 @@
         }
 
         _computePrecisionInMarket(item, marketConfig, appConfig) {
-            const defaultVolumePrecision = appConfig.marketConfig.defaultVolumePrecision;
-            item.pricePrecision = marketConfig.pricePrecision;
+            const defaultVolumePrecision = appConfig.defaultVolumePrecision;
             const tokenxConfigS = appConfig.tokenMap[item.tokenS];
             if (tokenxConfigS) {
                 item.volumnPrecisionS = tokenxConfigS.precision;
@@ -438,7 +437,6 @@
         _computePrecision(item, appConfig) {
             let precisionS = this._getTokenPrecision(item.tokenS, appConfig);
             item.volumnPrecisionS = precisionS.pricePrecision;
-            item.pricePrecision = precisionS.pricePrecision;
             const tokenSConfig = appConfig.tokenMap[item.tokenS.toUpperCase()];
             if (tokenSConfig) {
                 item.unitS = tokenSConfig.unit;
@@ -456,8 +454,8 @@
         }
 
         _getTokenPrecision(tokenName, appConfig) {
-            let pricePrecision = appConfig.marketConfig.defaultPricePrecision,
-                volumnPrecision = appConfig.marketConfig.defaultVolumePrecision;
+            let pricePrecision = appConfig.defaultPricePrecision,
+                volumnPrecision = appConfig.defaultVolumePrecision;
             let marketConfig = this.getMarket(tokenName + "-WETH");
             if (marketConfig) {
                 pricePrecision = marketConfig.pricePrecision;
