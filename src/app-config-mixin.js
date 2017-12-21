@@ -176,7 +176,7 @@ const AppConfigMixin = (superclass) => class extends superclass {
             if (market) {
                 return market.pricePrecision;
             } else {
-                return 8;
+                return appConfig.marketConfig.defaultPricePrecision;
             }
         }
     }

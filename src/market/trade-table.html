@@ -371,7 +371,6 @@
 
         _computeOrderItem(appConfig, item) {
             if (item && appConfig) {
-                item.pricePrecision = appConfig.marketConfig.defaultPricePrecision;
                 item.volumnPrecisionS = appConfig.marketConfig.defaultVolumePrecision;
                 item.volumnPrecisionB = appConfig.marketConfig.defaultVolumePrecision;
                 item.ringLink = "#/ring/" + item.ringHash;
@@ -402,6 +401,7 @@
                 item.fillAmountB = this.toNumber(item.amountB, tokenB);
                 item.fee = Number(item.fee);
                 item.price = this._calculatePrice(appConfig, item.tokenS, item.tokenB, item.fillAmountS, item.fillAmountB);
+                item.pricePrecision = this._calculatePricePrecision(appConfig, item.tokenS, item.tokenB);
                 item.feeLrc = Number(item.lrcFee) / 1e18;
                 item.marginSplitToken = (item.splitS && Number(item.splitS)) ? item.tokenS : item.tokenB;
                 let marginSplitToken = appConfig.tokenMap[item.marginSplitToken.toUpperCase()];
@@ -420,7 +420,6 @@
 
         _computePrecisionInMarket(item, marketConfig, appConfig) {
             const defaultVolumePrecision = appConfig.marketConfig.defaultVolumePrecision;
-            item.pricePrecision = marketConfig.pricePrecision;
             const tokenxConfigS = appConfig.tokenMap[item.tokenS];
             if (tokenxConfigS) {
                 item.volumnPrecisionS = tokenxConfigS.precision;
@@ -438,7 +437,6 @@
         _computePrecision(item, appConfig) {
             let precisionS = this._getTokenPrecision(item.tokenS, appConfig);
             item.volumnPrecisionS = precisionS.pricePrecision;
-            item.pricePrecision = precisionS.pricePrecision;
             const tokenSConfig = appConfig.tokenMap[item.tokenS.toUpperCase()];
             if (tokenSConfig) {
                 item.unitS = tokenSConfig.unit;
