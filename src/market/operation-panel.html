@@ -106,7 +106,7 @@
                         <div slot="suffix">[[tokens.unit]]</div>
                     </balance-text-field>
                     <div class="seperator">&times;</div>
-                    <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{sellPrice}}"
+                    <vaadin-text-field label="[[tokenb.token]/[[tokens.token]]] Price" value="{{sellPrice}}"
                                        pattern="[[_numPatten(marketPrecision)]]"
                                        error-message="non-zero number with [[marketPrecision]] precision">
                         <div slot="suffix">[[tokenb.unit]]/[[tokens.unit]]</div>
@@ -170,7 +170,7 @@
                         <div slot="suffix">[[tokens.unit]]</div>
                     </balance-text-field>
                     <div class="seperator">&times;</div>
-                    <vaadin-text-field label="[[tokens.token]]/[[tokenb.token]] Price" value="{{buyPrice}}"
+                    <vaadin-text-field label="[[tokenb.token]/[[tokens.token]]] Price" value="{{buyPrice}}"
                                        pattern="[[_numPatten(marketPrecision)]]"
                                        error-message="non-zero number with [[marketPrecision]] precision">
                         <div slot="suffix">[[tokenb.unit]]/[[tokens.unit]]</div>
