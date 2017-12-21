@@ -175,17 +175,8 @@ const AppConfigMixin = (superclass) => class extends superclass {
             let market = appConfig.computeMarketByTokens(tempx, tempy);
             if (market) {
                 return market.pricePrecision;
-            } else {// if not configured in market, sort the tokens and use the first token's precision
-                let tempArr = new Array();
-                tempArr.push(tempx);
-                tempArr.push(tempy);
-                let sortedArr = _.sortBy(tempArr, [function(o) { return o; }]);
-                let priceToken = appConfig.tokenMap[sortedArr[0]];
-                if (priceToken) {
-                    return priceToken.precision;
-                } else {
-                    return 1;
-                }
+            } else {
+                return 8;
             }
         }
     }
