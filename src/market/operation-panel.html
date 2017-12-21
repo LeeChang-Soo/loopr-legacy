@@ -313,8 +313,11 @@
                 return ['buyButtonState(buyAmount,tokenb,tokens,buyPrice,marketPrecision,buyTotal,tokenbBalance,lrcBalance,buyFee)',
                     'computeTokenBalances(tokens,tokenb,lrc,balancesRaw)',
                     'sellButtonState(sellAmount,tokenb,tokens,sellPrice,marketPrecision,tokensBalance,sellTotal, lrcBalance, sellFee)',
-                    'reload(subpage)'];
+                    'reload(subpage)',
+                'computePrice(priceQuote,tokens,tokenb,marketPrecision)'];
             }
+
+
 
             _computedMarket(page, subpage) {
                 if (page && "market" === page && subpage) return subpage;
@@ -326,6 +329,23 @@
                 } else {
                     this.$.buyAmount.focus();
                 }
+            }
+
+
+            computePrice(priceQuote,tokens,tokenb,marketPrecision){
+
+                if(priceQuote && tokens && tokenb){
+
+                    const priceS = priceQuote.getPrice(tokens.token.toUpperCase());
+                    const priceb = priceQuote.getPrice(tokenb.token.toUpperCase());
+
+                    if(priceb && priceS){
+
+                        this.sellPrice = Number((priceS / priceb).toFixed(marketPrecision));
+                        this.buyPrice = Number((priceS / priceb).toFixed(marketPrecision));
+                    }
+                }
+
             }
 
             _computeFee(token, tradeAmount, priceQuote, settingsLrcFe){
