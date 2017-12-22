@@ -178,7 +178,7 @@
                 processed.sizeUnit = tokenyConfig.unit;
                 processed.sizePrecision = tokenyConfig.precision;
                 processed.pricePrecision = marketConfig.pricePrecision;
-                processed.priceUnit = tokenxConfig.unit + "/" + tokenyConfig.unit;
+                processed.priceUnit = tokenyConfig.unit + "/" + tokenxConfig.unit;
                 processed.asks = _.map(resp.result.depth.sell, f);
                 processed.bids = _.map(resp.result.depth.buy, f);
                 return processed;
