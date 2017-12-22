@@ -390,7 +390,7 @@
                         && marketPrecision && sellPrice && new RegExp(this._numPatten(marketPrecision)).test(sellPrice.toString())
                         && tokensBalance && Number(tokensBalance) && sellTotal && sellTotal >= tokenb.minTradeValue && lrcBalance >=0 && lrcFee >=0  &&  Number(sellAmount) <= tokensBalance) {
                     this.$.sellButton.disabled = false;
-                    this.$.sellButton.style.backgroundColor = 'var(--paper-green-500)';
+                    this.$.sellButton.style.backgroundColor = 'var(--paper-red-500)';
                 } else {
                     this.$.sellButton.disabled = true;
                     this.$.sellButton.style.backgroundColor = 'var(--paper-grey-500)';
