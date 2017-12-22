@@ -74,7 +74,7 @@
                     <div class="left-aligned">
                         <a href="[[item.ringLink]]">
                             <div class="long-hash">[[item.ringHash]]</div>
-                        </a>#[[item.ringIndex]]
+                        </a>#[[item.fillIndex]]
                     </div>
                 </template>
             </vaadin-grid-column>
@@ -92,7 +92,7 @@
                 </template>
                 <template>
                     <div class="left-aligned">
-                        [[item.ringIndex]]
+                        [[item.fillIndex]]
                     </div>
                 </template>
             </vaadin-grid-column>
@@ -376,6 +376,7 @@
                 item.ringLink = "#/ring/" + item.ringHash;
                 item.orderLink = "#/order/" + item.orderHash;
                 item.txLink = "https://etherscan.io/tx/" + item.txHash;
+                item.fillIndex = item.fillIndex + 1;
                 if (this.market) {
                     let marketConfig = this.getMarket(this.market);
                     if (null !== marketConfig) {
