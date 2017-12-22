@@ -373,8 +373,6 @@
 
             buyButtonState(buyAmount, tokenb,tokens, buyPrice, marketPrecision, buyTotal, tokenbBalance, lrcBalance, lrcFee) {
 
-              if(tokens) {console.log(new RegExp(this._numPatten(tokens.precision)).test(buyAmount.toString()));}
-
                 if (tokenb && tokens && buyAmount && new RegExp(this._numPatten(tokens.precision)).test(buyAmount.toString()) && Number(buyAmount) >= tokens.minTradeValue
                         && buyPrice && new RegExp(this._numPatten(marketPrecision)).test(buyPrice.toString())
                         && buyTotal && Number(buyTotal)>=tokenb.minTradeValue && tokenbBalance  && lrcBalance>=0 && lrcFee>=0 && buyTotal <= tokenbBalance) {
