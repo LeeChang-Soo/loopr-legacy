@@ -367,7 +367,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _numPatten(precision) {
-            return "^[1-9]\\d*(\\.\\d{1," + precision + "})?|0\\.(\\d{1," + (precision - 1) + "})?[1-9]$";
+            return "^[1-9]\\d*(\\.\\d{1," + precision + "})?$|^0\\.(\\d{1," + (precision - 1) + "})?[1-9]$";
         }
 
         _isNum(num, precision) {
