@@ -412,11 +412,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     const WETHConfig = this.appConfig.tokenMap['WETH'];
                     tx.to = WETHConfig.address;
                     if (this.fromToken === 'ETH') {
-                        tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
+                        tx.value = '0x' + (new BigNumber(this.$.amount.value).times(1e18)).toString(16);
                         tx.data = '0xd0e30db0';
                         subTitle = 'Convert ETH to  WETH';
                         description = 'Convert ' + this.$.amount.value + ' ETH to WETH with gas is ' + Number(tx.gasLimit) + ' and gasPrice  is '+ Number(tx.gasPrice)/1e9 + 'Gwei'
-                        if (this.fromTokenBalance.balance < (Number(tx.value) + Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                        if (new BigNumber(this.fromTokenBalance.balance).lt(new BigNumber(tx.value).plus(new BigNumber(tx.gasLimit).times(Number(tx.gasPrice))))) {
                             const detail = {
                                 tx: tx,
                                 token: {

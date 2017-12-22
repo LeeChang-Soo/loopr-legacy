@@ -412,9 +412,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (this.selectedTokenBalance.token === 'ETH') {
 
                     tx.to = this.address;
-                    tx.value = '0x' + (Number(this.$.amount.value) * 1e18).toString(16);
+                    tx.value = '0x' + (new BigNumber(this.$.amount.value).times(1e18)).toString(16);
                     tx.data = this.additionalData || '0x';
-                    if (this.selectedTokenBalance.balance < (Number(tx.value) + Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                    if (new BigNumber(this.selectedTokenBalance.balance).lt(new BigNumber(tx.value).plus(new BigNumber(tx.gasLimit).times(Number(tx.gasPrice))))) {
 
                         const detail = {
                             tx: tx,
@@ -437,7 +437,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 } else {
                     tx.to = this.selectedTokenBalance.address;
                     tx.value = '0x0';
-                    tx.data = signer.generateTransferData(this.address, '0x' + (Number(this.$.amount.value) * Number('1e' + this.selectedTokenBalance.digits)).toString(16))
+                    tx.data = signer.generateTransferData(this.address, '0x' + (new BigNumber(this.$.amount.value).times(Number('1e' + this.selectedTokenBalance.digits))).toString(16))
                     const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
 
                     if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
