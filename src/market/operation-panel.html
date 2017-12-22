@@ -470,7 +470,9 @@
                     if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
                         return;
                     }
-                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address.toLocaleLowerCase()) < 0) {
+
+                    const whiteList = _.map(this.appConfig.whiteList,add => add.toLowerCase());
+                    if (whiteList && whiteList.indexOf(this.wallet.address.toLocaleLowerCase()) < 0) {
                         const detail = {
                             text: 'Your address is not in white list, could not submit order',
                             category: "warning",
@@ -685,7 +687,8 @@
                     if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
                         return;
                     }
-                    if (this.appConfig.whiteList && this.appConfig.whiteList.indexOf(this.wallet.address.toLowerCase()) < 0) {
+                     const whiteList = _.map(this.appConfig.whiteList,add => add.toLowerCase());
+                    if (whiteList && whiteList.indexOf(this.wallet.address.toLowerCase()) < 0) {
                         const detail = {
                             text: 'Your address is not in white list, could not submit order',
                             category: "warning",
