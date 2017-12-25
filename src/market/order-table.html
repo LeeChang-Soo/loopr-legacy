@@ -42,6 +42,23 @@
             padding-right: 4px;
         }
 
+         .warning {
+             color: var(--paper-amber-700);
+         }
+
+         div.front {
+             width: 85%;
+         }
+
+         div.tail {
+             width: 10%;
+         }
+
+         .status {
+             @apply(--layout-horizontal);
+             @apply(--layout-center);
+         }
+
         .hidden {
             visibility: hidden;
         }
@@ -118,7 +135,8 @@
             <vaadin-grid-column width="50px">
                 <template class="header">Status</template>
                 <template>
-                    <div id="progress[[index]]" class="horizontal end-justified layout">
+                    <div  class="status">
+                    <div id="progress[[index]]" class="front">
                         <paper-progress value="[[item.totalDealed]]" secondary-progress="[[item.dealedAndCanceled]]" max="[[item.total]]"></paper-progress>
                         <paper-tooltip for="progress[[index]]" position="left">
                             <div>
@@ -127,6 +145,15 @@
                                 <div>Cancelled: [[item.totalCanceled]]</div>
                             </div>
                         </paper-tooltip>
+                    </div>
+                        <div id="warn[[index]]" class="tail ">
+                        <template is="dom-if" if="[[item.warning]]">
+                            <iron-icon  class="warning" icon="warning"></iron-icon>
+                            <paper-tooltip for="warn[[index]]" position="left">
+                                [[item.description]]
+                            </paper-tooltip>
+                        </template>
+                        </div>
                     </div>
                 </template>
                 <template class="footer"></template>
@@ -193,7 +220,7 @@
                 },
                 orders: {
                     type: Object,
-                    computed: '_computeOrders(appConfig, resp, balancesRaw)'
+                    computed: '_computeOrders(appConfig, resp, balances)'
                 },
                 currentPage: {
                     type: Number,
@@ -414,13 +441,13 @@
             }
         }
 
-        _computeOrders(appConfig, resp, rawBalances) {
+        _computeOrders(appConfig, resp, balances) {
             if (appConfig && resp && resp.result.data) {
-                return _.map(resp.result.data, o => this._computeItem(appConfig, o));
+                return _.map(resp.result.data, o => this._computeItem(appConfig, o, balances));
             }
         }
 
-        _computeItem(appConfig, order) {
+        _computeItem(appConfig, order, balances) {
             let upperTokenB = order.originalOrder.tokenB.toUpperCase();
             order.originalOrder.tokenB = upperTokenB;
             let upperTokenS = order.originalOrder.tokenS.toUpperCase();
@@ -439,8 +466,28 @@
             order.totalDealed = order.originalOrder.buyNoMoreThanAmountB ? this.numberFormat(order.dealtAmountB, tokenb) : this.numberFormat(order.dealtAmountS, tokens);
             if(order.status === 'ORDER_CANCELED' || order.status === 'ORDER_CUTOFF') {
                 order.totalCanceled = order.total - order.totalDealed;
+                order.warning = false;
             } else {
                 order.totalCanceled = 0;
+                if(this.filterMine && balances){
+                     const balance = new BigNumber(balances[tokens.token.toUpperCase()].balance);
+                     const allowance = new BigNumber(balances[tokens.token.toUpperCase()].allowance);
+                     const left = new BigNumber(order.originalOrder.amountS).minus(order.dealtAmountS);
+                     if(balance.lt(left) && allowance.lt(left)){
+                         order.warning = true;
+                         order.description = 'You have insufficient balance and allowance to complete this order';
+                     }else if(balance.lt(left)) {
+                         order.warning = true;
+                         order.description = 'You have insufficient balance to complete this order';
+                     }else if(allowance.lt(left)) {
+                         order.warning = true;
+                         order.description = 'You have insufficient allowance to complete this order';
+                     }else {
+                         order.warning = false;
+                     }
+                }else {
+                    order.warning = false;
+                }
             }
             order.dealedAndCanceled = order.totalDealed + order.totalCanceled;
             let marketConfig = null;
@@ -484,10 +531,10 @@
             order.price = this._calculatePrice(appConfig, upperTokenB, upperTokenS, order.amountB, order.amountS);
             order.pricePrecision = this._calculatePricePrecision(appConfig, upperTokenB, upperTokenS);
             order.volumnPrecisionS = tokens.volumnPrecision;
-            order.dealtAmountB = this.numberFormat(order.dealtAmountB, tokenb);
-            order.dealtAmountS = this.numberFormat(order.dealtAmountS, tokens);
-            order.cancelledAmountB = this.numberFormat(order.cancelledAmountB, tokenb);
-            order.cancelledAmountS = this.numberFormat(order.cancelledAmountS, tokens);
+//            order.dealtAmountB = this.numberFormat(order.dealtAmountB, tokenb);
+//            order.dealtAmountS = this.numberFormat(order.dealtAmountS, tokens);
+//            order.cancelledAmountB = this.numberFormat(order.cancelledAmountB, tokenb);
+//            order.cancelledAmountS = this.numberFormat(order.cancelledAmountS, tokens);
             return order;
         }
 
