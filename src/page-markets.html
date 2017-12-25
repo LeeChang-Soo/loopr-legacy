@@ -285,12 +285,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
                 let filteredMarkets = _.map(result, function(i) {
                     var item = i;
-                    if (i.change > 0) {
+                    let change = Number(item.change.substring(0, item.change.length - 1));
+                    if (change > 0) {
                         item.changeClass = "increase";
-                        item.changeStr = "+" + i.change.toFixed(1) + "%";
+                        item.changeStr = i.change;
                     } else if (i.change < 0) {
                         item.changeClass = "decrease";
-                        item.changeStr = i.change.toFixed(1) + "%";
+                        item.changeStr = i.change;
                     } else {
                         item.changeClass = "";
                         item.changeStr = "0.0%";
