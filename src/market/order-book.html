@@ -168,7 +168,7 @@
                     var item = {};
                     item.amount = Number(i[1]);
                     item.price = Number(i[0]);
-                    item.size = item.amount * item.price;
+                    item.size = Number(i[2]);
                     return item;
                 };
 
