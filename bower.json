@@ -68,6 +68,8 @@
         "iron-a11y-keys-behavior": "^v2.0.0",
         "iron-flex-layout": "^2.0.0",
         "iron-resizable-behavior": "^v2.0.0",
+        "vaadin-control-state-mixin": "^2.0.0",
+        "iron-collapse": "^2.0.0",
         "iron-selector": "^2.0.0",
         "lodash": "^4.17.4",
         "paper-styles": "^2.0.0",
