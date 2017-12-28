@@ -137,7 +137,7 @@
 
         commitCutoff() {
             try {
-                let cutoff = Date.parse(new Date());
+                let cutoff = Date.parse(new Date()) / 1000;
                 let currentVersion = this.settingsVersion;
                 const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
                 const data = signer.generateCutOffData('0x' + cutoff.toString(16));
