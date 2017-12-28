@@ -256,6 +256,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="settings-marginSplit" value="{{settingsMarginSplit}}"></global-variable>
+        <global-variable key="settings-expireTime" value="{{settingsExpireTime}}"></global-variable>
+        <global-variable key="settings-expireTimeUnit" value="{{settingsExpireTimeUnit}}"></global-variable>
         <scary-cookie id="settingsLang" name="settings-lang" value="{{settingsLang}}"></scary-cookie>
         <scary-cookie id="settingsCurrency" name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
         <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
@@ -265,6 +267,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
         <scary-cookie id="warnedVersion" name="warned-version" value="{{warnedVersion}}"></scary-cookie>
         <scary-cookie id="settingsMarginSplit" name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
+        <scary-cookie id="settingsExpireTime" name="settings-expireTime" value="{{settingsExpireTime}}"></scary-cookie>
+        <scary-cookie id="settingsExpireTimeUnit" name="settings-expireTimeUnit" value="{{settingsExpireTimeUnit}}"></scary-cookie>
         <!-- main layout -->
         <app-drawer-layout fullbleed force-narrow>
             <app-drawer no-focus-trap slot="drawer">
@@ -425,6 +429,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             if (this.$.settingsMarginSplit.value) {
                 cookieValue["settingsMarginSplit"] = this.$.settingsMarginSplit.value;
             }
+            if (this.$.settingsExpireTime.value) {
+                cookieValue["settingsExpireTime"] = this.$.settingsExpireTime.value;
+            }
+            if (this.$.settingsExpireTimeUnit.value) {
+                cookieValue["settingsExpireTimeUnit"] = this.$.settingsExpireTimeUnit.value;
+            }
             this.cookieValues = cookieValue;
 
             this.addEventListener('notification', e => this.$.notification.display(e.detail));
@@ -514,6 +524,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.settingsMarginSplit = cookieValues["settingsMarginSplit"];
                 } else {
                     this.settingsMarginSplit = appConfig.defaultMarginSplitPercentage;
+                }
+                if (cookieValues["settingsExpireTime"] && cookieValues["settingsExpireTimeUnit"]) {
+                    this.settingsExpireTime = cookieValues["settingsExpireTime"];
+                    this.settingsExpireTimeUnit = cookieValues["settingsExpireTimeUnit"];
+                } else {
+                    this.settingsExpireTime = appConfig.defaultExpireTime;
+                    this.settingsExpireTimeUnit = appConfig.defaultExpireTimeUnit;
                 }
             }
         }

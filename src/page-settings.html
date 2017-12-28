@@ -84,6 +84,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 padding-top: 96px;
             }
         }
+
+        .time-selector {
+            width: 60px;
+            padding-left: 10px;
+        }
+
+        .time-input {
+            width: 70px;
+        }
+
         </style>
         <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -96,6 +106,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
             <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
             <global-variable key="settings-marginSplit" value="{{settingsMarginSplit}}"></global-variable>
+            <global-variable key="settings-expireTime" value="{{settingsExpireTime}}"></global-variable>
+            <global-variable key="settings-expireTimeUnit" value="{{settingsExpireTimeUnit}}"></global-variable>
             <scary-cookie id="settingsCurrency" name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
             <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
             <scary-cookie id="settingsRelay" name="settings-relay" value="{{settingsRelay}}"></scary-cookie>
@@ -104,6 +116,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <scary-cookie id="settingsVersion" name="settings-version" value="{{settingsVersion}}"></scary-cookie>
             <scary-cookie id="settingsMarginSplit" name="settings-marginSplit" value="{{settingsMarginSplit}}"></scary-cookie>
             <scary-cookie id="settingsLang" name="settings-lang" value="{{settingsLang}}"></scary-cookie>
+            <scary-cookie id="settingsExpireTime" name="settings-expireTime" value="{{settingsExpireTime}}"></scary-cookie>
+            <scary-cookie id="settingsExpireTimeUnit" name="settings-expireTimeUnit" value="{{settingsExpireTimeUnit}}"></scary-cookie>
             <loopr-toolbar slot="secondary-toolbar" active-tab="settings"></loopr-toolbar>
             <div class="sections" unresolved>
                 <paper-card>
@@ -153,6 +167,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     <div class="value-label"><span id="gasPriceLabel" class="caption">{{appConfig.defaultGasPrice}}GWEI</span></div>
                                 </div>
                             </div>
+                            <div class="item horizontal center layout">
+                                <div class="label">Order Expire Time</div>
+                                <div class="horizontal start-justified layout">
+                                    <vaadin-text-field class="time-input" id="expireTime" pattern="[[_expireTimePatten()]]" error-message="[[_expireTimeError()]]"></vaadin-text-field>
+                                    <vaadin-combo-box class="time-selector" id="timeUnits" items="{{timeUnits}}"></vaadin-combo-box>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </paper-card>
@@ -182,7 +203,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Object,
                     computed: '_initBind(appConfig, cookieValues)'
                 },
-                contractAddress: String
+                contractAddress: String,
+                timeUnits: {
+                    type: Object,
+                    value: function() { return ["Day", "Hour", "Minute", "Second"]; }
+                }
             };
         }
 
@@ -212,6 +237,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             if (this.$.settingsMarginSplit.value) {
                 cookieValue["settingsMarginSplit"] = this.$.settingsMarginSplit.value;
+            }
+            if (this.$.settingsExpireTime.value) {
+                cookieValue["settingsExpireTime"] = this.$.settingsExpireTime.value;
+            }
+            if (this.$.settingsExpireTimeUnit.value) {
+                cookieValue["settingsExpireTimeUnit"] = this.$.settingsExpireTimeUnit.value;
             }
             this.cookieValues = cookieValue;
 
@@ -247,6 +278,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     console.log("marginSplit change to: " + _this.settingsMarginSplit);
                 }
             });
+
+            this.$.expireTime.addEventListener('value-changed', function() {
+                let value = this.$.expireTime.value;
+                if (this._isExpireTime(value)) {
+                    this.$.settingsExpireTime.value = value;
+                    this.settingsExpireTime = value;
+                    console.log("expireTime change to: " + this.$.settingsExpireTime.value);
+                }
+            }.bind(this));
+
+            this.$.timeUnits.addEventListener('value-changed', function() {
+                let value = this.$.timeUnits.value;
+                this.$.settingsExpireTimeUnit.value = value;
+                this.settingsExpireTimeUnit = value;
+                console.log("expireTimeUnit change to: " + this.$.settingsExpireTimeUnit.value);
+            }.bind(this));
         }
 
         static get observers() {
@@ -274,7 +321,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.settingsMarginSplit = appConfig.defaultMarginSplitPercentage;
                     this.$.settingsMarginSplit.value = appConfig.defaultMarginSplitPercentage;
                 }
-
+                if (cookieValues["settingsExpireTime"] && cookieValues["settingsExpireTimeUnit"]) {
+                    this.$.expireTime.value = cookieValues["settingsExpireTime"];
+                    this.$.timeUnits.value = cookieValues["settingsExpireTimeUnit"];
+                } else {
+                    this.$.settingsExpireTime.value = appConfig.defaultExpireTime;
+                    this.$.settingsExpireTimeUnit.value = appConfig.defaultExpireTimeUnit;
+                    this.$.expireTime.value = appConfig.defaultExpireTime;
+                    this.$.timeUnits.value = appConfig.defaultExpireTimeUnit;
+                }
             }
             return null;
         }
@@ -416,6 +471,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         _marginSplitError(int) {
             return "input valid integer value (0~100)";
+        }
+
+        _expireTimePatten() {
+            return "^([0-9]{1,})$";
+        }
+
+        _isExpireTime(intVal) {
+            return intVal.toString().match(this._marginSplitPatten());
+        }
+
+        _expireTimeError(int) {
+            return "int only";
         }
     }
 

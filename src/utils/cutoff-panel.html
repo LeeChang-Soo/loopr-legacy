@@ -60,9 +60,10 @@
             <paper-card>
                 <div class="vertical center layout">
                     <div class="horizontal center layout">
-                        <overlay-datetime-picker id="cutoff" native value="{{cutoff}}"></overlay-datetime-picker>
+                        <!--<overlay-datetime-picker id="cutoff" native value="{{cutoff}}"></overlay-datetime-picker>-->
+                        <div id="cutoff">{{cutoff}}</div>
                         <div class="button">
-                            <paper-button primary raised on-click="commitCutoff" id="set">Commit Cutoff</paper-button>
+                            <paper-button primary raised on-click="commitCutoff" id="set">Cancel All Orders</paper-button>
                         </div>
                     </div>
                     <div class="explain horizontal center layout">
@@ -122,20 +123,24 @@
         }
 
         _computeCutoff(resp) {
-            this.$.cutoff.datetime = "1970-01-01T00:00:00.000Z"; //set default datetime or it will not display correctly
             if (resp && resp.result) {
-                return Math.max(1, Number(resp.result) * 1000);
+                let set = Number(resp.result);
+                if (set >0) {
+                    return moment(set * 1000).format('YYYY/MM/DD HH:MM:ss')
+                } else {
+                    return "Cutoff Not Set";
+                }
             } else {
-                return Number(1);
+                return "Cutoff Not Set";
             }
         }
 
         commitCutoff() {
             try {
-                let cutoffNode = this.$.cutoff;
+                let cutoff = Date.parse(new Date()) / 1000;
                 let currentVersion = this.settingsVersion;
                 const contractAddress = this.appConfig.contractVersionMap[currentVersion].address;
-                const data = signer.generateCutOffData('0x' + (Number(cutoffNode.value) / 1000).toString(16));
+                const data = signer.generateCutOffData('0x' + cutoff.toString(16));
                 const rawTx = {
                     to: contractAddress,
                     gasPrice: '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16),

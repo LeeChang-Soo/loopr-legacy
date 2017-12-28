@@ -86,12 +86,13 @@
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
-
         <global-variable key="settings-lrcFee" value="{{settingsLrcFee}}"></global-variable>
         <global-variable key="settings-relay" value="{{settingsRelay}}"></global-variable>
         <global-variable key="settings-gasPrice" value="{{settingsGasPrice}}"></global-variable>
         <global-variable key="settings-version" value="{{settingsVersion}}"></global-variable>
         <global-variable key="settings-marginSplit" value="{{settingsMarginSplit}}"></global-variable>
+        <global-variable key="settings-expireTime" value="{{settingsExpireTime}}"></global-variable>
+        <global-variable key="settings-expireTimeUnit" value="{{settingsExpireTimeUnit}}"></global-variable>
 
         <paper-tabs selected="{{sellOrBuy}}" attr-for-selected="name">
             <paper-tab name="buy">Buy</paper-tab>
@@ -467,7 +468,7 @@
 
                         return;
                     }
-                    if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
+                    if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee || !this.settingsExpireTime || !this.settingsExpireTimeUnit) {
                         return;
                     }
 
@@ -500,7 +501,17 @@
                     data.amountS = '0x' +new  BigNumber(new BigNumber(this.buyAmount).times(this.buyPrice).times(Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
                     data.amountB = '0x' + new BigNumber(this.buyAmount).times(Number('1e' + this.tokens.digits)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
-                    data.ttl = 10 * 24 * 3600;
+                    let ttl = this.appConfig.defaultExpireTime * 24 * 3600;
+                    if (this.settingsExpireTimeUnit === "Day") {
+                        ttl = this.settingsExpireTime * 24 * 3600;
+                    } else if (this.settingsExpireTimeUnit === "Hour") {
+                        ttl = this.settingsExpireTime * 3600;
+                    } else if (this.settingsExpireTimeUnit === "Minute") {
+                        ttl = this.settingsExpireTime * 60;
+                    } else if (this.settingsExpireTimeUnit === "Second") {
+                        ttl = this.settingsExpireTime;
+                    }
+                    data.ttl = ttl;
                     data.salt = Math.round(Math.random() * 1e8);
                     if (!this.lrc) {
                         const detail = {
@@ -533,7 +544,7 @@
                     if (this.tokenb.token.toUpperCase() === 'LRC') {
                         const require = new BigNumber(data.amountS).plus(data.buyFee).plus(response.result) ;
                         if (require.gt(allowance)) {
-                            const amount = defaultValue.gt(require)  ? defaultValue : require;
+                            const amount = new BigNumber("9223372036854775806").times(Number('1e'+this.tokenb.digits));
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -544,7 +555,7 @@
                                 tx.data = signer.generateApproveData(spender, '0x' + amount.toString(16));
                                 raws.push({"raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of "+this.tokenb.token.toUpperCase(),
-                                    "description":"Set allowance  to " + amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set allowance to " + amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             } else {
                                 tx.data = signer.generateApproveData(spender, '0x0');
@@ -554,21 +565,17 @@
                                 raws.push({
                                     "raw": cancelRaw,
                                     "subTitle": "Cancel Older Authorization Of " + this.tokenb.token.toUpperCase(),
-                                    "description": "Set allowance  to 0 first in order to set Allowance to "+ amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description": "Set allowance to 0 first in order to set Allowance to "+ amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 }, {"raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of "+this.tokenb.token.toUpperCase(),
-                                    "description":"Set allowance  to " + amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set allowance to " + amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             }
                         }
-
                     } else {
-
                         const require = new BigNumber(data.amountS).plus(response.result) ;
-
                         if (require.gt(allowance)) {
-
-                            const amount = defaultValue .gt(require) ? defaultValue : require;
+                            const amount = new BigNumber("9223372036854775806").times(Number('1e'+this.tokenb.digits));
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -590,11 +597,11 @@
                                 raws.push({
                                     "raw": cancelRaw,
                                     "subTitle": "Cancel Older Authorization Of " + this.tokenb.token.toUpperCase(),
-                                    "description": "Set allowance  to 0 first in order to set Allowance to "+ amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description": "Set allowance to 0 first in order to set Allowance to "+ amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 }, {
                                     "raw": JSON.stringify(tx),
                                     "subTitle": "New Authorization Of " + this.tokenb.token.toUpperCase(),
-                                    "description":"Set allowance  to " + amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
+                                    "description":"Set allowance to " + amount.div(Number('1e'+this.tokenb.digits))+" with gas is "+Number(gasLimit)+ " and gasPrice is " + Number(gasPrice)/1e9 + "Gwei."
                                 });
                             }
                         }
@@ -602,8 +609,7 @@
                         const lrcResponse =  await relay.getEstimatedAllocatedAllowance(this.wallet.address, 'LRC');
                         const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
                         if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times(Number('1e' + this.lrc.digits))) ) {
-                            const defaultlrc = new BigNumber(this.lrc.allowance);
-                            const lrcAmount = defaultlrc.gt(lrcRequest) ? defaultlrc : lrcRequest;
+                            const lrcAmount = new BigNumber("9223372036854775806").times(Number('1e'+this.lrc.digits));
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -684,7 +690,7 @@
 
                         return
                     }
-                    if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee) {
+                    if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee || !this.settingsExpireTime || !this.settingsExpireTimeUnit) {
                         return;
                     }
                      const whiteList = _.map(this.appConfig.whiteList,add => add.toLowerCase());
@@ -715,7 +721,17 @@
                     data.amountS = '0x' + new BigNumber(this.sellAmount).times(Number('1e' + this.tokens.digits)).toString(16);
                     data.amountB = '0x' + new BigNumber(new BigNumber(this.sellAmount).times(this.sellPrice).times(Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
-                    data.ttl = 30 * 24 * 3600;
+                    let ttl = this.appConfig.defaultExpireTime * 24 * 3600;
+                    if (this.settingsExpireTimeUnit === "Day") {
+                        ttl = this.settingsExpireTime * 24 * 3600;
+                    } else if (this.settingsExpireTimeUnit === "Hour") {
+                        ttl = this.settingsExpireTime * 3600;
+                    } else if (this.settingsExpireTimeUnit === "Minute") {
+                        ttl = this.settingsExpireTime * 60;
+                    } else if (this.settingsExpireTimeUnit === "Second") {
+                        ttl = this.settingsExpireTime;
+                    }
+                    data.ttl = ttl;
                     data.salt = Math.round(Math.random() * 1e8);
 
                     if (!this.lrc) {
@@ -747,7 +763,7 @@
                         const require = new BigNumber(data.amountS).plus(data.lrcFee).plus(response.result) ;
 
                         if (require .gt(allowance) ) {
-                            const amount = defaultValue > require ? defaultValue :require;
+                            const amount = new BigNumber("9223372036854775806").times(Number('1e'+this.tokens.digits));
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -781,7 +797,7 @@
                         const require = new BigNumber(data.amountS).plus(response.result) ;
 
                         if (require.gt(allowance) ) {
-                            const  amount = defaultValue.gt(require) ? defaultValue : require;
+                            const amount = new BigNumber("9223372036854775806").times(Number('1e'+this.tokens.digits));
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -816,8 +832,7 @@
                         const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
 
                         if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times(Number('1e' + this.lrc.digits))) ) {
-                            const defaultlrc = new BigNumber(this.lrc.allowance);
-                            const lrcAmount = defaultlrc.gt(lrcRequest) ? defaultlrc : lrcRequest;
+                            const lrcAmount = new BigNumber("9223372036854775806").times(Number('1e'+this.lrc.digits));
 
                             const tx = {};
                             tx.gasPrice = gasPrice;
