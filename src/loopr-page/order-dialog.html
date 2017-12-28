@@ -326,8 +326,14 @@
                             composed: true,
                             detail: detail
                         }));
-                    }
-                    if (err && err.message.indexOf('known transaction') === -1) {
+                    }else if(err && err.message.indexOf('underpriced') > -1){
+                        const detail = {text: 'A tx with the same nonce has been sent, wait for it complete, or increase gasprice or gaslimit, then try again if you want to replace it', category: "warning", duration: 8000};
+                        this.dispatchEvent(new CustomEvent('notification', {
+                            bubbles: true,
+                            composed: true,
+                            detail: detail
+                        }));
+                    } else if (err) {
                         const detail = {text: err.message, category: "error", duration: 8000};
                         this.dispatchEvent(new CustomEvent('notification', {
                             bubbles: true,
