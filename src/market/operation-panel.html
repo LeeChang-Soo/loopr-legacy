@@ -127,7 +127,7 @@
                         </template>
                         <template is="dom-if"
                                   if="[[!bothNonEnough(sellAmount,tokensBalance,tokensAllowance,tokens,sellFee)]]">
-                            <template is="dom-if" if="[[!isBalanceEnough(sellAmount,tokensBalance,tokens,sellFee)]]">
+                            <template is="dom-if" if="[[!isBalanceEnough(sellAmount,tokensBalance)]]">
                                 [[_showBalanceNonEnough(tokensBalance,tokens,sellFee,sellAmount)]].<br>
                             </template>
                         </template>
@@ -135,8 +135,8 @@
                                   if="[[bothNonEnough(sellAmount,tokensBalance,tokensAllowance,tokens,sellFee)]]">
                             [[_showBothNonEnough(tokensBalance,tokensAllowance,tokens,sellAmount,sellFee)]]  <br>
                         </template>
-                        <template is="dom-if" if="[[!isEnoughFee(sellFee,lrcBalance,tokens)]]">
-                              You have insufficient LRC balance([[lrcBalance]]) to afford LRC fee, we will set Margin Split to be 100% if you continue to place order
+                        <template is="dom-if" if="[[!isEnoughFee(sellFee,lrcBalance,tokens,sellAmount)]]">
+                              You have insufficient LRC balance([[lrcBalance]]) to afford LRC fee and sell [[sellAmount]] [[tokens.token]], we will set Margin Split to be 100% if you continue to place order
                         </template>
                     </div>
                     <div class="common">
@@ -152,7 +152,7 @@
                         </template>
                         <template is="dom-if"
                                   if="[[!bothNonEnough(sellAmount,tokensBalance,tokensAllowance,tokens,sellFee)]]">
-                            <template is="dom-if" if="[[!isBalanceEnough(sellAmount,tokensAllowance,tokens,sellFee)]]">
+                            <template is="dom-if" if="[[!isBalanceEnough(sellAmount,tokensAllowance)]]">
                                 You have insufficient allowance([[tokensAllowance]]). <a
                                     href="/#/approve/[[tokenb.token]]" tabindex="-1"> Improve allowance </a>
                                 <br> [[_showAmountInfo(tokenb, sellTotal, priceQuote,settingsLrcFee)]]
@@ -198,8 +198,8 @@
                         <template is="dom-if" if="[[bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance,buyFee)]]">
                             [[_showBothNonEnough(tokenbBalance,tokenbAllowance,tokenb,buyTotal,buyFee)]] <br>
                         </template>
-                        <template is="dom-if" if="[[!isEnoughFee(buyFee,lrcBalance,tokenb)]]">
-                            You have insufficient LRC balance( [[lrcBalance]]) to afford LRC fee, we will set Margin Split to be 100% if you continue to place order.
+                        <template is="dom-if" if="[[!isEnoughFee(buyFee,lrcBalance,tokenb,buyTotal)]]">
+                            You have insufficient LRC balance( [[lrcBalance]]) to afford LRC fee and and sell [[buyTotal]] [[tokenb.token]], we will set Margin Split to be 100% if you continue to place order.
                         </template>
                     </div>
                     <div class="common">
@@ -214,7 +214,7 @@
                         </template>
                         <template is="dom-if"
                                   if="[[!bothNonEnough(buyTotal,tokenbBalance,tokenbAllowance,tokenb,buyFee)]]">
-                            <template is="dom-if" if="[[!isBalanceEnough(buyTotal,tokenbAllowance,tokenb,buyFee)]]">
+                            <template is="dom-if" if="[[!isBalanceEnough(buyTotal,tokenbAllowance)]]">
                                 You have insufficient allowance([[tokenbAllowance]]).
                                 <a href="/#/approve/[[tokenb.token]]" tabindex="-1"> Improve allowance </a>
                                 <br> [[_showAmountInfo(tokenb, buyTotal, priceQuote, settingsLrcFee)]]
@@ -498,8 +498,8 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokenb.address;
                     data.tokenB = this.tokens.address;
-                    data.amountS = '0x' + Number((Number(this.buyTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
-                    data.amountB = '0x' + (Number(this.buyAmount) * Number('1e' + this.tokens.digits)).toString(16);
+                    data.amountS = '0x' +new  BigNumber(new BigNumber(this.buyAmount).times(this.buyPrice).times(Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
+                    data.amountB = '0x' + new BigNumber(this.buyAmount).times(Number('1e' + this.tokens.digits)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     let ttl = this.appConfig.defaultExpireTime * 24 * 3600;
                     if (this.settingsExpireTimeUnit === "Day") {
@@ -526,7 +526,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = this.isEnoughFee(this.buyFee, this.lrcBalance,this.tokenb) ? '0x' + (this._showAmount(this.buyFee) * Number('1e' + this.lrc.digits)).toString(16) : '0x0';
+                    data.lrcFee = this.isEnoughFee(this.buyFee, this.lrcBalance,this.tokenb,this.buyTotal) ? '0x' + new BigNumber(this._showAmount(this.buyFee)).times(Number('1e' + this.lrc.digits)).toString(16) : '0x0';
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(data.lrcFee) !==0 ? Number(this.settingsMarginSplit) : 100;
                     detail.order = {
@@ -723,8 +723,8 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
-                    data.amountS = '0x' + (Number(this.sellAmount) * Number('1e' + this.tokens.digits)).toString(16);
-                    data.amountB = '0x' + Number((Number(this.sellTotal) * Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
+                    data.amountS = '0x' + new BigNumber(this.sellAmount).times(Number('1e' + this.tokens.digits)).toString(16);
+                    data.amountB = '0x' + new BigNumber(new BigNumber(this.sellAmount).times(this.sellPrice).times(Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     let ttl = this.appConfig.defaultExpireTime * 24 * 3600;
                     if (this.settingsExpireTimeUnit === "Day") {
@@ -748,7 +748,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = this.isEnoughFee(this.sellFee, this.lrcBalance,this.tokens) ? '0x' + (this._showAmount(this.sellFee) * Number('1e' + this.lrc.digits)).toString(16) : '0x0';
+                    data.lrcFee = this.isEnoughFee(this.sellFee, this.lrcBalance,this.tokens,this.sellAmount) ? '0x' + new BigNumber(this._showAmount(this.sellFee)).times(Number('1e' + this.lrc.digits)).toString(16) : '0x0';
                     data.buyNoMoreThanAmountB = false;
                     data.marginSplitPercentage = Number(data.lrcFee) !==0 ? Number(this.settingsMarginSplit) : 100;
                     detail.order = {
@@ -935,17 +935,17 @@
                 return true;
             }
 
-            isEnoughFee(lrcFee, lrcBalance, token) {
+            isEnoughFee(lrcFee, lrcBalance, token, amount) {
 
-                if (lrcFee >= 0 && lrcBalance >= 0 && token) {
-                    return token.token.toUpperCase() === "LRC" ? true : lrcFee <= lrcBalance;
+                if (lrcFee >= 0 && lrcBalance >= 0 && token && amount >= 0) {
+                    return token.token.toUpperCase() === "LRC" ? Number(amount) + lrcFee <= lrcBalance: lrcFee <= lrcBalance;
                 }
                 return true
             }
 
-            isBalanceEnough(require, left, token, lrcFee) {
-                if (left >= 0 && Number(require) >= 0 && token) {
-                    return (lrcFee && token.token.toUpperCase() === 'LRC') ? left >= Number(require) + lrcFee : left >= Number(require)
+            isBalanceEnough(require, left) {
+                if (left >= 0 && Number(require) >= 0 ) {
+                    return  Number(left) >= Number(require)
                 }
                 return true
             }
