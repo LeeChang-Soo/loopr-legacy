@@ -419,12 +419,6 @@
                     return _.find(appConfig.tokens, {token: "ETH"});
                 }
             }
-            isLRC(token){
-                if(token){
-                    return token.token.toUpperCase() === 'LRC'
-                }
-                return false;
-            }
 
             _numPatten(precision) {
                 if(precision){
@@ -448,7 +442,7 @@
 
             async placeBuyOrder() {
 
-           //     try {
+                try {
                     if (!this.wallet) {
 
                         const detail = {
@@ -672,19 +666,19 @@
                         composed: true,
                         detail: detail
                     }));
-//                } catch (e) {
-//
-//                    const detail = {
-//                        text: e.message,
-//                        category: "error",
-//                        duration: 5000
-//                    };
-//                    this.dispatchEvent(new CustomEvent('notification', {
-//                        bubbles: true,
-//                        composed: true,
-//                        detail
-//                    }));
-//                }
+                } catch (e) {
+
+                    const detail = {
+                        text: e.message,
+                        category: "error",
+                        duration: 5000
+                    };
+                    this.dispatchEvent(new CustomEvent('notification', {
+                        bubbles: true,
+                        composed: true,
+                        detail
+                    }));
+                }
             }
 
             async placeSellOrder() {
@@ -926,14 +920,6 @@
                 return false;
             }
 
-            bothNonEnough(amount, balance, allowance, token, lrcFee, ethBalance) {
-                if (balance >= 0 && allowance >= 0 && Number(amount) >= 0 && token) {
-                    return (lrcFee>=0 && token.token.toUpperCase() === 'LRC') ?
-                        Number(amount) + lrcFee > balance && Number(amount) + lrcFee > allowance :
-                        Number(amount) > balance && Number(amount) > allowance
-                }
-                return false
-            }
 
             isEnough(require, left) {
 
