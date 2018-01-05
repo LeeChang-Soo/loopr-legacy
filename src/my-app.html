@@ -34,7 +34,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../bower_components/iron-autogrow-textarea/iron-autogrow-textarea.html">
 <link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
-
 <link rel="import" href="../bower_components/marked-element/marked-element.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
@@ -244,6 +243,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- ajax -->
         <loopr-ajax relay="https://raw.githubusercontent.com" suffix="Loopring/mock-relay-data/master/config.json" last-response="{{appConfigRaw}}"></loopr-ajax>
         <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getPriceQuote" params="[[priceParams]]" last-response="{{priceQuoteRaw}}" loading="{{priceLoading}}"></loopr-relay-ajax>
+        <loopr-relay-ajax relay="[[relayUrl]]" method="loopring_getSupportedMarket" params="[[{}]]" last-response="{{marketsRaw}}"></loopr-relay-ajax>
+
         <!-- global vars -->
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -258,6 +259,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <global-variable key="settings-marginSplit" value="{{settingsMarginSplit}}"></global-variable>
         <global-variable key="settings-expireTime" value="{{settingsExpireTime}}"></global-variable>
         <global-variable key="settings-expireTimeUnit" value="{{settingsExpireTimeUnit}}"></global-variable>
+        <global-variable key="support-markets" value="{{supportMarkets}}"></global-variable>
         <scary-cookie id="settingsLang" name="settings-lang" value="{{settingsLang}}"></scary-cookie>
         <scary-cookie id="settingsCurrency" name="settings-currency" value="{{settingsCurrency}}"></scary-cookie>
         <scary-cookie id="settingsLrcFee" name="settings-lrcFee" value="{{settingsLrcFee}}"></scary-cookie>
@@ -395,6 +397,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 relayUrl: {
                     type: String,
                     computed: '_computeUrl(settingsRelay)'
+                },
+                supportMarkets:{
+                    type:Object,
+                    computed:'_computedMarkets(marketsRaw)'
                 }
             };
         }
@@ -581,6 +587,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.$.pages.style.display = "inherit";
                 return appConfig;
             }
+        }
+
+
+        _computedMarkets(marketsRaw){
+
+        return marketsRaw ? marketsRaw.result : [];
         }
 
         _resetWallet() {

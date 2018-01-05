@@ -94,6 +94,8 @@
         <scary-cookie id="favoriteTokens" name="favorite-tokens" value="{{favoriteTokens}}"></scary-cookie>
         <global-variable key="token-price" value="{{priceQuote}}"></global-variable>
         <global-variable key="balances-raw" value="{{balancesRaw}}"></global-variable>
+        <global-variable key="support-markets" value="{{supportMarkets}}"></global-variable>
+
         <!--<loopr-ajax id="ajax" relay="[[settingsRelay]]" suffix="Loopring/mock-relay-data/master/balances.json" last-response="{{balancesRaw}}" loading={{loading}}></loopr-ajax>-->
         <loopr-relay-ajax id="ajax" relay="[[relayUrl]]" method="loopring_getBalance" params="[[params]]" last-response="{{balancesRaw}}" loading="{{loading}}"></loopr-relay-ajax>
         <div class="sections">
@@ -215,7 +217,7 @@
                         <template>
                             <div class="operations">
                                 <a href="#/transfer/[[item.token]]">Transfer</a>
-                                <a href="#/market/[[item.token]]-WETH">Trade</a>
+                                <a href="[[computeHref(item,supportMarkets)]]" disabled="[[isSupport(item,supportMarkets)]]">Trade</a>
                                 <a href="#/approve/[[item.token]]">Approve</a>
                             </div>
                         </template>
@@ -284,6 +286,14 @@
                 cookieValue["favoriteTokens"] = "";
             }
             this.cookieValues = cookieValue;
+        }
+
+        isSupport(item, supportMarkets){
+            return item && supportMarkets ? _.indexOf(supportMarkets, market) > -1: false;
+        }
+
+        computeHref(item, supportMarkets){
+            return this.isSupport(item, supportMarkets) ? ' #/market/'+item.token +'-WETH' :'';
         }
 
         _computeParams(route, settingsVersion, wallet) {
