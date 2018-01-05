@@ -90,7 +90,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <template is="dom-if" if="[[!isSupportMarket(market,supportMarkets)]]">
                         <div class="walletlink">
                             <a href="/#/settings" class="walletlink">
-                                Current relay doesn't support [[market]] Market, change relay to trade
+                               <paper-button primary> Current relay doesn't support [[market]] Market, change relay to trade</paper-button>
                             </a>
                         </div>
                     </template>
@@ -175,10 +175,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         isSupportMarket(market, supportMarkets){
 
             if(market && supportMarkets){
-
-                console.log(market);
-                return false;
-//                return _.indexOf(supportMarkets, market.toUpperCase()) > -1;
+                return _.indexOf(supportMarkets, market.toUpperCase()) > -1;
             }else {
                 return false;
             }

@@ -85,6 +85,12 @@
             --iron-icon-width: 20px;
             --iron-icon-fill-color: var(--paper-amber-700);
         }
+
+        a.disabledLink {
+            color: var(--google-grey-300);
+            text-decoration: none;
+        }
+
         </style>
         <global-variable key="wallet" value="{{wallet}}"></global-variable>
         <global-variable key="app-config" value="{{appConfig}}"></global-variable>
@@ -217,7 +223,7 @@
                         <template>
                             <div class="operations">
                                 <a href="#/transfer/[[item.token]]">Transfer</a>
-                                <a href="[[computeHref(item,supportMarkets)]]" disabled="[[isSupport(item,supportMarkets)]]">Trade</a>
+                                <a href="[[computeHref(item,supportMarkets)]]" class$="[[tradeClass(item,supportMarkets)]]" >Trade</a>
                                 <a href="#/approve/[[item.token]]">Approve</a>
                             </div>
                         </template>
@@ -289,11 +295,16 @@
         }
 
         isSupport(item, supportMarkets){
-            return item && supportMarkets ? _.indexOf(supportMarkets, market) > -1: false;
+            return item && supportMarkets ? _.indexOf(supportMarkets, item.token.toUpperCase()+'-WETH') > -1: false;
         }
 
         computeHref(item, supportMarkets){
-            return this.isSupport(item, supportMarkets) ? ' #/market/'+item.token +'-WETH' :'';
+            return this.isSupport(item, supportMarkets) ? ' #/market/'+item.token.toUpperCase()+'-WETH' :'javascript:void(0)';
+        }
+
+        tradeClass(item, supportMarkets){
+
+            return this.isSupport(item, supportMarkets) ? '' : 'disabledLink';
         }
 
         _computeParams(route, settingsVersion, wallet) {
