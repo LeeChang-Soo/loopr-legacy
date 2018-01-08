@@ -94,6 +94,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             width: 70px;
         }
 
+        .qtumBind {
+            width: 50px;
+        }
+
+        .neoBind {
+            width: 50px;
+        }
+
         </style>
         <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -174,9 +182,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     <vaadin-combo-box class="time-selector" id="timeUnits" items="{{timeUnits}}"></vaadin-combo-box>
                                 </div>
                             </div>
+                            <template is="dom-if" if="[[_isShowBindQtum(wallet)]]">
+                                <div class="item horizontal center layout">
+                                    <div class="label">Bind QTUM Address</div>
+                                    <vaadin-text-field id="qtumAddress" value="[[qtumAddress]]" pattern="[[_length()]]" error-message="Not a valid QTUM address"></vaadin-text-field>
+                                    <template is="dom-if" if="[[_isQtumBindable(wallet, appConfig)]]">
+                                        <div class="qtumBind"><paper-button on-click="_bindQtum">Bind</paper-button></div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template is="dom-if" if="[[_isShowBindNeo(wallet)]]">
+                                <div class="item horizontal center layout">
+                                    <div class="label">Bind NEO Address</div>
+                                    <vaadin-text-field id="neoAddress" value="[[neoAddress]]" pattern="[[_length()]]" error-message="Not a valid NEO address"></vaadin-text-field>
+                                    <template is="dom-if" if="[[_isNeoBindable(wallet, appConfig)]]">
+                                        <div class="neoBind"><paper-button on-click="_bindNeo">Bind</paper-button></div>
+                                    </template>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </paper-card>
+                <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
+                <iron-ajax id="getData" url="http://ec2-13-112-62-24.ap-northeast-1.compute.amazonaws.com:8888/getAddress" method="GET" params="[[getBindParams]]" handle-as="json" last-response="{{getBindResult}}" debounce-duration="300" loading="{{loading}}" on-error="_bindError"></iron-ajax>
+                <iron-ajax id="sendData" url="http://ec2-13-112-62-24.ap-northeast-1.compute.amazonaws.com:8888/setAddress" method="GET" params="[[bindParams]]" handle-as="json" last-response="{{bindResult}}" debounce-duration="300" on-error="_bindError"></iron-ajax>
                 <div class="footer-spacer"></div>
                 <loopr-footer></loopr-footer>
             </div>
@@ -207,7 +236,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 timeUnits: {
                     type: Object,
                     value: function() { return ["Day", "Hour", "Minute", "Second"]; }
-                }
+                },
+                getBindParams: {
+                    type: Object,
+                    computed: '_computeGetBindParams(wallet)'
+                },
+                bindParams: Object
             };
         }
 
@@ -296,10 +330,77 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }.bind(this));
         }
 
+        _length() {
+            return "^[a-zA-Z0-9]{34}$"
+        }
+
+        _computeGetBindParams(wallet) {
+            if (wallet) {
+                return { ethAddress: wallet.address }
+            }
+        }
+
+        _isShowBindQtum(wallet) {
+            return (wallet && wallet.address)
+        }
+
+        isQtumBindable(wallet, appConfig) {
+            if  (wallet && appConfig) {
+                return Date.parse(new Date()) < Number(appConfig.qtumBindDeadline * 1000);
+            }
+        }
+
+        _isShowBindNeo(wallet) {
+            return (wallet && wallet.address)
+        }
+
+        _isNeoBindable(wallet, appConfig) {
+            if  (wallet && appConfig) {
+                return Date.parse(new Date()) < Number(appConfig.neoBindDeadline * 1000);
+            }
+        }
+
+        _isQtumBindable(wallet, appConfig) {
+            if  (wallet && appConfig) {
+                return Date.parse(new Date()) < Number(appConfig.qtumBindDeadline * 1000);
+            }
+        }
+
+        _bindQtum(e) {
+            let qtumAddress = this.shadowRoot.querySelector('#qtumAddress').value;
+            if (this.wallet && qtumAddress && qtumAddress.match(this._length())) {
+                this.bindParams = { ethAddress: this.wallet.address, qtumAddress:qtumAddress};
+                this.$.sendData.generateRequest();
+            }
+        }
+
+        _bindNeo(e) {
+            let neoAddress = this.shadowRoot.querySelector('#neoAddress').value;
+            if (this.wallet && neoAddress && neoAddress.match(this._length())) {
+                this.bindParams = { ethAddress: this.wallet.address, neoAddress:neoAddress};
+                this.$.sendData.generateRequest();
+            }
+        }
+
+        _reloadGetBind(getBindParams) {
+            if (getBindParams) {
+                this.$.getData.generateRequest();
+            }
+        }
+
+        _getBindResult(getBindResult) {
+            if (getBindResult) {
+                this.qtumAddress = getBindResult.data.qtum;
+                this.neoAddress = getBindResult.data.neo;
+            }
+        }
+
         static get observers() {
             return [
                 '_computeCookie(appConfig, cookieValues)',
-                '_setRelay(appConfig, cookieValues, relays)'
+                '_setRelay(appConfig, cookieValues, relays)',
+                '_reloadGetBind(getBindParams)',
+                '_getBindResult(getBindResult)'
             ];
         }
 
@@ -483,6 +584,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         _expireTimeError(int) {
             return "int only";
+        }
+
+        _bindError(e) {
+            if (e) {
+                if (e.detail.error.message) {
+                    console.log( "Error message:["+e.detail.error.message+"]");
+                } else {
+                    console.log( "Error:["+e+"]");
+                }
+                let message = "Failed to talk to server,Please try again later"
+                var detail = { text: message, category: "error", duration: 30000 }
+                this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
+            }
         }
     }
 
