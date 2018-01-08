@@ -179,7 +179,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             if(route){
                 let parameters = this._returnParameters(route);
-                if(parameters && parameters.page && parameters.page === 'market' && market && supportMarkets && _.indexOf(supportMarkets, market.toUpperCase()) > -1){
+                if(parameters && parameters.page && parameters.page === 'market' && market && supportMarkets && _.indexOf(supportMarkets, market.toUpperCase()) === -1){
                     window.location.href = "#/markets";
                 }
             }
