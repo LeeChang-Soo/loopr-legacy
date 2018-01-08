@@ -74,7 +74,7 @@
 
         _computeMaxSend(token, gasLimit, gasPrice) {
             if (token && gasPrice && gasLimit) {
-                return new BigNumber(token.balance, 10).minus(gasLimit * gasPrice * 1e9).dividedBy(Number('1e' + token.digits)).times(Number('1e' + token.precision)).floor().dividedBy(Number('1e' + token.precision));
+                return new BigNumber(token.balance, 10).minus(gasLimit * gasPrice * 1e9).dividedBy(Number('1e' + token.digits)).times(Number('1e' + token.precision)).floor().dividedBy(Number('1e' + token.precision)).toString();
             }
         }
 
