@@ -554,7 +554,7 @@
                     if (this.tokenb.token.toUpperCase() === 'LRC') {
                         const require = new BigNumber(data.amountS).plus(data.buyFee).plus(response.result) ;
                         if (require.gt(allowance)) {
-                            const amount = new BigNumber("9223372036854775806").times(Number('1e'+this.tokenb.digits));
+                            const amount = new BigNumber('9223372036854775806').times(Number('1e'+this.tokenb.digits));
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
