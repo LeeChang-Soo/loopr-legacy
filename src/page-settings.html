@@ -344,12 +344,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return (wallet && wallet.address)
         }
 
-        isQtumBindable(wallet, appConfig) {
-            if  (wallet && appConfig) {
-                return Date.parse(new Date()) < Number(appConfig.qtumBindDeadline * 1000);
-            }
-        }
-
         _isShowBindNeo(wallet) {
             return (wallet && wallet.address)
         }
@@ -389,9 +383,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         _getBindResult(getBindResult) {
-            if (getBindResult) {
+            if (getBindResult && getBindResult.code === 0) {
                 this.qtumAddress = getBindResult.data.qtum;
                 this.neoAddress = getBindResult.data.neo;
+            } else {
+                console.log(getBindResult)
+                let message = "Failed to talk to server,Please try again later"
+                var detail = { text: message, category: "error", duration: 30000 }
+                this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
+            }
+        }
+
+        _bindResult(bindResult) {
+            if (bindResult && bindResult.code === 0) {
+                let message = "Bind success"
+                var detail = { text: message, category: "info", duration: 30000 }
+                this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
+            } else {
+                console.log(bindResult)
+                let message = "Failed to talk to server,Please try again later"
+                var detail = { text: message, category: "error", duration: 30000 }
+                this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
             }
         }
 
@@ -400,7 +412,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 '_computeCookie(appConfig, cookieValues)',
                 '_setRelay(appConfig, cookieValues, relays)',
                 '_reloadGetBind(getBindParams)',
-                '_getBindResult(getBindResult)'
+                '_getBindResult(getBindResult)',
+                '_bindResult(bindResult)'
             ];
         }
 
