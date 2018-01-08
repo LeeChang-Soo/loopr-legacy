@@ -58,6 +58,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
+            <global-variable key="support-markets" value="{{supportMarkets}}"></global-variable>
+
             <simple-toolbar slot="secondary-toolbar" title="Market" id="[[market]]" back-link="#/markets" tabindex="-1"></simple-toolbar>
             <div class="sections" unresolved>
                 <paper-card id="charts">
@@ -75,6 +77,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </div>
                 </paper-card>
                 <paper-card class="operation-panel-container">
+                    <template is="dom-if" if="[[isSupportMarket(market,supportMarkets)]]">
                     <template is="dom-if" if="[[_isUnlocked(wallet)]]">
                         <operation-panel page="{{computedPage}}" subpage="{{computedSubpage}}"></operation-panel>
                     </template>
@@ -83,6 +86,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <paper-button primary>Unlock your wallet to trade</paper-button>
                         </a>
                     </div>
+                    </template>
+                    <template is="dom-if" if="[[!isSupportMarket(market,supportMarkets)]]">
+                        <div class="walletlink">
+                            <a href="/#/settings" class="walletlink">
+                               <paper-button primary> Current relay doesn't support [[market]] Market, change relay to trade</paper-button>
+                            </a>
+                        </div>
+                    </template>
                 </paper-card>
                 <paper-card>
                     <order-book id="orderbook" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-book>
@@ -159,6 +170,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             Array.prototype.forEach.call(this.root.querySelectorAll('a'), (item) => {
                 item.tabIndex = "-1";
             });
+        }
+
+        isSupportMarket(market, supportMarkets){
+
+            if(market && supportMarkets){
+                return _.indexOf(supportMarkets, market.toUpperCase()) > -1;
+            }else {
+                return false;
+            }
         }
 
         _computedMarket(route) {
