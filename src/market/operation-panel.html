@@ -585,7 +585,7 @@
                     } else {
                         const require = new BigNumber(data.amountS).plus(response.result) ;
                         if (require.gt(allowance)) {
-                            const amount = new BigNumber("9223372036854775806").times(Number('1e'+this.tokenb.digits));
+                            const amount = new BigNumber('9223372036854775806').times(Number('1e'+this.tokenb.digits));
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -619,7 +619,7 @@
                         const lrcResponse =  await relay.getEstimatedAllocatedAllowance(this.wallet.address, 'LRC');
                         const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
                         if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times(Number('1e' + this.lrc.digits))) ) {
-                            const lrcAmount = new BigNumber("9223372036854775806").times(Number('1e'+this.lrc.digits));
+                            const lrcAmount = new BigNumber('9223372036854775806').times(Number('1e'+this.lrc.digits));
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -667,7 +667,7 @@
                         detail: detail
                     }));
                 } catch (e) {
-
+                console.log(e);
                     const detail = {
                         text: e.message,
                         category: "error",
@@ -771,7 +771,7 @@
                         const require = new BigNumber(data.amountS).plus(data.lrcFee).plus(response.result) ;
 
                         if (require .gt(allowance) ) {
-                            const amount = new BigNumber("9223372036854775806").times(Number('1e'+this.tokens.digits));
+                            const amount = new BigNumber('9223372036854775806').times(Number('1e'+this.tokens.digits));
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -805,7 +805,7 @@
                         const require = new BigNumber(data.amountS).plus(response.result) ;
 
                         if (require.gt(allowance) ) {
-                            const amount = new BigNumber("9223372036854775806").times(Number('1e'+this.tokens.digits));
+                            const amount = new BigNumber('9223372036854775806').times(Number('1e'+this.tokens.digits));
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -840,7 +840,7 @@
                         const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
 
                         if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times(Number('1e' + this.lrc.digits))) ) {
-                            const lrcAmount = new BigNumber("9223372036854775806").times(Number('1e'+this.lrc.digits));
+                            const lrcAmount = new BigNumber('9223372036854775806').times(Number('1e'+this.lrc.digits));
 
                             const tx = {};
                             tx.gasPrice = gasPrice;
@@ -892,7 +892,7 @@
 
 
                 } catch (e) {
-
+                    console.log(e);
                     const detail = {text: e.message, category: "error", duration: 5000};
 
                     this.dispatchEvent(new CustomEvent('notification', {
