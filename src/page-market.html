@@ -55,6 +55,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         div.hidden {
             visibility: hidden;
         }
+
+        div.warning {
+            color: var(--google-red-500);
+        }
+
         </style>
         <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -77,7 +82,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </div>
                 </paper-card>
                 <paper-card class="operation-panel-container">
-                    <template is="dom-if" if="[[isSupportMarket(market,supportMarkets)]]">
                     <template is="dom-if" if="[[_isUnlocked(wallet)]]">
                         <operation-panel page="{{computedPage}}" subpage="{{computedSubpage}}"></operation-panel>
                     </template>
@@ -86,14 +90,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <paper-button primary>Unlock your wallet to trade</paper-button>
                         </a>
                     </div>
-                    </template>
-                    <template is="dom-if" if="[[!isSupportMarket(market,supportMarkets)]]">
-                        <div class="walletlink">
-                            <a href="/#/settings" class="walletlink">
-                               <paper-button primary> Current relay doesn't support [[market]] Market, change relay to trade</paper-button>
-                            </a>
-                        </div>
-                    </template>
                 </paper-card>
                 <paper-card>
                     <order-book id="orderbook" page="{{computedPage}}" subpage="{{computedSubpage}}"></order-book>
@@ -172,15 +168,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             });
         }
 
-        isSupportMarket(market, supportMarkets){
 
-            if(market && supportMarkets){
-                return _.indexOf(supportMarkets, market.toUpperCase()) > -1;
-            }else {
-                return false;
-            }
+        static get observers() {
+            return [
+                '_redirect(market, supportMarkets,route)'
+            ]
         }
 
+        _redirect(market, supportMarkets, route){
+
+            if(route){
+                let parameters = this._returnParameters(route);
+                if(parameters && parameters.page && parameters.page === 'market' && market && supportMarkets && _.indexOf(supportMarkets, market.toUpperCase()) === -1){
+                    window.location.href = "#/markets";
+                }
+            }
+        }
         _computedMarket(route) {
             let params = this._returnParameters(route);
             if (params && params.page && "market" === params.page && params.subpage) {
