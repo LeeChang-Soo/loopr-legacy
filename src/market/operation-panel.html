@@ -617,7 +617,7 @@
 
                         const lrcResponse =  await relay.getEstimatedAllocatedAllowance(this.wallet.address, 'LRC');
                         const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
-                        if (lrcRequest.gt(new BigNumber(this.lrcAllowance.toString()).times('1e' + this.lrc.digits)) ) {
+                        if (lrcRequest.gt(new BigNumber(this.lrcAllowance.toString()).times('1e' + this.lrc.digits))) {
                             const lrcAmount = new BigNumber('9223372036854775806').times('1e'+this.lrc.digits);
                             const tx = {};
                             tx.gasPrice = gasPrice;
@@ -766,9 +766,7 @@
                     const response = await relay.getEstimatedAllocatedAllowance(this.wallet.address, this.tokens.token.toUpperCase());
 
                     if (this.tokens.token.toUpperCase() === 'LRC') {
-
                         const require = new BigNumber(data.amountS).plus(data.lrcFee).plus(response.result) ;
-
                         if (require .gt(allowance) ) {
                             const amount = new BigNumber('9223372036854775806').times('1e'+this.tokens.digits);
                             const tx = {};
@@ -838,7 +836,7 @@
                         const lrcResponse = await relay.getEstimatedAllocatedAllowance(this.wallet.address, 'LRC');
                         const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
 
-                        if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times('1e' + this.lrc.digits)) ) {
+                        if (lrcRequest.gt(new BigNumber(this.lrcAllowance.toString()).times('1e' + this.lrc.digits)) ) {
                             const lrcAmount = new BigNumber('9223372036854775806').times('1e'+this.lrc.digits);
 
                             const tx = {};
