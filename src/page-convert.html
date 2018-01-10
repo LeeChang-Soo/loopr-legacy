@@ -415,7 +415,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         tx.value = '0x' + (new BigNumber(this.$.amount.value).times(1e18)).toString(16);
                         tx.data = '0xd0e30db0';
                         subTitle = 'Convert ETH to  WETH';
-                        description = 'Convert ' + this.$.amount.value + ' ETH to WETH with gas is ' + Number(tx.gasLimit) + ' and gasPrice  is '+ Number(tx.gasPrice)/1e9 + 'Gwei'
+                        description = 'Convert ' + this.$.amount.value + ' ETH to WETH with gas is ' + Number(tx.gasLimit) + ' and gasPrice  is '+ Number(tx.gasPrice)/1e9 + 'Gwei';
+                        const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
+                        if (ETHBalance < (Number(tx.gasLimit) * Number(tx.gasPrice))) {
+                            const detail = {
+                                text: 'You has insufficient ETH balance for gasLimit * gasPrice',
+                                category: "warning",
+                                duration: 8000
+                            };
+                            this.dispatchEvent(new CustomEvent('notification', {
+                                bubbles: true,
+                                composed: true,
+                                detail: detail
+                            }));
+                            return;
+                        }
                         if (new BigNumber(this.fromTokenBalance.balance).lt(new BigNumber(tx.value).plus(new BigNumber(tx.gasLimit).times(Number(tx.gasPrice))))) {
                             const detail = {
                                 tx: tx,
@@ -456,6 +470,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     const detail = {raws: [{raw: JSON.stringify(tx), subTitle, description}]};
                     this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
                 } catch (e) {
+                    console.log(e);
                     var detail = {text: e.message, category: "error", duration: 8000}
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,

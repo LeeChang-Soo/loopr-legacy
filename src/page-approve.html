@@ -519,6 +519,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     
                     this.dispatchEvent(new CustomEvent('signtosend', {bubbles: true, composed: true, detail: detail}));
                 } catch (e) {
+                    console.log(e);
                     var detail = {text: e.message, category: "error", duration: 8000}
                     this.dispatchEvent(new CustomEvent('notification', {
                         bubbles: true,
