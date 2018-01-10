@@ -728,7 +728,7 @@
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
                     data.amountS = '0x' + new BigNumber(this.sellAmount.toString()).times('1e' + this.tokens.digits).toString(16);
-                    data.amountB = '0x' + new BigNumber(new BigNumber(this.sellAmount.toString()).times(this.sellPrice).times('1e' + this.tokenb.digits).toFixed(0)).toString(16);
+                    data.amountB = '0x' + new BigNumber(new BigNumber(this.sellAmount.toString()).times(this.sellPrice.toString()).times('1e' + this.tokenb.digits).toFixed(0)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     let ttl = this.appConfig.defaultExpireTime * 24 * 3600;
                     if (this.settingsExpireTimeUnit === "Day") {
