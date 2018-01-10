@@ -490,8 +490,8 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokenb.address;
                     data.tokenB = this.tokens.address;
-                    data.amountS = '0x' +new  BigNumber(new BigNumber(this.buyAmount).times(this.buyPrice).times('1e' + this.tokenb.digits).toFixed(0)).toString(16);
-                    data.amountB = '0x' + new BigNumber(this.buyAmount).times('1e' + this.tokens.digits).toString(16);
+                    data.amountS = '0x' +new  BigNumber(new BigNumber(this.buyAmount.toString()).times(this.buyPrice.toString()).times('1e' + this.tokenb.digits).toFixed(0)).toString(16);
+                    data.amountB = '0x' + new BigNumber(this.buyAmount.toString()).times('1e' + this.tokens.digits).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     let ttl = this.appConfig.defaultExpireTime * 24 * 3600;
                     if (this.settingsExpireTimeUnit === "Day") {
@@ -728,7 +728,7 @@
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
                     data.amountS = '0x' + new BigNumber(this.sellAmount.toString()).times('1e' + this.tokens.digits).toString(16);
-                    data.amountB = '0x' + new BigNumber(new BigNumber(this.sellAmount).times(this.sellPrice).times('1e' + this.tokenb.digits).toFixed(0)).toString(16);
+                    data.amountB = '0x' + new BigNumber(new BigNumber(this.sellAmount.toString()).times(this.sellPrice).times('1e' + this.tokenb.digits).toFixed(0)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     let ttl = this.appConfig.defaultExpireTime * 24 * 3600;
                     if (this.settingsExpireTimeUnit === "Day") {
@@ -838,8 +838,8 @@
                         const lrcResponse = await relay.getEstimatedAllocatedAllowance(this.wallet.address, 'LRC');
                         const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
 
-                        if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times(Number('1e' + this.lrc.digits))) ) {
-                            const lrcAmount = new BigNumber('9223372036854775806').times(Number('1e'+this.lrc.digits));
+                        if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times('1e' + this.lrc.digits)) ) {
+                            const lrcAmount = new BigNumber('9223372036854775806').times('1e'+this.lrc.digits);
 
                             const tx = {};
                             tx.gasPrice = gasPrice;
