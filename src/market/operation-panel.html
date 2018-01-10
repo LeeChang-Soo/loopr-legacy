@@ -424,7 +424,6 @@
                 if(precision){
                     return "^[1-9]\\d*(\\.\\d{1," + precision + "})?$|^0\\.(\\d{1," + (precision - 1) + "})?[1-9]$";
                 }
-
             }
 
             _computeBuyTotal(amount, price, tokenb) {
@@ -491,8 +490,8 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokenb.address;
                     data.tokenB = this.tokens.address;
-                    data.amountS = '0x' +new  BigNumber(new BigNumber(this.buyAmount).times(this.buyPrice).times(Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
-                    data.amountB = '0x' + new BigNumber(this.buyAmount).times(Number('1e' + this.tokens.digits)).toString(16);
+                    data.amountS = '0x' +new  BigNumber(new BigNumber(this.buyAmount).times(this.buyPrice).times('1e' + this.tokenb.digits).toFixed(0)).toString(16);
+                    data.amountB = '0x' + new BigNumber(this.buyAmount).times('1e' + this.tokens.digits).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     let ttl = this.appConfig.defaultExpireTime * 24 * 3600;
                     if (this.settingsExpireTimeUnit === "Day") {
@@ -519,7 +518,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = this.isEnoughFee(this.buyFee, this.lrcBalance,this.tokenb,this.buyTotal) ? '0x' + new BigNumber(this._showAmount(this.buyFee)).times(Number('1e' + this.lrc.digits)).toString(16) : '0x0';
+                    data.lrcFee = this.isEnoughFee(this.buyFee, this.lrcBalance,this.tokenb,this.buyTotal) ? '0x' + new BigNumber(this._showAmount(this.buyFee).toString()).times('1e' + this.lrc.digits).toString(16) : '0x0';
                     data.buyNoMoreThanAmountB = true;
                     data.marginSplitPercentage = Number(data.lrcFee) !==0 ? Number(this.settingsMarginSplit) : 100;
                     detail.order = {
@@ -537,7 +536,7 @@
                         convertTx.gasLimit = gasLimit;
                         convertTx.to = WETHConfig.address;
                         const value = Number(this.buyAmount) * this.buyPrice - this.tokenbBalance ;
-                        convertTx.value = '0x' + new BigNumber(Number('1e' + WETHConfig.digits)).times(value.toString(10)).toString(16);
+                        convertTx.value = '0x' + new BigNumber('1e' + WETHConfig.digits).times(value.toString(10)).toString(16);
                         const subTitle = 'Convert ETH to  WETH';
                         const description = 'Convert ' + Math.floor((Number(this.buyAmount) * this.buyPrice - this.tokenbBalance) * Number('1e'+this.eth.precision))/ Number('1e'+this.eth.precision) + ' ETH to WETH with gas is ' + Number(convertTx.gasLimit) + ' and gasPrice  is ' + Number(convertTx.gasPrice) / 1e9 + 'Gwei';
                         raws.push({
@@ -549,12 +548,12 @@
                     const relay = new Relay(this.settingsRelay+"/rpc");
                     const response =  await relay.getEstimatedAllocatedAllowance(this.wallet.address, this.tokenb.token.toUpperCase());
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
-                    const allowance = balances[this.tokenb.token.toUpperCase()].allowance ? new BigNumber(balances[this.tokenb.token.toUpperCase()].allowance) : new BigNumber(0);
+                    const allowance = balances[this.tokenb.token.toUpperCase()].allowance ? new BigNumber((balances[this.tokenb.token.toUpperCase()].allowance).toString()) : new BigNumber(0);
 
                     if (this.tokenb.token.toUpperCase() === 'LRC') {
-                        const require = new BigNumber(data.amountS).plus(data.buyFee).plus(response.result) ;
+                        const require = new BigNumber(data.amountS).plus(data.lrcFee).plus(response.result) ;
                         if (require.gt(allowance)) {
-                            const amount = new BigNumber('100000000').times(Number('1e'+this.tokenb.digits));
+                            const amount = new BigNumber('9223372036854775806').times('1e'+this.tokenb.digits);
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -585,7 +584,7 @@
                     } else {
                         const require = new BigNumber(data.amountS).plus(response.result) ;
                         if (require.gt(allowance)) {
-                            const amount = new BigNumber('100000000').times(Number('1e'+this.tokenb.digits));
+                            const amount = new BigNumber('9223372036854775806').times('1e'+this.tokenb.digits);
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -618,8 +617,8 @@
 
                         const lrcResponse =  await relay.getEstimatedAllocatedAllowance(this.wallet.address, 'LRC');
                         const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
-                        if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times(Number('1e' + this.lrc.digits))) ) {
-                            const lrcAmount = new BigNumber('100000000').times(Number('1e'+this.lrc.digits));
+                        if (lrcRequest.gt(new BigNumber(this.lrcAllowance.toString()).times('1e' + this.lrc.digits)) ) {
+                            const lrcAmount = new BigNumber('9223372036854775806').times('1e'+this.lrc.digits);
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -728,8 +727,8 @@
                     data.owner = this.wallet.address;
                     data.tokenS = this.tokens.address;
                     data.tokenB = this.tokenb.address;
-                    data.amountS = '0x' + new BigNumber(this.sellAmount).times(Number('1e' + this.tokens.digits)).toString(16);
-                    data.amountB = '0x' + new BigNumber(new BigNumber(this.sellAmount).times(this.sellPrice).times(Number('1e' + this.tokenb.digits)).toFixed(0)).toString(16);
+                    data.amountS = '0x' + new BigNumber(this.sellAmount.toString()).times('1e' + this.tokens.digits).toString(16);
+                    data.amountB = '0x' + new BigNumber(new BigNumber(this.sellAmount).times(this.sellPrice).times('1e' + this.tokenb.digits).toFixed(0)).toString(16);
                     data.timestamp = Number((new Date().getTime() / 1000).toFixed(0));
                     let ttl = this.appConfig.defaultExpireTime * 24 * 3600;
                     if (this.settingsExpireTimeUnit === "Day") {
@@ -753,7 +752,7 @@
                         }));
                         return;
                     }
-                    data.lrcFee = this.isEnoughFee(this.sellFee, this.lrcBalance,this.tokens,this.sellAmount) ? '0x' + new BigNumber(this._showAmount(this.sellFee)).times(Number('1e' + this.lrc.digits)).toString(16) : '0x0';
+                    data.lrcFee = this.isEnoughFee(this.sellFee, this.lrcBalance,this.tokens,this.sellAmount) ? '0x' + new BigNumber(this._showAmount(this.sellFee).toString()).times('1e' + this.lrc.digits).toString(16) : '0x0';
                     data.buyNoMoreThanAmountB = false;
                     data.marginSplitPercentage = Number(data.lrcFee) !==0 ? Number(this.settingsMarginSplit) : 100;
                     detail.order = {
@@ -762,7 +761,7 @@
                         description:"Sell "+ Number(this.sellAmount) +" "+ this.tokens.token.toUpperCase()+"  to get "+ Number(this.sellTotal) +" "+ this.tokenb.token.toUpperCase()
                     };
                     const balances = _.keyBy(this.balancesRaw.result.tokens, 'token');
-                    const allowance = balances[this.tokens.token.toUpperCase()].allowance ? new BigNumber(balances[this.tokens.token.toUpperCase()].allowance) : new BigNumber(0);
+                    const allowance = balances[this.tokens.token.toUpperCase()].allowance ? new BigNumber((balances[this.tokens.token.toUpperCase()].allowance).toString()) : new BigNumber(0);
                     const relay = new Relay(this.settingsRelay+"/rpc");
                     const response = await relay.getEstimatedAllocatedAllowance(this.wallet.address, this.tokens.token.toUpperCase());
 
@@ -771,7 +770,7 @@
                         const require = new BigNumber(data.amountS).plus(data.lrcFee).plus(response.result) ;
 
                         if (require .gt(allowance) ) {
-                            const amount = new BigNumber('100000000').times(Number('1e'+this.tokens.digits));
+                            const amount = new BigNumber('9223372036854775806').times('1e'+this.tokens.digits);
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -805,7 +804,7 @@
                         const require = new BigNumber(data.amountS).plus(response.result) ;
 
                         if (require.gt(allowance) ) {
-                            const amount = new BigNumber('100000000').times(Number('1e'+this.tokens.digits));
+                            const amount = new BigNumber('9223372036854775806').times('1e'+this.tokens.digits);
                             const tx = {};
                             tx.gasPrice = gasPrice;
                             tx.gasLimit = gasLimit;
@@ -840,7 +839,7 @@
                         const lrcRequest = new BigNumber(data.lrcFee).plus(lrcResponse.result);
 
                         if (lrcRequest.gt(new BigNumber(this.lrcAllowance).times(Number('1e' + this.lrc.digits))) ) {
-                            const lrcAmount = new BigNumber('100000000').times(Number('1e'+this.lrc.digits));
+                            const lrcAmount = new BigNumber('9223372036854775806').times(Number('1e'+this.lrc.digits));
 
                             const tx = {};
                             tx.gasPrice = gasPrice;
@@ -954,28 +953,28 @@
                     const balances = _.keyBy(rawBalances.result.tokens, 'token');
 
                     if(eth){
-                        this.ethBalance = balances['ETH'] ? Number(new BigNumber(balances['ETH'].balance).dividedBy(1e18).toFixed(eth ? eth.precision : 6)) : 0;
+                        this.ethBalance = balances['ETH'] ? Number(new BigNumber((balances['ETH'].balance).toString()).dividedBy(1e18).toFixed(eth ? eth.precision : 6)) : 0;
                     }
 
                     if (tokens) {
-                        const balance = balances[tokens.token.toUpperCase()] ? new BigNumber(balances[tokens.token.toUpperCase()].balance) : 0;
-                        const allowance = balances[tokens.token.toUpperCase()] ? new BigNumber(balances[tokens.token.toUpperCase()].allowance) : 0;
-                        this.tokensBalance = Number(balance.dividedBy(Number('1e' + tokens.digits)).toFixed(tokens.precision));
-                        this.tokensAllowance = Number(allowance.dividedBy(Number('1e' + tokens.digits)).toFixed(tokens.precision));
+                        const balance = balances[tokens.token.toUpperCase()] ? new BigNumber((balances[tokens.token.toUpperCase()].balance).toString()) : 0;
+                        const allowance = balances[tokens.token.toUpperCase()] ? new BigNumber((balances[tokens.token.toUpperCase()].allowance).toString()) : 0;
+                        this.tokensBalance = Number(balance.dividedBy('1e' + tokens.digits).toFixed(tokens.precision));
+                        this.tokensAllowance = Number(allowance.dividedBy('1e' + tokens.digits).toFixed(tokens.precision));
 
                     }
                     if (tokenb) {
-                        const balance = balances[tokenb.token.toUpperCase()] ? new BigNumber(balances[tokenb.token.toUpperCase()].balance) : 0;
-                        const allowance = balances[tokenb.token.toUpperCase()].allowance ? new BigNumber(balances[tokenb.token.toUpperCase()].allowance) : 0;
-                        this.tokenbBalance = Number(balance.dividedBy(Number('1e' + tokenb.digits)).toFixed(tokenb.precision));
-                        this.tokenbAllowance = Number(allowance.dividedBy(Number('1e' + tokenb.digits)).toFixed(tokenb.precision));
+                        const balance = balances[tokenb.token.toUpperCase()] ? new BigNumber((balances[tokenb.token.toUpperCase()].balance).toString()) : 0;
+                        const allowance = balances[tokenb.token.toUpperCase()].allowance ? new BigNumber((balances[tokenb.token.toUpperCase()].allowance).toString()) : 0;
+                        this.tokenbBalance = Number(balance.dividedBy('1e' + tokenb.digits).toFixed(tokenb.precision));
+                        this.tokenbAllowance = Number(allowance.dividedBy('1e' + tokenb.digits).toFixed(tokenb.precision));
                     }
 
                     if (lrc) {
-                        const balance = balances[lrc.token.toUpperCase()] ? new BigNumber(balances[lrc.token.toUpperCase()].balance) : 0;
-                        const allowance = balances[lrc.token.toUpperCase()].allowance ? new BigNumber(balances[lrc.token.toUpperCase()].allowance) : 0;
-                        this.lrcBalance = Number(balance.dividedBy(Number('1e' + lrc.digits)).toFixed(lrc.precision));
-                        this.lrcAllowance = Number(allowance.dividedBy(Number('1e' + lrc.digits)).toFixed(lrc.precision));
+                        const balance = balances[lrc.token.toUpperCase()] ? new BigNumber((balances[lrc.token.toUpperCase()].balance).toString()) : 0;
+                        const allowance = balances[lrc.token.toUpperCase()].allowance ? new BigNumber((balances[lrc.token.toUpperCase()].allowance).toString()) : 0;
+                        this.lrcBalance = Number(balance.dividedBy('1e' + lrc.digits).toFixed(lrc.precision));
+                        this.lrcAllowance = Number(allowance.dividedBy('1e' + lrc.digits).toFixed(lrc.precision));
                     }
 
                 }
