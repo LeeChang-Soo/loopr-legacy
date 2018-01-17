@@ -109,6 +109,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             padding: 0px;
         }
 
+        .address {
+            font-size: 2px;
+            font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", "Microsoft YaHei", "\\5FAE软雅黑", Arial, sans-serif;
+        }
+
         </style>
         <loopr-page>
             <global-variable key="wallet" value="{{wallet}}"></global-variable>
@@ -192,7 +197,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <template is="dom-if" if="[[_isShowBindQtum(wallet)]]">
                                 <div class="item horizontal center layout">
                                     <div class="label">Bind QTUM Address</div>
-                                    <vaadin-text-field id="qtumAddress" value="[[qtumAddress]]" pattern="[[_length()]]" error-message="Not a valid QTUM address"></vaadin-text-field>
+                                    <vaadin-text-field id="qtumAddress"class="address" value="[[qtumAddress]]" minlength="34" maxlength="34" pattern="[[_length()]]" error-message="Not a valid QTUM address"></vaadin-text-field>
                                     <template is="dom-if" if="[[_isQtumBindable(wallet, appConfig)]]">
                                         <div class="qtumBind"><paper-button raised class="avaliable" on-click="_bindQtum">Bind</paper-button></div>
                                     </template>
@@ -201,7 +206,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <template is="dom-if" if="[[_isShowBindNeo(wallet)]]">
                                 <div class="item horizontal center layout">
                                     <div class="label">Bind NEO Address</div>
-                                    <vaadin-text-field id="neoAddress" value="[[neoAddress]]" pattern="[[_length()]]" error-message="Not a valid NEO address"></vaadin-text-field>
+                                    <vaadin-text-field id="neoAddress" class="address" value="[[neoAddress]]" minlength="34" maxlength="34" pattern="[[_length()]]" error-message="Not a valid NEO address"></vaadin-text-field>
                                     <template is="dom-if" if="[[_isNeoBindable(wallet, appConfig)]]">
                                         <div class="neoBind"><paper-button raised class="avaliable" on-click="_bindNeo">Bind</paper-button></div>
                                     </template>
@@ -211,8 +216,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </div>
                 </paper-card>
                 <paper-progress indeterminate disabled$="{{!loading}}" class="data-loading"></paper-progress>
-                <iron-ajax id="getData" url="http://ec2-13-112-62-24.ap-northeast-1.compute.amazonaws.com:8888/getAddress" method="GET" params="[[getBindParams]]" handle-as="json" last-response="{{getBindResult}}" debounce-duration="300" loading="{{loading}}" on-error="_bindError"></iron-ajax>
-                <iron-ajax id="sendData" url="http://ec2-13-112-62-24.ap-northeast-1.compute.amazonaws.com:8888/setAddress" method="GET" params="[[bindParams]]" handle-as="json" last-response="{{bindResult}}" debounce-duration="300" on-error="_bindError"></iron-ajax>
+                <iron-ajax id="getData" url="https://relay1.loopring.io/lrx/getAddress" method="GET" params="[[getBindParams]]" handle-as="json" last-response="{{getBindResult}}" debounce-duration="300" loading="{{loading}}" on-error="_bindError"></iron-ajax>
+                <iron-ajax id="sendData" url="https://relay1.loopring.io/lrx/setAddress" method="GET" params="[[bindParams]]" handle-as="json" last-response="{{bindResult}}" debounce-duration="300" on-error="_bindError"></iron-ajax>
                 <div class="footer-spacer"></div>
                 <loopr-footer></loopr-footer>
             </div>
@@ -370,7 +375,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         _bindQtum(e) {
             let qtumAddress = this.shadowRoot.querySelector('#qtumAddress').value;
             if (this.wallet && qtumAddress && qtumAddress.match(this._length())) {
-                this.bindParams = { ethAddress: this.wallet.address, qtumAddress:qtumAddress};
+                let time = Date.parse(new Date());
+                let raw = "ethAddress:"+this.wallet.address+"qtumAddress:"+qtumAddress+"timestamp:"+time;
+                let sign = signer.sign(raw, this.wallet.privateKey);
+                this.bindParams =  { ethAddress: this.wallet.address, qtumAddress:qtumAddress, timestamp: time, sign:JSON.stringify(sign) };
                 this.$.sendData.generateRequest();
             }
         }
@@ -378,7 +386,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         _bindNeo(e) {
             let neoAddress = this.shadowRoot.querySelector('#neoAddress').value;
             if (this.wallet && neoAddress && neoAddress.match(this._length())) {
-                this.bindParams = { ethAddress: this.wallet.address, neoAddress:neoAddress};
+                let time = Date.parse(new Date());
+                let raw = "ethAddress:"+this.wallet.address+"neoAddress:"+neoAddress+"timestamp:"+time;
+                let sign = signer.sign(raw, this.wallet.privateKey);
+                this.bindParams =  { ethAddress: this.wallet.address, neoAddress:neoAddress, timestamp: time, sign:JSON.stringify(sign) };
                 this.$.sendData.generateRequest();
             }
         }
@@ -395,7 +406,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.neoAddress = getBindResult.data.neo;
             } else {
                 console.log(getBindResult)
-                let message = "Failed to talk to server,Please try again later"
+                let message = "Failed to get bind address,Please try again later"
                 var detail = { text: message, category: "error", duration: 30000 }
                 this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
             }
@@ -409,6 +420,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             } else {
                 console.log(bindResult)
                 let message = "Failed to talk to server,Please try again later"
+                if(bindResult.code === 1001) {
+                    message = "Failed to bind address, Please confirm the ETH address is yours";
+                }
                 var detail = { text: message, category: "error", duration: 30000 }
                 this.dispatchEvent(new CustomEvent('notification', { bubbles: true, composed: true, detail: detail }));
             }

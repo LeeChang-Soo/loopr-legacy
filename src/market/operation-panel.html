@@ -465,20 +465,20 @@
                         return;
                     }
 
-                    const whiteList = _.map(this.appConfig.whiteList,add => add.toLowerCase());
-                    if (whiteList && whiteList.indexOf(this.wallet.address.toLocaleLowerCase()) < 0) {
-                        const detail = {
-                            text: 'Your address is not in white list, could not submit order',
-                            category: "warning",
-                            duration: 5000
-                        };
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-                        return;
-                    }
+//                    const whiteList = _.map(this.appConfig.whiteList,add => add.toLowerCase());
+//                    if (whiteList && whiteList.indexOf(this.wallet.address.toLocaleLowerCase()) < 0) {
+//                        const detail = {
+//                            text: 'Your address is not in white list, could not submit order',
+//                            category: "warning",
+//                            duration: 5000
+//                        };
+//                        this.dispatchEvent(new CustomEvent('notification', {
+//                            bubbles: true,
+//                            composed: true,
+//                            detail: detail
+//                        }));
+//                        return;
+//                    }
 
                     let data = {};
                     const detail = {};
@@ -703,20 +703,20 @@
                     if (!this.appConfig || !this.settingsMarginSplit || !this.settingsLrcFee || !this.settingsExpireTime || !this.settingsExpireTimeUnit) {
                         return;
                     }
-                     const whiteList = _.map(this.appConfig.whiteList,add => add.toLowerCase());
-                    if (whiteList && whiteList.indexOf(this.wallet.address.toLowerCase()) < 0) {
-                        const detail = {
-                            text: 'Your address is not in white list, could not submit order',
-                            category: "warning",
-                            duration: 5000
-                        };
-                        this.dispatchEvent(new CustomEvent('notification', {
-                            bubbles: true,
-                            composed: true,
-                            detail: detail
-                        }));
-                        return;
-                    }
+//                     const whiteList = _.map(this.appConfig.whiteList,add => add.toLowerCase());
+//                    if (whiteList && whiteList.indexOf(this.wallet.address.toLowerCase()) < 0) {
+//                        const detail = {
+//                            text: 'Your address is not in white list, could not submit order',
+//                            category: "warning",
+//                            duration: 5000
+//                        };
+//                        this.dispatchEvent(new CustomEvent('notification', {
+//                            bubbles: true,
+//                            composed: true,
+//                            detail: detail
+//                        }));
+//                        return;
+//                    }
                     const detail = {};
                     const data = {};
                     const raws = [];
