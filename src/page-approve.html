@@ -474,7 +474,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         return;
                     }
                     const spender = this.appConfig.delegateAddress;
-                    const currentAllowance = Number(this.balances[this.token].allowance);
+                    const currentAllowance = new BigNumber((this.balances[this.token].allowance).toString());
                     const tx = {};
                     tx.gasPrice = '0x' + (Number(this.settingsGasPrice) * 1e9).toString(16);
                     tx.gasLimit = '0x' + Number(this.$.gasLimit.value).toString(16);
@@ -482,8 +482,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     tx.value = '0x0';
                     const ETHBalance = this.balances['ETH'] ? this.balances['ETH'].balance : 0;
 
-                    if (currentAllowance === 0 || Number(this.$.amount.value) === 0 ) {
-                        tx.data = signer.generateApproveData(spender, '0x' + (new BigNumber(this.$.amount.value).times(Number('1e' + this.selectedTokenBalance.digits))).toString(16));
+                    if (currentAllowance.equals(0) || Number(this.$.amount.value) === 0 ) {
+                        tx.data = signer.generateApproveData(spender, '0x' + (new BigNumber(this.$.amount.value).times('1e' + this.selectedTokenBalance.digits)).toString(16));
                         detail = {
                             raws: [{"raw": JSON.stringify(tx), "subTitle": "New Authorization Of " + this.selectedTokenBalance.token.toUpperCase(),"description":"Set allowance  to " + this.$.amount.value+" with gas is "+Number(tx.gasLimit)+ " and gasPrice is " + Number(tx.gasPrice)/1e9 + "Gwei."
                             }]
@@ -492,7 +492,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     } else {
                         tx.data = signer.generateApproveData(spender, '0x0');
                         const cancelRaw = JSON.stringify(tx);
-                        tx.data = signer.generateApproveData(spender, '0x' + (new BigNumber(this.$.amount.value).times(Number('1e' + this.selectedTokenBalance.digits))).toString(16));
+                        tx.data = signer.generateApproveData(spender, '0x' + (new BigNumber(this.$.amount.value).times('1e' + this.selectedTokenBalance.digits)).toString(16));
                         detail = {
                             raws: [{
                                 "raw": cancelRaw,
