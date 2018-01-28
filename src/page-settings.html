@@ -187,31 +187,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     <div class="value-label"><span id="gasPriceLabel" class="caption">{{appConfig.defaultGasPrice}}GWEI</span></div>
                                 </div>
                             </div>
-                            <div class="item horizontal center layout">
-                                <div class="label">Order Expire Time</div>
-                                <div class="horizontal start-justified layout">
-                                    <vaadin-text-field class="time-input" id="expireTime" pattern="[[_expireTimePatten()]]" error-message="[[_expireTimeError()]]"></vaadin-text-field>
-                                    <vaadin-combo-box class="time-selector" id="timeUnits" items="{{timeUnits}}"></vaadin-combo-box>
-                                </div>
-                            </div>
-                            <template is="dom-if" if="[[_isShowBindQtum(wallet)]]">
-                                <div class="item horizontal center layout">
-                                    <div class="label">Bind QTUM Address</div>
-                                    <vaadin-text-field id="qtumAddress" value="[[qtumAddress]]" class="address" minlength="34" maxlength="34" pattern="[[_length()]]" error-message="Not a valid QTUM address"></vaadin-text-field>
-                                    <template is="dom-if" if="[[_isQtumBindable(wallet, appConfig)]]">
-                                        <div class="qtumBind"><paper-button raised class="avaliable" on-click="_bindQtum">Bind</paper-button></div>
-                                    </template>
-                                </div>
-                            </template>
-                            <template is="dom-if" if="[[_isShowBindNeo(wallet)]]">
-                                <div class="item horizontal center layout">
-                                    <div class="label">Bind NEO Address</div>
-                                    <vaadin-text-field id="neoAddress" value="[[neoAddress]]" class="address" minlength="34" maxlength="34" pattern="[[_length()]]" error-message="Not a valid NEO address"></vaadin-text-field>
-                                    <template is="dom-if" if="[[_isNeoBindable(wallet, appConfig)]]">
-                                        <div class="neoBind"><paper-button raised class="avaliable" on-click="_bindNeo">Bind</paper-button></div>
-                                    </template>
-                                </div>
-                            </template>
                         </div>
                     </div>
                 </paper-card>
